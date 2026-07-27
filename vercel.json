@@ -1,0 +1,5 @@
+{
+  "buildCommand": "cp output/locallist.html output/index.html",
+  "outputDirectory": "output",
+  "cleanUrls": true
+}

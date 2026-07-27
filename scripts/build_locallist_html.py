@@ -23,6 +23,7 @@ SETUPS = DATA / "hardware-setups.json"
 BL_STATS = DATA / "benchmarklist-stats.json"
 EBAY_PRICES = DATA / "ebay-prices.json"
 OUT = OUTPUT / "locallist.html"
+INDEX_OUT = OUTPUT / "index.html"
 HAMSTERS_OUT = OUTPUT / "hamsters.html"
 
 _EBAY_CACHE: dict | None = None
@@ -3285,9 +3286,12 @@ def main() -> None:
     rows = [by_id[mid] for mid in liked_ids if mid in by_id]
     rows.sort(key=lambda r: (r.get("month", ""), r.get("id", "")), reverse=True)
     bl_stats = json.loads(BL_STATS.read_text(encoding="utf-8")) if BL_STATS.exists() else {}
-    OUT.write_text(build_html(rows, bl_stats), encoding="utf-8")
+    html = build_html(rows, bl_stats)
+    OUT.write_text(html, encoding="utf-8")
+    INDEX_OUT.write_text(html, encoding="utf-8")
     HAMSTERS_OUT.write_text(build_hamsters_html(), encoding="utf-8")
     print(f"Wrote {OUT} ({len(rows)} setups)")
+    print(f"Wrote {INDEX_OUT}")
     print(f"Wrote {HAMSTERS_OUT}")
 
 
