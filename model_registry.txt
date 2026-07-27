@@ -1,0 +1,258 @@
+# LocalLLM Model Registry
+# Canonical slugs and aliases for matching Discord messages.
+# Format:  canonical_slug  |  alias1, alias2, alias3
+# Use canonical_slug in output JSON. Match any alias (case-insensitive).
+#
+# Updated: 2026-07-19 · Source: LocalLLM Discord Jul 2025 – Jul 2026
+
+# =============================================================================
+# OPEN-WEIGHT — PRIMARY (local / self-hosted focus)
+# =============================================================================
+
+# --- OpenAI GPT-OSS ---
+gpt-oss-120b          | gpt oss 120b, gpt-oss-120b, oss-120b, oss120b, gpt oss 120 b
+gpt-oss-20b           | gpt oss 20b, gpt-oss-20b, oss-20b, oss20b, gpt-oss:20b
+
+# --- Qwen 3.x ---
+qwen3-480b-coder      | qwen3 480b coder, qwen3-coder-480b, q3 480b coder, 480b coder
+qwen3-235b            | qwen3 235b, qwen3-235b-instruct, qwen3 instruct 235b, q235b, 235b instruct
+qwen3-30b-a3b         | qwen3 30b a3b, qwen3-30b-a3b-instruct, qwen3-30b-a3b-thinking-2507, instruct 30b, qwen 30b, 30b a3b
+qwen3-coder-30b       | qwen3 coder 30b, qwen3-coder-30b-a3b, qwen3-coder:30b, qwen3 coder 30b a3b
+qwen3-coder-plus      | qwen3-coder-plus, qwen3 coder plus
+qwen3-coder-0.8       | qwen3 coder 0.8, qwencode
+qwen3-coder           | qwen3 coder, qwen3-coder
+qwen3-32b             | qwen3 32b
+qwen3-14b             | qwen3 14b, qwen3 2507 14b
+qwen3-8b              | qwen3 8b, qwen3-8b-fp8, qwen3-8b-awq, qwen3(8b)
+qwen3-4b              | qwen3 4b, qwen3-4b-thinking-2507, qwen3-4b-2507, qwen3:4b
+qwen3-270m            | qwen3 270m
+qwen3                 | qwen 3, qwen3
+
+# --- Qwen 3.5 ---
+qwen3.5-397b          | qwen3.5 397b, qwen 3.5 397b
+qwen3.5-122b          | qwen3.5 122b
+qwen3.5-27b           | qwen3.5 27b, qwen 3.5 27b
+qwen3.5-9b            | qwen3.5 9b
+qwen3.5-4b            | qwen3.5 4b
+qwen3.5-2b            | qwen3.5 2b
+qwen3.5               | qwen 3.5, qwen3.5
+
+# --- Qwen 3.6 ---
+qwen3.6-397b          | qwen3.6 397b
+qwen3.6-122b          | qwen3.6 122b
+qwen3.6-40b           | qwen3.6 40b
+qwen3.6-27b           | qwen3.6 27b, qwen 3.6 27b
+qwen3.6               | qwen 3.6, qwen3.6
+qwen3.6-plus          | qwen3.6 plus, qwen 3.6 plus, qwen3.6-plus-preview, qwen plus preview
+qwen3.7               | qwen 3.7, qwen3.7
+qwen3-coder-next      | qwen coder next, qwen3 coder next, qwen3-coder-next, qwen3next, qwen next
+qwen3.5-35b-a3b       | qwen3.5-35b-a3b, qwen 3.5 35b a3b, qwen a3b 35b, qwen3.5-35b, qwen3.5 35b
+qwen3.6-35b-a3b       | qwen3.6-35b-a3b, qwen 3.6 35b a3b, qwen 3.6 a3b 35b, qwen3.6-35b, qwen3.6 35b
+qwen3-1.7b            | qwen3-1.7b, qwen 1.7b, qwen-1.7b
+qwen3-0.6b            | qwen3-0.6b, qwen3 0.6b
+qwen3-5b              | qwen3-5b, qwen 5b
+qwen3.5-80b           | qwen3.5-80b, qwen3-80b, qwen 80b
+qwen3-vl              | qwen3-vl, qwen3 vl, qwen 3 vl
+qwen3-tts             | qwen3-tts, qwen3 tts
+
+# --- Qwen 2.5 ---
+qwen2.5-72b           | qwen2.5 72b
+qwen2.5-32b-vl        | qwen2.5 32b vl, qwen2.5-vl-32b
+qwen2.5-14b           | qwen2.5 14b
+qwen2.5-7b            | qwen2.5 7b
+qwen2.5-omni          | qwen2.5-omni, qwen2.5 omni
+qwen2.5               | qwen 2.5, qwen2.5
+
+# --- Qwen other ---
+qwen                  | qwen
+qwen-code             | qwen-code, qwen code
+qwen-image-edit       | qwen-image-edit, qwen image edit, qwen-image
+qwen3-embedding       | qwen3-embedding, qwen3 embedding
+qwen3-reranker        | qwen3-reranker, qwen3 reranker
+qwen-wan2.2-s2v       | qwen wan2.2-s2v, wan2.2-s2v
+
+# --- Google Gemma ---
+gemma4-31b            | gemma 4 31b, gemma4 31b, gemma-4-31b-it
+gemma4-26b            | gemma 4 26b, gemma4 26b
+gemma4-12b            | gemma 4 12b, gemma4 12b
+gemma4-e4b           | gemma 4 e4b, gemma4 e4b, gemma e4b, gemma-4-e4b
+gemma4-e2b           | gemma 4 e2b, gemma4 e2b, gemma e2b, gemma-4-e2b
+gemma4-4b            | gemma 4 4b, gemma4 4b
+gemma4-2b            | gemma 4 2b, gemma4 2b
+gemma4                | gemma 4, gemma4
+gemma3-27b            | gemma 3 27b, gemma3-27b, gemma-3-27b-it
+gemma3-12b            | gemma 3 12b
+gemma3-4b             | gemma 3 4b, gemma3 4b
+gemma3-1b             | gemma 3 1b, gemma3 1b, gemma-3-1b-it
+gemma3-270m           | gemma 3 270m, gemma3-270m, gemma3:270m
+gemma3n               | gemma 3n, gemma3n
+gemma3                | gemma 3, gemma3
+
+# --- Zhipu GLM ---
+glm-4.5               | glm 4.5, glm-4.5, glm4.5
+glm-4.5-air           | glm 4.5 air, glm-4.5-air, glm4.5 air
+glm-4.5v              | glm 4.5v, glm-4.5v, glm4.5v, glm4v_moe, glm 4.5v/air
+glm-4-air             | glm 4 air, glm-4-air
+glm-4                 | glm 4, glm4
+glm-4.1v            | glm-4.1v, glm 4.1v, glm4.1v, glm-4.1v-thinking
+glm-5               | glm 5, glm-5, glm5
+glm-5.1             | glm 5.1, glm-5.1, glm5.1
+glm-5.2             | glm 5.2, glm-5.2, glm5.2
+glm-4.6             | glm 4.6, glm-4.6, glm4.6
+glm-4.6v-flash      | glm 4.6v, glm-4.6v, glm 4.6 flash
+glm-4.7             | glm 4.7, glm-4.7, glm4.7
+glm-4.7-flash       | glm 4.7 flash, glm-4.7-flash, glm4.7 flash, glm flash
+
+# --- DeepSeek ---
+deepseek-v3.1         | deepseek v3.1, deepseek-v3.1, deepseek v3
+deepseek-v3.1-base    | deepseek-v3.1-base, deepseek v3.1 base
+deepseek-r1-0528      | deepseek r1, deepseek-r1, r1 0528, deepseek r1 0528
+deepseek-v4-flash     | deepseek v4 flash, deepseek-v4-flash, deepseek v4-flash, deepseek-v4flash, v4 flash
+deepseek-v4           | deepseek v4, deepseek-v4, deepseek 4, deepseek4, deep seek v4, deepseek v4 pro, deepseek-v4-pro, v4 pro
+deepseek-coder-v2-16b | deepseek-coder-v2, deepseek coder v2 16b, deepseek-coder-v2:16b
+deepseek              | deepseek, deep seek
+
+# --- Meta Llama ---
+llama-3.3-70b         | llama 3.3 70b, llama3.3 70b
+llama-3.1-70b         | llama 3.1 70b, llama3.1 70b
+llama-3.1-8b          | llama 3.1 8b
+llama-3-70b           | llama 3 70b, llama3 70b
+llama-3-8b            | llama 3 8b, llama3 8b
+llama-3               | llama 3, llama3
+llama-4               | llama 4, llama4
+llama-behemoth        | behemoth, llama behemoth
+
+# --- Mistral / Mixtral ---
+mistral-small-4       | mistral small 4, mistral-small-4
+mistral-medium-3.5    | mistral medium 3.5, mistral 3.5 medium, mistral medium
+devstral-2-123b       | devstral-2-123b, devstral 2 123b, devstral2 123b, devstral 2
+codestral             | codestral
+magistral             | magistral
+pixtral               | pixtral
+
+# --- Microsoft Phi ---
+phi-4                 | phi 4, phi-4
+phi-3.5               | phi 3.5, phi-3.5, phi3.5
+phi-3                 | phi 3, phi-3, phi3(8b)
+phi-1.5               | phi 1.5, phi-1.5
+
+# --- Moonshot Kimi ---
+kimi-k2.6             | kimi k2.6, kimi-k2.6, kimi 2.6, k2.6
+kimi-k2.5             | kimi k2.5, kimi-k2.5, kimi 2.5
+kimi-k2.7             | kimi k2.7, kimi-k2.7, kimi 2.7
+kimi-k2               | kimi k2, kimi-k2, moonshot k2
+kimi                  | kimi, moonshot kimi
+
+# --- ByteDance / Seed ---
+seed-oss-36b          | seed-oss-36b, seed oss 36b, seed-36b
+
+# --- Alibaba Ovis / Wan ---
+ovis-2.5-9b           | ovis2.5 9b, ovis 2.5 9b
+ovis-2.5-2b           | ovis2.5 2b, ovis 2.5 2b
+wan-2.2               | wan 2.2, wan2.2, wan2.2-t2v
+wan-2.1               | wan 2.1, wan2.1
+
+# --- Vision / multimodal ---
+internvl-3.5-241b-a28b | internvl3.5-241b-a28b, internvl 3.5 241b
+internvl-3.5-14b      | internvl 3.5 14b, internvl3.5 14b
+internvl-3.5          | internvl 3.5, internvl3.5, internvl3_5
+minicpm-v-4.5         | minicpm v4.5, minicpm-v-4.5, minicpmv, minicpm-v-4_5
+minicpm-4.5           | minicpm 4.5
+qwen2.5-vl            | qwen2.5 vl, qwen-vl
+llava                 | llava
+moondream             | moondream
+
+# --- Nous / community finetunes ---
+hermes-4              | hermes 4, hermes4
+nous-hermes-2-mistral-7b-dpo | nous-hermes-2-mistral-7b-dpo, nous hermes 2 mistral 7b
+glm-steam-106b-a12b   | glm-steam-106b, thedrummer glm steam
+behemoth-x-123b       | behemoth-x-123b, behemoth x 123b
+skyfall-31b           | skyfall-31b, skyfall 31b
+cydonia-24b           | cydonia-24b, cylonia-24b
+stheno-8b             | stheno 8b, stheno-8b
+stheno-1b             | stheno 1b
+gemmasutra            | gemmasutra
+vicuna-13b            | vicuna-13b, vicuna 13b
+wizardlm              | wizardlm, wizard
+
+# --- Other open labs ---
+nemotron-3-super-120b-a12b | nemotron 3 super, nemotron super, nemotron ultra, nemotron3-120b, nemotron-3-super-120b-a12b, nvidia-nemotron-3-super-120b-a12b
+nemotron-3-nano-30b-a3b    | nemotron 3 nano 30b, nemotron 30b, nemotron-3-nano-30b-a3b, nemotron-3-nano:30b, nemotron nano 30b
+granite-4-h-tiny           | granite 4 h tiny, granite-4-h-tiny, granite4-h-tiny, ibm granite 4.0-h 1b, granite h 4 tiny
+granite-4.1                | granite 4.1, granite-4.1
+granite-4                  | granite 4, granite 4.0, ibm granite 4
+olmo                  | olmo, ai2 olmo
+internlm              | internlm
+smollm                | smollm, smol lm
+hunyuan               | hunyuan, tencent hunyuan
+minimax-m2.7          | minimax m2.7, minimax 2.7, minimax-m2.7, m2.7
+minimax-m2.5          | minimax m2.5, minimax 2.5, minimax-m2.5, m2.5
+minimax-m2.1          | minimax m2.1, minimax 2.1, minimax-m2.1, m2.1
+minimax-m3            | minimax m3, minimax 3, minimax-m3
+minimax               | minimax
+mimo                  | mimo, xiaomi mimo
+liquid-lfm            | lfm, liquid ai, liquid lfm
+step                  | step 3, step-3
+
+# --- Speech / audio models (local) ---
+parakeet              | parakeet, nvidia parakeet
+openaudio-s1-mini     | openaudio s1-mini, fish audio s1-mini
+cosyvoice             | cosyvoice, cosyvoice 2, cosyvoice 3
+
+# --- Legacy / historical (still referenced in comparisons) ---
+codellama-7b          | codellama 7b, codellama:7b, codellama-7b
+codellama-13b         | codellama 13b
+davinci               | davinci, openai davinci, text-davinci
+llama-2-70b           | llama 2 70b, llama2 70b
+llama-2-13b           | llama 2 13b
+
+# =============================================================================
+# CLOUD / API — SECONDARY (comparison & "vs local" context only)
+# =============================================================================
+
+chatgpt-5             | chatgpt 5, gpt 5, gpt5, gpt-5, chatgpt-5-high, gpt-5-high
+gpt-4.5               | gpt 4.5, gpt4.5
+chatgpt               | chatgpt, gpt-4o, gpt-4, gpt4o
+claude                | claude, claude 3.5, claude 4
+sonnet-4              | sonnet 4, claude sonnet 4
+opus-4.1              | opus 4.1, claude opus 4.1
+gemini                | gemini, google gemini
+gemini-pro            | gemini pro, gemini 2.5 pro
+grok-4                | grok 4, grok4
+grok-3                | grok 3, grok3
+grok-2                | grok 2, grok2, grok-2
+grok-1                | grok 1, grok1
+
+# =============================================================================
+# EXCLUSIONS — NOT MODELS (ignore even if message is about LLMs)
+# =============================================================================
+# ollama
+# llama.cpp
+# llama-server
+# llamacpp
+# vllm
+# lmstudio
+# lm studio
+# open-webui
+# openwebui
+# koboldcpp
+# kobold
+# tabbyapi
+# jan
+# sillytavern
+# continue.dev
+# cline
+# roo code
+# cursor
+# openrouter
+# huggingface (as platform, not a model)
+# gguf (format only)
+# localllama (community name, not llama model)
+# r/localllama
+
+# =============================================================================
+# AMBIGUOUS SIZE-ONLY (do NOT match alone — require family name in same message)
+# =============================================================================
+# 8b, 9b, 10b, 14b, 20b, 27b, 30b, 32b, 70b, 100b, 120b, 235b, 480b
+# 270m, 1b, 2b, 3b, 4b
+# 7x8b, a3b, a22b, moe

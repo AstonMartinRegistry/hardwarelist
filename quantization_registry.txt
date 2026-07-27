@@ -1,0 +1,36 @@
+# LocalLLM Quantization Registry
+# Canonical slugs for matching quant mentions in setup lists and rollups.
+# Format:  canonical_slug  |  alias1, alias2, alias3
+
+# --- NVIDIA formats ---
+nvfp4                  | nvfp4, nv fp4, nvidia fp4
+mxfp4                  | mxfp4, mx fp4
+fp8                    | fp8, float8, float-8
+fp4                    | fp4
+
+# --- GGUF / llama.cpp ---
+q2-k                   | q2_k, q2-k, q2
+q3-k                   | q3_k, q3-k, q3
+q4-k-m                 | q4_k_m, q4-k-m, q4km, q4 km
+q4-k-xl                | q4_k_xl, q4-k-xl
+q4-0                   | q4_0, q4-0
+q4                     | q4, 4bit, 4 bit, 4-bit
+q5-k                   | q5_k, q5-k, q5
+q6-k                   | q6_k, q6-k, q6
+q8-0                   | q8_0, q8-0
+q8-k-xl                | q8_k_xl, q8-k-xl
+q8                     | q8, 8bit, 8 bit, 8-bit
+iq3-xxs                | iq3_xxs, iq3-xxs
+iq4-xs                 | iq4_xs, iq4-xs
+iq4-nl                 | iq4_nl, iq4-nl
+gguf                   | gguf, ggufs
+
+# --- Other formats ---
+bf16                   | bf16, bfloat16
+fp16                   | fp16, f16, float16
+int4                   | int4, w4a16, awq, gptq
+int8                   | int8
+bf16-full              | full precision, unquantized, fp32
+turboquant             | turboquant
+qat                    | qat, quantization aware training
+dflash                 | dflash

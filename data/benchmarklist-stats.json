@@ -1,0 +1,1475 @@
+{
+  "qwen-qwen3.6-27b": {
+    "name": "Qwen3.6 27B",
+    "benchmark_count": 69,
+    "open_weight": {
+      "rank": 18,
+      "total": 154,
+      "shared_benchmarks": 38,
+      "peer_pairs": 92,
+      "relative_rank": 5,
+      "relative_total": 5,
+      "peer_wins": 17,
+      "peer_losses": 75,
+      "peer_median_pctile": "-15.0"
+    },
+    "stats": [
+      {
+        "label": "AA Intelligence Index",
+        "metric": "Intelligence Index",
+        "value": 37.0517,
+        "unit": "points",
+        "rank": 92,
+        "total": 442
+      },
+      {
+        "label": "GPQA Diamond",
+        "metric": "Accuracy",
+        "value": 84.2424,
+        "unit": "fraction",
+        "rank": 79,
+        "total": 437
+      },
+      {
+        "label": "Humanity's Last Exam",
+        "metric": "Accuracy",
+        "value": 21.5941,
+        "unit": "fraction",
+        "rank": 79,
+        "total": 425
+      },
+      {
+        "label": "SWE-bench Verified",
+        "metric": "Score",
+        "value": 70,
+        "unit": "%",
+        "rank": 43,
+        "total": 68
+      },
+      {
+        "label": "AA-LCR (long context)",
+        "metric": "Score",
+        "value": 68.6667,
+        "unit": "",
+        "rank": 40,
+        "total": 371
+      },
+      {
+        "label": "Terminal-Bench 2.1",
+        "metric": "Score",
+        "value": 60.6742,
+        "unit": "%",
+        "rank": 44,
+        "total": 143
+      },
+      {
+        "label": "MMMU-Pro",
+        "metric": "MMMU-Pro Overall",
+        "value": 74.6243,
+        "unit": "",
+        "rank": 47,
+        "total": 203
+      },
+      {
+        "label": "SciCode",
+        "metric": "Accuracy",
+        "value": 39.8148,
+        "unit": "fraction",
+        "rank": 103,
+        "total": 415
+      },
+      {
+        "label": "Openness Index",
+        "metric": "Openness Index",
+        "value": 38.8889,
+        "unit": "points",
+        "rank": 104,
+        "total": 205
+      }
+    ],
+    "price_in": 0.285,
+    "price_out": 2.4
+  },
+  "qwen-qwen3.6-35b-a3b": {
+    "name": "Qwen3.6 35B A3B",
+    "benchmark_count": 69,
+    "open_weight": {
+      "rank": 15,
+      "total": 154,
+      "shared_benchmarks": 36,
+      "peer_pairs": 78,
+      "relative_rank": 5,
+      "relative_total": 5,
+      "peer_wins": 4,
+      "peer_losses": 74,
+      "peer_median_pctile": "-20.4"
+    },
+    "stats": [
+      {
+        "label": "AA Intelligence Index",
+        "metric": "Intelligence Index",
+        "value": 31.6496,
+        "unit": "points",
+        "rank": 118,
+        "total": 442
+      },
+      {
+        "label": "GPQA Diamond",
+        "metric": "Accuracy",
+        "value": 84.1414,
+        "unit": "fraction",
+        "rank": 81,
+        "total": 437
+      },
+      {
+        "label": "Humanity's Last Exam",
+        "metric": "Accuracy",
+        "value": 20.1576,
+        "unit": "fraction",
+        "rank": 83,
+        "total": 425
+      },
+      {
+        "label": "AA-LCR (long context)",
+        "metric": "Score",
+        "value": 63.6667,
+        "unit": "",
+        "rank": 82,
+        "total": 371
+      },
+      {
+        "label": "Terminal-Bench 2.1",
+        "metric": "Score",
+        "value": 44.9438,
+        "unit": "%",
+        "rank": 62,
+        "total": 143
+      },
+      {
+        "label": "MMMU-Pro",
+        "metric": "MMMU-Pro Overall",
+        "value": 75.0289,
+        "unit": "",
+        "rank": 43,
+        "total": 203
+      },
+      {
+        "label": "SciCode",
+        "metric": "Accuracy",
+        "value": 35.7639,
+        "unit": "fraction",
+        "rank": 157,
+        "total": 415
+      },
+      {
+        "label": "Openness Index",
+        "metric": "Openness Index",
+        "value": 38.8889,
+        "unit": "points",
+        "rank": 104,
+        "total": 205
+      }
+    ],
+    "price_in": 0.14,
+    "price_out": 1.0
+  },
+  "qwen-qwen3.5-27b": {
+    "name": "Qwen3.5-27B",
+    "benchmark_count": 130,
+    "open_weight": {
+      "rank": 11,
+      "total": 154,
+      "shared_benchmarks": 43,
+      "peer_pairs": 80,
+      "relative_rank": 5,
+      "relative_total": 5,
+      "peer_wins": 9,
+      "peer_losses": 71,
+      "peer_median_pctile": "-16.7"
+    },
+    "stats": [
+      {
+        "label": "AA Intelligence Index",
+        "metric": "Intelligence Index",
+        "value": 33.7762,
+        "unit": "points",
+        "rank": 103,
+        "total": 442
+      },
+      {
+        "label": "GPQA Diamond",
+        "metric": "Accuracy",
+        "value": 85.7576,
+        "unit": "fraction",
+        "rank": 60,
+        "total": 437
+      },
+      {
+        "label": "Humanity's Last Exam",
+        "metric": "Accuracy",
+        "value": 22.1965,
+        "unit": "fraction",
+        "rank": 78,
+        "total": 425
+      },
+      {
+        "label": "AA-LCR (long context)",
+        "metric": "Score",
+        "value": 67.3333,
+        "unit": "",
+        "rank": 47,
+        "total": 371
+      },
+      {
+        "label": "MMMU-Pro",
+        "metric": "MMMU-Pro Overall",
+        "value": 75.0289,
+        "unit": "",
+        "rank": 43,
+        "total": 203
+      },
+      {
+        "label": "SciCode",
+        "metric": "Accuracy",
+        "value": 39.4676,
+        "unit": "fraction",
+        "rank": 108,
+        "total": 415
+      },
+      {
+        "label": "Openness Index",
+        "metric": "Openness Index",
+        "value": 38.8889,
+        "unit": "points",
+        "rank": 104,
+        "total": 205
+      }
+    ],
+    "price_in": 0.195,
+    "price_out": 1.56
+  },
+  "qwen-qwen3.5-9b": {
+    "name": "Qwen3.5-9B",
+    "benchmark_count": 99,
+    "open_weight": {
+      "rank": 23,
+      "total": 154,
+      "shared_benchmarks": 36,
+      "peer_pairs": 81,
+      "relative_rank": 5,
+      "relative_total": 5,
+      "peer_wins": 3,
+      "peer_losses": 78,
+      "peer_median_pctile": "-36.0"
+    },
+    "stats": [
+      {
+        "label": "AA Intelligence Index",
+        "metric": "Intelligence Index",
+        "value": 21.438,
+        "unit": "points",
+        "rank": 189,
+        "total": 442
+      },
+      {
+        "label": "GPQA Diamond",
+        "metric": "Accuracy",
+        "value": 80.6061,
+        "unit": "fraction",
+        "rank": 106,
+        "total": 437
+      },
+      {
+        "label": "Humanity's Last Exam",
+        "metric": "Accuracy",
+        "value": 13.2994,
+        "unit": "fraction",
+        "rank": 117,
+        "total": 425
+      },
+      {
+        "label": "AA-LCR (long context)",
+        "metric": "Score",
+        "value": 59,
+        "unit": "",
+        "rank": 107,
+        "total": 371
+      },
+      {
+        "label": "Terminal-Bench 2.1",
+        "metric": "Score",
+        "value": 29.2135,
+        "unit": "%",
+        "rank": 83,
+        "total": 143
+      },
+      {
+        "label": "MMMU-Pro",
+        "metric": "MMMU-Pro Overall",
+        "value": 69.2486,
+        "unit": "",
+        "rank": 68,
+        "total": 203
+      },
+      {
+        "label": "SciCode",
+        "metric": "Accuracy",
+        "value": 27.6822,
+        "unit": "fraction",
+        "rank": 247,
+        "total": 415
+      },
+      {
+        "label": "Openness Index",
+        "metric": "Openness Index",
+        "value": 38.8889,
+        "unit": "points",
+        "rank": 104,
+        "total": 205
+      }
+    ],
+    "price_in": 0.1,
+    "price_out": 0.15
+  },
+  "qwen-qwen3.5-35b-a3b": {
+    "name": "Qwen3.5-35B-A3B",
+    "benchmark_count": 107,
+    "open_weight": {
+      "rank": 16,
+      "total": 154,
+      "shared_benchmarks": 47,
+      "peer_pairs": 90,
+      "relative_rank": 5,
+      "relative_total": 5,
+      "peer_wins": 3,
+      "peer_losses": 87,
+      "peer_median_pctile": "-26.5"
+    },
+    "stats": [
+      {
+        "label": "AA Intelligence Index",
+        "metric": "Intelligence Index",
+        "value": 29.2597,
+        "unit": "points",
+        "rank": 131,
+        "total": 442
+      },
+      {
+        "label": "GPQA Diamond",
+        "metric": "Accuracy",
+        "value": 84.5455,
+        "unit": "fraction",
+        "rank": 75,
+        "total": 437
+      },
+      {
+        "label": "Humanity's Last Exam",
+        "metric": "Accuracy",
+        "value": 19.7405,
+        "unit": "fraction",
+        "rank": 86,
+        "total": 425
+      },
+      {
+        "label": "AA-LCR (long context)",
+        "metric": "Score",
+        "value": 62.6667,
+        "unit": "",
+        "rank": 89,
+        "total": 371
+      },
+      {
+        "label": "Terminal-Bench 2.1",
+        "metric": "Score",
+        "value": 40.824,
+        "unit": "%",
+        "rank": 69,
+        "total": 143
+      },
+      {
+        "label": "MMMU-Pro",
+        "metric": "MMMU-Pro Overall",
+        "value": 72.659,
+        "unit": "",
+        "rank": 62,
+        "total": 203
+      },
+      {
+        "label": "SciCode",
+        "metric": "Accuracy",
+        "value": 37.7315,
+        "unit": "fraction",
+        "rank": 128,
+        "total": 415
+      },
+      {
+        "label": "Openness Index",
+        "metric": "Openness Index",
+        "value": 38.8889,
+        "unit": "points",
+        "rank": 104,
+        "total": 205
+      }
+    ],
+    "price_in": 0.14,
+    "price_out": 1.0
+  },
+  "qwen-qwen3.5-122b-a10b": {
+    "name": "Qwen3.5-122B-A10B",
+    "benchmark_count": 96,
+    "open_weight": {
+      "rank": 9,
+      "total": 154,
+      "shared_benchmarks": 40,
+      "peer_pairs": 80,
+      "relative_rank": 5,
+      "relative_total": 5,
+      "peer_wins": 8,
+      "peer_losses": 72,
+      "peer_median_pctile": "-16.8"
+    },
+    "stats": [
+      {
+        "label": "AA Intelligence Index",
+        "metric": "Intelligence Index",
+        "value": 32.2791,
+        "unit": "points",
+        "rank": 114,
+        "total": 442
+      },
+      {
+        "label": "GPQA Diamond",
+        "metric": "Accuracy",
+        "value": 85.6566,
+        "unit": "fraction",
+        "rank": 62,
+        "total": 437
+      },
+      {
+        "label": "Humanity's Last Exam",
+        "metric": "Accuracy",
+        "value": 23.4476,
+        "unit": "fraction",
+        "rank": 72,
+        "total": 425
+      },
+      {
+        "label": "AA-LCR (long context)",
+        "metric": "Score",
+        "value": 66.6667,
+        "unit": "",
+        "rank": 53,
+        "total": 371
+      },
+      {
+        "label": "Terminal-Bench 2.1",
+        "metric": "Score",
+        "value": 47.5655,
+        "unit": "%",
+        "rank": 58,
+        "total": 143
+      },
+      {
+        "label": "MMMU-Pro",
+        "metric": "MMMU-Pro Overall",
+        "value": 74.9711,
+        "unit": "",
+        "rank": 45,
+        "total": 203
+      },
+      {
+        "label": "SciCode",
+        "metric": "Accuracy",
+        "value": 42.0139,
+        "unit": "fraction",
+        "rank": 72,
+        "total": 415
+      },
+      {
+        "label": "Openness Index",
+        "metric": "Openness Index",
+        "value": 38.8889,
+        "unit": "points",
+        "rank": 104,
+        "total": 205
+      }
+    ],
+    "price_in": 0.26,
+    "price_out": 2.08
+  },
+  "qwen-qwen3.5-397b-a17b": {
+    "name": "Qwen3.5 397B A17B",
+    "benchmark_count": 141,
+    "open_weight": {
+      "rank": 10,
+      "total": 154
+    },
+    "stats": [
+      {
+        "label": "AA Intelligence Index",
+        "metric": "Intelligence Index",
+        "value": 33.6817,
+        "unit": "points",
+        "rank": 103,
+        "total": 442
+      },
+      {
+        "label": "GPQA Diamond",
+        "metric": "Accuracy",
+        "value": 89.2929,
+        "unit": "fraction",
+        "rank": 38,
+        "total": 437
+      },
+      {
+        "label": "Humanity's Last Exam",
+        "metric": "Accuracy",
+        "value": 27.2938,
+        "unit": "fraction",
+        "rank": 56,
+        "total": 425
+      },
+      {
+        "label": "SWE-bench Verified",
+        "metric": "Resolved",
+        "value": 69.9,
+        "unit": "",
+        "rank": 28,
+        "total": 29
+      },
+      {
+        "label": "AA-LCR (long context)",
+        "metric": "Score",
+        "value": 65.6667,
+        "unit": "",
+        "rank": 64,
+        "total": 371
+      },
+      {
+        "label": "Terminal-Bench 2.1",
+        "metric": "Score",
+        "value": 51.3109,
+        "unit": "%",
+        "rank": 54,
+        "total": 143
+      },
+      {
+        "label": "MMMU-Pro",
+        "metric": "MMMU-Pro Overall",
+        "value": 77.2832,
+        "unit": "",
+        "rank": 30,
+        "total": 203
+      },
+      {
+        "label": "SciCode",
+        "metric": "Accuracy",
+        "value": 42.0139,
+        "unit": "fraction",
+        "rank": 71,
+        "total": 415
+      },
+      {
+        "label": "LiveCodeBench",
+        "metric": "Pass@1",
+        "value": 79.3,
+        "unit": "%",
+        "rank": 13,
+        "total": 44
+      },
+      {
+        "label": "Openness Index",
+        "metric": "Openness Index",
+        "value": 38.8889,
+        "unit": "points",
+        "rank": 104,
+        "total": 205
+      }
+    ],
+    "price_in": 0.385,
+    "price_out": 2.45
+  },
+  "qwen-qwen3-coder": {
+    "name": "Qwen3 Coder 480B A35B",
+    "benchmark_count": 39,
+    "open_weight": {
+      "rank": 95,
+      "total": 154,
+      "shared_benchmarks": 16,
+      "peer_pairs": 44,
+      "relative_rank": 5,
+      "relative_total": 5,
+      "peer_wins": 0,
+      "peer_losses": 44,
+      "peer_median_pctile": "-39.8"
+    },
+    "stats": [
+      {
+        "label": "AA Intelligence Index",
+        "metric": "Intelligence Index",
+        "value": 17.9828,
+        "unit": "points",
+        "rank": 232,
+        "total": 442
+      },
+      {
+        "label": "GPQA Diamond",
+        "metric": "Accuracy",
+        "value": 61.8182,
+        "unit": "fraction",
+        "rank": 236,
+        "total": 437
+      },
+      {
+        "label": "Humanity's Last Exam",
+        "metric": "Accuracy",
+        "value": 4.3559,
+        "unit": "fraction",
+        "rank": 340,
+        "total": 425
+      },
+      {
+        "label": "AA-LCR (long context)",
+        "metric": "Score",
+        "value": 42.3333,
+        "unit": "",
+        "rank": 161,
+        "total": 371
+      },
+      {
+        "label": "SciCode",
+        "metric": "Accuracy",
+        "value": 35.8796,
+        "unit": "fraction",
+        "rank": 153,
+        "total": 415
+      },
+      {
+        "label": "Openness Index",
+        "metric": "Openness Index",
+        "value": 44.4444,
+        "unit": "points",
+        "rank": 73,
+        "total": 205
+      }
+    ],
+    "price_in": 0.22,
+    "price_out": 1.8
+  },
+  "z-ai-glm-4.5": {
+    "name": "GLM 4.5",
+    "benchmark_count": 51,
+    "open_weight": {
+      "rank": 62,
+      "total": 154,
+      "shared_benchmarks": 30,
+      "peer_pairs": 75,
+      "relative_rank": 5,
+      "relative_total": 5,
+      "peer_wins": 3,
+      "peer_losses": 72,
+      "peer_median_pctile": "-29.3"
+    },
+    "stats": [
+      {
+        "label": "AA Intelligence Index",
+        "metric": "Intelligence Index",
+        "value": 19.4874,
+        "unit": "points",
+        "rank": 204,
+        "total": 442
+      },
+      {
+        "label": "GPQA Diamond",
+        "metric": "Accuracy",
+        "value": 78.1818,
+        "unit": "fraction",
+        "rank": 69,
+        "total": 112
+      },
+      {
+        "label": "Humanity's Last Exam",
+        "metric": "Accuracy",
+        "value": 12.2335,
+        "unit": "fraction",
+        "rank": 125,
+        "total": 425
+      },
+      {
+        "label": "AA-LCR (long context)",
+        "metric": "Score",
+        "value": 48.3333,
+        "unit": "",
+        "rank": 148,
+        "total": 371
+      },
+      {
+        "label": "SciCode",
+        "metric": "Accuracy",
+        "value": 34.838,
+        "unit": "fraction",
+        "rank": 166,
+        "total": 415
+      },
+      {
+        "label": "LiveCodeBench",
+        "metric": "Score",
+        "value": 67.446,
+        "unit": "%",
+        "rank": 76,
+        "total": 119
+      },
+      {
+        "label": "Openness Index",
+        "metric": "Openness Index",
+        "value": 55.5556,
+        "unit": "points",
+        "rank": 26,
+        "total": 205
+      }
+    ],
+    "price_in": 0.6,
+    "price_out": 2.2
+  },
+  "z-ai-glm-4.7": {
+    "name": "GLM 4.7",
+    "benchmark_count": 94,
+    "open_weight": {
+      "rank": 43,
+      "total": 154
+    },
+    "stats": [
+      {
+        "label": "AA Intelligence Index",
+        "metric": "Intelligence Index",
+        "value": 26.5579,
+        "unit": "points",
+        "rank": 149,
+        "total": 442
+      },
+      {
+        "label": "GPQA Diamond",
+        "metric": "Accuracy",
+        "value": 66.3636,
+        "unit": "fraction",
+        "rank": 53,
+        "total": 112
+      },
+      {
+        "label": "Humanity's Last Exam",
+        "metric": "Accuracy",
+        "value": 6.1168,
+        "unit": "fraction",
+        "rank": 221,
+        "total": 425
+      },
+      {
+        "label": "SWE-bench Verified",
+        "metric": "Score",
+        "value": 69.4,
+        "unit": "%",
+        "rank": 48,
+        "total": 68
+      },
+      {
+        "label": "AA-LCR (long context)",
+        "metric": "Score",
+        "value": 36.3333,
+        "unit": "",
+        "rank": 172,
+        "total": 371
+      },
+      {
+        "label": "SciCode",
+        "metric": "Accuracy",
+        "value": 35.4167,
+        "unit": "fraction",
+        "rank": 160,
+        "total": 415
+      },
+      {
+        "label": "LiveCodeBench",
+        "metric": "Score",
+        "value": 82.234,
+        "unit": "%",
+        "rank": 40,
+        "total": 119
+      },
+      {
+        "label": "Openness Index",
+        "metric": "Openness Index",
+        "value": 44.4444,
+        "unit": "points",
+        "rank": 73,
+        "total": 205
+      }
+    ],
+    "price_in": 0.4,
+    "price_out": 1.75
+  },
+  "z-ai-glm-5.2": {
+    "name": "GLM 5.2",
+    "benchmark_count": 88,
+    "open_weight": {
+      "rank": 2,
+      "total": 154
+    },
+    "stats": [
+      {
+        "label": "AA Intelligence Index",
+        "metric": "Intelligence Index",
+        "value": 51.0858,
+        "unit": "points",
+        "rank": 28,
+        "total": 442
+      },
+      {
+        "label": "GPQA Diamond",
+        "metric": "Accuracy",
+        "value": 91.2,
+        "unit": "fraction",
+        "rank": 31,
+        "total": 112
+      },
+      {
+        "label": "Humanity's Last Exam",
+        "metric": "Accuracy",
+        "value": 40.1297,
+        "unit": "fraction",
+        "rank": 24,
+        "total": 425
+      },
+      {
+        "label": "SWE-bench Verified",
+        "metric": "Score",
+        "value": 82.8,
+        "unit": "%",
+        "rank": 6,
+        "total": 68
+      },
+      {
+        "label": "AA-LCR (long context)",
+        "metric": "Score",
+        "value": 71.3333,
+        "unit": "",
+        "rank": 17,
+        "total": 371
+      },
+      {
+        "label": "Terminal-Bench 2.1",
+        "metric": "Score",
+        "value": 82.7,
+        "unit": "%",
+        "rank": 11,
+        "total": 143
+      },
+      {
+        "label": "SciCode",
+        "metric": "Accuracy",
+        "value": 50.463,
+        "unit": "fraction",
+        "rank": 26,
+        "total": 415
+      },
+      {
+        "label": "LiveCodeBench",
+        "metric": "Score",
+        "value": 69.5,
+        "unit": "%",
+        "rank": 75,
+        "total": 119
+      }
+    ],
+    "price_in": 0.94,
+    "price_out": 3.0
+  },
+  "minimax-minimax-m2.5": {
+    "name": "MiniMax M2.5",
+    "benchmark_count": 93,
+    "open_weight": {
+      "rank": 34,
+      "total": 154,
+      "shared_benchmarks": 46,
+      "peer_pairs": 100,
+      "relative_rank": 5,
+      "relative_total": 5,
+      "peer_wins": 9,
+      "peer_losses": 91,
+      "peer_median_pctile": "-19.2"
+    },
+    "stats": [
+      {
+        "label": "AA Intelligence Index",
+        "metric": "Intelligence Index",
+        "value": 33.6521,
+        "unit": "points",
+        "rank": 104,
+        "total": 442
+      },
+      {
+        "label": "GPQA Diamond",
+        "metric": "Accuracy",
+        "value": 84.8485,
+        "unit": "fraction",
+        "rank": 44,
+        "total": 112
+      },
+      {
+        "label": "Humanity's Last Exam",
+        "metric": "Accuracy",
+        "value": 19.1381,
+        "unit": "fraction",
+        "rank": 89,
+        "total": 425
+      },
+      {
+        "label": "SWE-bench Verified",
+        "metric": "Score",
+        "value": 74.2,
+        "unit": "%",
+        "rank": 30,
+        "total": 68
+      },
+      {
+        "label": "AA-LCR (long context)",
+        "metric": "Score",
+        "value": 66,
+        "unit": "",
+        "rank": 60,
+        "total": 371
+      },
+      {
+        "label": "SciCode",
+        "metric": "Accuracy",
+        "value": 42.5926,
+        "unit": "fraction",
+        "rank": 67,
+        "total": 415
+      },
+      {
+        "label": "LiveCodeBench",
+        "metric": "Score",
+        "value": 79.208,
+        "unit": "%",
+        "rank": 58,
+        "total": 119
+      },
+      {
+        "label": "Openness Index",
+        "metric": "Openness Index",
+        "value": 27.7778,
+        "unit": "points",
+        "rank": 158,
+        "total": 205
+      }
+    ],
+    "price_in": 0.12,
+    "price_out": 0.48
+  },
+  "google-gemma-4-31b-it": {
+    "name": "Gemma 4 31B",
+    "benchmark_count": 122,
+    "open_weight": {
+      "rank": 20,
+      "total": 154,
+      "shared_benchmarks": 43,
+      "peer_pairs": 95,
+      "relative_rank": 5,
+      "relative_total": 5,
+      "peer_wins": 8,
+      "peer_losses": 87,
+      "peer_median_pctile": "-19.7"
+    },
+    "stats": [
+      {
+        "label": "AA Intelligence Index",
+        "metric": "Intelligence Index",
+        "value": 29.3542,
+        "unit": "points",
+        "rank": 131,
+        "total": 442
+      },
+      {
+        "label": "GPQA Diamond",
+        "metric": "Accuracy",
+        "value": 85.6566,
+        "unit": "fraction",
+        "rank": 62,
+        "total": 437
+      },
+      {
+        "label": "Humanity's Last Exam",
+        "metric": "Accuracy",
+        "value": 26.5,
+        "unit": "fraction",
+        "rank": 61,
+        "total": 425
+      },
+      {
+        "label": "AA-LCR (long context)",
+        "metric": "Score",
+        "value": 62,
+        "unit": "",
+        "rank": 92,
+        "total": 371
+      },
+      {
+        "label": "Terminal-Bench 2.1",
+        "metric": "Score",
+        "value": 43.4457,
+        "unit": "%",
+        "rank": 66,
+        "total": 143
+      },
+      {
+        "label": "MMMU-Pro",
+        "metric": "MMMU-Pro Overall",
+        "value": 73.4104,
+        "unit": "",
+        "rank": 55,
+        "total": 203
+      },
+      {
+        "label": "SciCode",
+        "metric": "Accuracy",
+        "value": 43.4028,
+        "unit": "fraction",
+        "rank": 58,
+        "total": 415
+      },
+      {
+        "label": "LiveCodeBench",
+        "metric": "Pass@1",
+        "value": 80,
+        "unit": "%",
+        "rank": 12,
+        "total": 44
+      },
+      {
+        "label": "Openness Index",
+        "metric": "Openness Index",
+        "value": 38.8889,
+        "unit": "points",
+        "rank": 104,
+        "total": 205
+      }
+    ],
+    "price_in": 0.12,
+    "price_out": 0.35
+  },
+  "google-gemma-4-26b-a4b-it": {
+    "name": "Gemma 4 26B A4B",
+    "benchmark_count": 67,
+    "open_weight": {
+      "rank": 32,
+      "total": 154,
+      "shared_benchmarks": 33,
+      "peer_pairs": 77,
+      "relative_rank": 5,
+      "relative_total": 5,
+      "peer_wins": 2,
+      "peer_losses": 75,
+      "peer_median_pctile": "-27.0"
+    },
+    "stats": [
+      {
+        "label": "AA Intelligence Index",
+        "metric": "Intelligence Index",
+        "value": 25.6946,
+        "unit": "points",
+        "rank": 158,
+        "total": 442
+      },
+      {
+        "label": "GPQA Diamond",
+        "metric": "Accuracy",
+        "value": 79.1919,
+        "unit": "fraction",
+        "rank": 115,
+        "total": 437
+      },
+      {
+        "label": "Humanity's Last Exam",
+        "metric": "Accuracy",
+        "value": 18.2576,
+        "unit": "fraction",
+        "rank": 91,
+        "total": 425
+      },
+      {
+        "label": "AA-LCR (long context)",
+        "metric": "Score",
+        "value": 55.6667,
+        "unit": "",
+        "rank": 117,
+        "total": 371
+      },
+      {
+        "label": "Terminal-Bench 2.1",
+        "metric": "Score",
+        "value": 38.9513,
+        "unit": "%",
+        "rank": 72,
+        "total": 143
+      },
+      {
+        "label": "MMMU-Pro",
+        "metric": "MMMU-Pro Overall",
+        "value": 69.2486,
+        "unit": "",
+        "rank": 67,
+        "total": 203
+      },
+      {
+        "label": "SciCode",
+        "metric": "Accuracy",
+        "value": 40.0463,
+        "unit": "fraction",
+        "rank": 96,
+        "total": 415
+      },
+      {
+        "label": "LiveCodeBench",
+        "metric": "Pass@1",
+        "value": 77.1,
+        "unit": "%",
+        "rank": 15,
+        "total": 44
+      },
+      {
+        "label": "Openness Index",
+        "metric": "Openness Index",
+        "value": 38.8889,
+        "unit": "points",
+        "rank": 104,
+        "total": 205
+      }
+    ],
+    "price_in": 0.06,
+    "price_out": 0.33
+  },
+  "qwen-qwen3-coder-next": {
+    "name": "Qwen3 Coder Next",
+    "benchmark_count": 22,
+    "open_weight": {
+      "rank": 63,
+      "total": 154,
+      "shared_benchmarks": 18,
+      "peer_pairs": 55,
+      "relative_rank": 5,
+      "relative_total": 5,
+      "peer_wins": 0,
+      "peer_losses": 55,
+      "peer_median_pctile": "-39.8"
+    },
+    "stats": [
+      {
+        "label": "AA Intelligence Index",
+        "metric": "Intelligence Index",
+        "value": 21.1086,
+        "unit": "points",
+        "rank": 193,
+        "total": 464
+      },
+      {
+        "label": "GPQA Diamond",
+        "metric": "Accuracy",
+        "value": 73.7374,
+        "unit": "fraction",
+        "rank": 170,
+        "total": 454
+      },
+      {
+        "label": "Humanity's Last Exam",
+        "metric": "Accuracy",
+        "value": 9.3142,
+        "unit": "fraction",
+        "rank": 173,
+        "total": 443
+      },
+      {
+        "label": "AA-LCR (long context)",
+        "metric": "Score",
+        "value": 40,
+        "unit": "",
+        "rank": 168,
+        "total": 370
+      },
+      {
+        "label": "Terminal-Bench 2.1",
+        "metric": "Score",
+        "value": 38.2022,
+        "unit": "%",
+        "rank": 73,
+        "total": 142
+      },
+      {
+        "label": "SciCode",
+        "metric": "Accuracy",
+        "value": 32.2917,
+        "unit": "fraction",
+        "rank": 200,
+        "total": 433
+      },
+      {
+        "label": "Openness Index",
+        "metric": "Openness Index",
+        "value": 41.6667,
+        "unit": "points",
+        "rank": 103,
+        "total": 205
+      }
+    ],
+    "price_in": 0.22,
+    "price_out": 1.8
+  },
+  "qwen-qwen3.5-0.8b": {
+    "name": "Qwen3.5-0.8B",
+    "benchmark_count": 34,
+    "open_weight": {
+      "rank": 153,
+      "total": 154,
+      "shared_benchmarks": 23,
+      "peer_pairs": 60,
+      "relative_rank": 5,
+      "relative_total": 5,
+      "peer_wins": 0,
+      "peer_losses": 60,
+      "peer_median_pctile": "-74.9"
+    },
+    "stats": [
+      {
+        "label": "AA Intelligence Index",
+        "metric": "Intelligence Index",
+        "value": 5.4783,
+        "unit": "points",
+        "rank": 451,
+        "total": 464
+      },
+      {
+        "label": "GPQA Diamond",
+        "metric": "Accuracy",
+        "value": 23.6364,
+        "unit": "fraction",
+        "rank": 444,
+        "total": 454
+      },
+      {
+        "label": "Humanity's Last Exam",
+        "metric": "Accuracy",
+        "value": 4.8656,
+        "unit": "fraction",
+        "rank": 306,
+        "total": 443
+      },
+      {
+        "label": "AA-LCR (long context)",
+        "metric": "Score",
+        "value": 6.6667,
+        "unit": "",
+        "rank": 280,
+        "total": 370
+      },
+      {
+        "label": "Terminal-Bench 2.1",
+        "metric": "Score",
+        "value": 0.3745,
+        "unit": "%",
+        "rank": 137,
+        "total": 142
+      },
+      {
+        "label": "MMMU-Pro",
+        "metric": "MMMU-Pro Overall",
+        "value": 25.8382,
+        "unit": "",
+        "rank": 181,
+        "total": 197
+      },
+      {
+        "label": "SciCode",
+        "metric": "Accuracy",
+        "value": 2.8935,
+        "unit": "fraction",
+        "rank": 419,
+        "total": 433
+      },
+      {
+        "label": "Openness Index",
+        "metric": "Openness Index",
+        "value": 38.8889,
+        "unit": "points",
+        "rank": 104,
+        "total": 205
+      }
+    ],
+    "price_in": null,
+    "price_out": null
+  },
+  "mistral-small-4": {
+    "name": "Mistral Small",
+    "benchmark_count": 21,
+    "open_weight": {
+      "rank": 88,
+      "total": 154,
+      "shared_benchmarks": 16,
+      "peer_pairs": 50,
+      "relative_rank": 5,
+      "relative_total": 5,
+      "peer_wins": 0,
+      "peer_losses": 50,
+      "peer_median_pctile": "-31.9"
+    },
+    "stats": [
+      {
+        "label": "AA Intelligence Index",
+        "metric": "Intelligence Index",
+        "value": 19.5555,
+        "unit": "points",
+        "rank": 208,
+        "total": 464
+      },
+      {
+        "label": "GPQA Diamond",
+        "metric": "Accuracy",
+        "value": 76.8687,
+        "unit": "fraction",
+        "rank": 143,
+        "total": 454
+      },
+      {
+        "label": "Humanity's Last Exam",
+        "metric": "Accuracy",
+        "value": 9.4995,
+        "unit": "fraction",
+        "rank": 172,
+        "total": 443
+      },
+      {
+        "label": "AA-LCR (long context)",
+        "metric": "Score",
+        "value": 44.6667,
+        "unit": "",
+        "rank": 157,
+        "total": 370
+      },
+      {
+        "label": "Terminal-Bench 2.1",
+        "metric": "Score",
+        "value": 20.9738,
+        "unit": "%",
+        "rank": 92,
+        "total": 142
+      },
+      {
+        "label": "MMMU-Pro",
+        "metric": "MMMU-Pro Overall",
+        "value": 56.8208,
+        "unit": "",
+        "rank": 117,
+        "total": 197
+      },
+      {
+        "label": "SciCode",
+        "metric": "Accuracy",
+        "value": 37.963,
+        "unit": "fraction",
+        "rank": 130,
+        "total": 433
+      },
+      {
+        "label": "Openness Index",
+        "metric": "Openness Index",
+        "value": 38.8889,
+        "unit": "points",
+        "rank": 104,
+        "total": 205
+      }
+    ],
+    "price_in": null,
+    "price_out": null
+  },
+  "google-gemma-4-12b-it": {
+    "name": "Gemma 4 12B",
+    "benchmark_count": 28,
+    "open_weight": {
+      "rank": 46,
+      "total": 154,
+      "shared_benchmarks": 21,
+      "peer_pairs": 53,
+      "relative_rank": 5,
+      "relative_total": 5,
+      "peer_wins": 0,
+      "peer_losses": 53,
+      "peer_median_pctile": "-30.8"
+    },
+    "stats": [
+      {
+        "label": "AA Intelligence Index",
+        "metric": "Intelligence Index",
+        "value": 22.003,
+        "unit": "points",
+        "rank": 188,
+        "total": 464
+      },
+      {
+        "label": "GPQA Diamond",
+        "metric": "Accuracy",
+        "value": 75.2525,
+        "unit": "fraction",
+        "rank": 159,
+        "total": 454
+      },
+      {
+        "label": "Humanity's Last Exam",
+        "metric": "Accuracy",
+        "value": 14.7822,
+        "unit": "fraction",
+        "rank": 112,
+        "total": 443
+      },
+      {
+        "label": "AA-LCR (long context)",
+        "metric": "Score",
+        "value": 55.3333,
+        "unit": "",
+        "rank": 121,
+        "total": 370
+      },
+      {
+        "label": "MMMU-Pro",
+        "metric": "MMMU-Pro Overall",
+        "value": 69.6532,
+        "unit": "",
+        "rank": 65,
+        "total": 197
+      },
+      {
+        "label": "SciCode",
+        "metric": "Accuracy",
+        "value": 38.1944,
+        "unit": "fraction",
+        "rank": 125,
+        "total": 433
+      },
+      {
+        "label": "LiveCodeBench",
+        "metric": "Pass@1",
+        "value": 72,
+        "unit": "%",
+        "rank": 20,
+        "total": 41
+      },
+      {
+        "label": "Openness Index",
+        "metric": "Openness Index",
+        "value": 38.8889,
+        "unit": "points",
+        "rank": 104,
+        "total": 205
+      }
+    ],
+    "price_in": null,
+    "price_out": null
+  }
+}

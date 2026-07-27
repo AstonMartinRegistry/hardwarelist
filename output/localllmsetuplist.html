@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>localllmsetuplist</title>
+</head>
+<body>
+<h1>localllmsetuplist</h1>
+<table border="1" cellpadding="8" cellspacing="0">
+<tr>
+<td valign="top"><fieldset>
+<legend>1526391187722866858</legend>
+<b>hardware:</b> RTX Quadro 4000, AMD BC-250, GbE<br><b>model:</b> qwen3.6-27b<br><b>quant:</b> Q4_K_M, q8_0<br><b>speed:</b> ~100t/s pp, ~20t/s generation · 100 tok/s, 20 tok/s, 100 tok/s, 20 tok/s<br><b>pp:</b> 100<br><b>ts:</b> 20, 100<br><b>additional info:</b> Got qwen3.6 27b on a kind of fairly weird/sketchy setup; RTX Quadro 4000 + 1x AMD BC-250 (40CU, 1.8Ghz) connected via GbE haha xP
+
+Surprisingly seems to mostly work xD
+With llama.cpp RPC (cuda backend on the RTX, vulkan on the BC-250)
+
+...though performance isn&#x27;t really great (still, better than running on CPU ig).
+I get about ~100t/s pp and ~20t/s generation with this:
+ llama-server --backend-sampling --n-gpu-layers -1 --rpc 192.168.100.10:50052 --jinja --cache-ram 32768 -fa on --model /opt/models/bottlecapai/ThinkingCap-Qwen3.6-27B-GGUF/ThinkingCap-Qwen3.6-27B-Q4_K_M.gguf --cache-type-k q8_0 --cache-type-v q8_0 --ctx-size 65536 --temp 1.0 --top-p 0.95 --top-k 64 -b 4096 -ub 1024 --spec-type draft-mtp --spec-draft-n-max 2 
+
+not sure if you have more ideas/things worth trying haha.
+I have another BC-250 I can connect, but I suspect it won&#x27;t help with tok/s (since this is pipeline parallelism)<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1526289704239235183</legend>
+<b>hardware:</b> RTX 5070 Laptop (8 GB), Ryzen AI 7 350, 32 GB RAM<br><b>model:</b> glm-5.2<br><b>quant:</b> —<br><b>speed:</b> ~0.3 tok/s, ~0.2 tok/s · 0.3 tok/s, 0.2 tok/s<br><b>pp:</b> —<br><b>ts:</b> 0.3, 4, 0.2<br><b>additional info:</b> Hey,
+
+I finally got GLM 5.2 (UD-IQ1_M) to run locally.
+
+Hardware:
+
+RTX 5070 Laptop (8 GB)
+Ryzen AI 7 350
+32 GB RAM
+Samsung Gen4 NVMe SSD
+
+Current performance:
+
+Prompt: ~0.3 tok/s
+Generation: ~0.2 tok/s
+
+Resource usage:
+
+~3.7 GB VRAM
+~31 GB RAM
+SSD at 100% utilization
+CPU around 50-60%
+
+I spent quite a while testing different configurations:
+
+GPU layers
+thread count
+cache sizes
+internal NVMe vs external HDD
+reasoning on/off
+
+The bottleneck appears to be streaming experts rather than GPU compute.
+
+It&#x27;s honestly pretty crazy seeing a 744B MoE actually run on a consumer laptop, even if it&#x27;s slow.
+
+Has anyone managed to squeeze noticeably higher throughput from similar hardware?<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1525888743716687912</legend>
+<b>hardware:</b> RX 7900 XTX, 192GB DDR5<br><b>model:</b> IQ3_XXS<br><b>quant:</b> iq3-xxs<br><b>speed:</b> 5 tok/s · 5 tok/s<br><b>pp:</b> —<br><b>ts:</b> 5<br><b>additional info:</b> I have two RX 7900 XTX, and 192GB of DDR5, and was only able to hit 5 tok/s at IQ3_XXS
+
+And the quality of output was not what I would consider &quot;acceptable&quot;. My first prompt was &quot;Hello&quot; and it responded in chinese<br></fieldset></td>
+</tr>
+<tr>
+<td valign="top"><fieldset>
+<legend>1525810426628145303</legend>
+<b>hardware:</b> 4x 5060 ti&#x27;s<br><b>model:</b> qwen3.6-27b<br><b>quant:</b> INT8<br><b>speed:</b> Input token throughput (tok/s): 177.35 · 200 tok/s · 7504.07ms TTFT, 7382.56ms TTFT<br><b>pp:</b> —<br><b>ts:</b> 4, 200<br><b>additional info:</b> Interesting, I tried using SG lang for Minachist/Qwen3.6-27B-INT8-Autoround with :
+
+8 concurrency
+
+TP=4
+
+MTP
+
+16K batch tokens
+
+200K context
+
+Bfloat16 KV Cache
+
+4x 5060 ti&#x27;s (4 lanes of gen 4 per card - bifurcation (8Gb/s bandwidth) per card
+
+And TTFT (prefill + token gen) was much lower than with VLLM at 8 concurrency.
+
+From memory prefill/ttft was horrible at 8 concurrency with VLLM at 15+ seconds.
+
+sglang seems to be showing better benchmarks overall
+
+```
+
+============ Serving Benchmark Result ============
+Backend: sglang-oai
+Traffic request rate: inf 
+Max request concurrency: 8 
+Successful requests: 200 
+Benchmark duration (s): 348.87 
+Total input tokens: 61870 
+Total input text tokens: 61870 
+Total generated tokens: 44525 
+Total generated tokens (retokenized): 44476 
+Request throughput (req/s): 0.57 
+Input token throughput (tok/s): 177.35 
+Output token throughput (tok/s): 127.63 
+Peak output token throughput (tok/s): 76.00 
+Peak concurrent requests: 11 
+Total token throughput (tok/s): 304.97 
+Concurrency: 7.84 
+Accept length: 2.50 
+----------------End-to-End Latency----------------
+Mean E2E Latency (ms): 13679.23 
+Median E2E Latency (ms): 12234.78 
+P90 E2E Latency (ms): 23320.88 
+P95 E2E Latency (ms): 28160.07 
+P99 E2E Latency (ms): 34531.84 
+---------------Time to First Token----------------
+Mean TTFT (ms): 7504.07 
+Median TTFT (ms): 7382.56 
+P90 TTFT (ms): 11857.75 
+P95 TTFT (ms): 12946.72 
+P99 TTFT (ms): 16279.74 
+-----Time per Output Token (excl. 1st token)------
+Mean TPOT (ms): 31.24 
+Median TPOT (ms): 26.88 
+P90 TPOT (ms): 40.12 
+P95 TPOT (ms): 51.57 
+P99 TPOT (ms): 133.01 
+---------------Inter-Token Latency----------------
+Mean ITL (ms): 27.90 
+Median ITL (ms): 18.30 
+P90 ITL (ms): 31.83 
+P95 ITL (ms): 54.90 
+P99 ITL (ms): 196.80 
+Max ITL (ms): 3217.83 
+==================================================
+```<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1523411305850212362</legend>
+<b>hardware:</b> 4x 5060 ti<br><b>model:</b> qwen3.6-27b<br><b>quant:</b> INT8-Autoround<br><b>speed:</b> Output token throughput (tok/s): 274.26 · 5354.11ms TTFT, 1961.24ms TTFT<br><b>pp:</b> —<br><b>ts:</b> —<br><b>additional info:</b> did a benchmark at 8 concurrency with INT8-Autoround with unquantized KV cache of Qwen3.6-27B.
+
+With the 4x 5060 ti&#x27;s.
+
+ ============ Serving Benchmark Result ============
+Successful requests: 150 
+Failed requests: 0 
+Maximum request concurrency: 8 
+Benchmark duration (s): 2240.18 
+Total input tokens: 3307200 
+Total generated tokens: 614400 
+Request throughput (req/s): 0.07 
+Output token throughput (tok/s): 274.26 
+Peak output token throughput (tok/s): 104.00 
+Peak concurrent requests: 10.00 
+Total token throughput (tok/s): 1750.57 
+---------------Time to First Token----------------
+Mean TTFT (ms): 5354.11 
+Median TTFT (ms): 1961.24 
+P90 TTFT (ms): 18384.43 
+P95 TTFT (ms): 27653.41 
+P99 TTFT (ms): 47726.86 
+-----Time per Output Token (excl. 1st token)------
+Mean TPOT (ms): 27.37 
+Median TPOT (ms): 26.59 
+P90 TPOT (ms): 32.38 
+P95 TPOT (ms): 33.65 
+P99 TPOT (ms): 42.01 
+---------------Inter-token Latency----------------
+Mean ITL (ms): 93.72 
+Median ITL (ms): 80.81 
+P90 ITL (ms): 82.84 
+P95 ITL (ms): 83.98 
+P99 ITL (ms): 706.95 
+----------------End-to-end Latency----------------
+Mean E2EL (ms): 117432.48 
+Median E2EL (ms): 112275.04 
+P90 E2EL (ms): 138500.87 
+P95 E2EL (ms): 165912.41 
+P99 E2EL (ms): 192595.94 
+---------------Speculative Decoding---------------
+Acceptance rate (%): 80.74 
+Acceptance length: 3.42 
+Drafts: 180831 
+Draft tokens: 542493 
+Accepted tokens: 438027 
+Per-position acceptance (%):
+ Position 0: 90.73 
+ Position 1: 80.14 
+ Position 2: 71.36 
+==================================================<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1518350155672322108</legend>
+<b>hardware:</b> 4x 5060 ti 16gb for 64 gb total<br><b>model:</b> qwen3.6-27b<br><b>quant:</b> FP8<br><b>speed:</b> 70 tokens /second · 70 tok/s, 70 tok/s<br><b>pp:</b> —<br><b>ts:</b> 70<br><b>additional info:</b> 4x 5060 ti 16gb for 64 gb total. Able to run Qwen/Qwen3.6-27b-FP8 with bf16 kv cache, 262K context, 4 concurrency, and 16k batch tokens at 70 tokens /second<br></fieldset></td>
+</tr>
+<tr>
+<td valign="top"><fieldset>
+<legend>1517354364006826015</legend>
+<b>hardware:</b> AMD Instinct MI50/MI60<br><b>model:</b> qwen3.5-27b<br><b>quant:</b> Q8_0<br><b>speed:</b> pp2048 256.29<br><b>pp:</b> —<br><b>ts:</b> 256<br><b>additional info:</b> If I&#x27;m remembering correctly, MTP wasn&#x27;t that big of an improvement on the MI50 (probably because of the compute limitations), but here&#x27;s my numbers running Q8 with two cards:
+
+ ========================================================================================
+Test Scenario Tensor (Full) Tensor (PCIe 1.0) Layer Split PCIe Drop %
+========================================================================================
+pp2048 (Prefill) 256.29 ± 0.15 180.34 ± 0.03 147.99 ± 0.03 -29.63%
+tg256 (Decoding) 28.45 ± 0.06 27.45 ± 0.05 20.72 ± 0.01 -3.51%
+pp2048 @ 16k Context 233.83 ± 0.75 168.49 ± 0.38 133.12 ± 0.06 -27.94%
+tg256 @ 16k Context 27.43 ± 0.25 26.68 ± 0.25 19.32 ± 0.02 -2.73%
+========================================================================================
+* Model: Qwen 27B Q8_0 | GPUs: 2x AMD Instinct MI50/MI60
+* &quot;PCIe Drop %&quot; shows performance loss of Tensor (PCIe 1.0) compared to Tensor (Full).<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1516415534948941885</legend>
+<b>hardware:</b> RTX 5060 Ti 16GB + RTX 3060 12GB<br><b>model:</b> Gemma-4 MeroMero 31B<br><b>quant:</b> IQ4_XS<br><b>speed:</b> 14.6 tokens/s · 14.6 tok/s<br><b>pp:</b> —<br><b>ts:</b> 14.6<br><b>additional info:</b> hey guys, I am currently running a local Gemma-4 MeroMero 31B IQ4_XS model on KoboldCPP, setting layers so that the 5060 Ti handles most of the workload in a dual GPU setup (RTX 5060 Ti 16GB + RTX 3060 12GB). My current speed is 14.6 tokens/s. If I replace the 3060 with an RTX 5070 Ti, what speed can I expect compared to the old combo?<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1515925193145581578</legend>
+<b>hardware:</b> dual 3060&#x27;s<br><b>model:</b> qwen3.6-35b-a3b<br><b>quant:</b> Q6_K_XL<br><b>speed:</b> ~260 pp/sec; ~170 pp/sec<br><b>pp:</b> 260, 170<br><b>ts:</b> —<br><b>additional info:</b> I&#x27;m running dual 3060&#x27;s in my PC, and I&#x27;m trying to isolate a performance problem. So I run Qwen3.6-35B-A3B-UD-Q6_K_XL, with -c 131072 and the MOE offloaded to the cpu. Using -dev CUDA0 and I get ~260 pp/sec I run it on -dev CUDA1, and I&#x27;m only getting 170 pp/sec. Both have similar tg/sec. The only diff between the two cards is one is running on a PCIE16x that&#x27;s direct to the cpu, and the other is running PCIE8x that&#x27;s direct to the CPU... Could that be the difference?<br></fieldset></td>
+</tr>
+<tr>
+<td valign="top"><fieldset>
+<legend>1515886723773497414</legend>
+<b>hardware:</b> Rtx 3060 12gb, Xeon 2650 v4, 32 RAM<br><b>model:</b> qwen3.6-35b-a3b<br><b>quant:</b> —<br><b>speed:</b> 35.20 t/s · 2.301 tok/s, 35.2 tok/s, 35.2 tok/s<br><b>pp:</b> —<br><b>ts:</b> 35.20, 2.301, 35.2<br><b>additional info:</b> Rtx 3060 12gb + Xeon 2650 v4 + 32 RAM
+2.301 tokens | 1min 5s | 35.20 t/s
+
+Is it good?
+llama-server.exe ^
+ -m &quot;C:\Users\Rafael\Downloads\models\Qwen3.6-35B-A3B-APEX-MTP-I-Compact.gguf&quot; ^
+ -ngl all ^
+ -t 16 ^
+ --n-cpu-moe 15 ^
+ -c 90000 ^
+ -b 2048 ^
+ -ub 1024 ^
+ --no-mmap ^
+ --ctx-checkpoints 128 ^
+ --mlock ^
+ --prio 2 ^
+ --prio-batch 2 ^
+ -fa on ^
+ -ctk turbo3_tcq ^
+ -ctv turbo3_tcq ^
+ -np 1 ^
+ --port 8080<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1515866977988644984</legend>
+<b>hardware:</b> 2x AMD Instinct MI50/MI60<br><b>model:</b> qwen3.5-27b<br><b>quant:</b> Q8_0<br><b>speed:</b> 256.29 t/s, 180.34 t/s, 147.99 t/s, 28.45 t/s, 27.45 t/s, 20.72 t/s, 233.83 t/s, 168.49 t/s, 133.12 t/s, 27.43 t/s, 26.68 t/s, 19.32 t/s · 20 tok/s, 20 tok/s<br><b>pp:</b> —<br><b>ts:</b> 20, 256, 256.29, 180.34, 147.99, 28.45, 27.45, 20.72, 233.83, 168.49, 133.12, 27.43, 26.68, 19.32<br><b>additional info:</b> You should be able to get +20 t/s generation easy with two V620 in tensor parallel, here&#x27;s some numbers from my own setup:
+
+ ========================================================================================
+Test Scenario Tensor (Full) Tensor (PCIe 1.0) Layer Split PCIe Drop %
+========================================================================================
+pp2048 (Prefill) 256.29 ± 0.15 180.34 ± 0.03 147.99 ± 0.03 -29.63%
+tg256 (Decoding) 28.45 ± 0.06 27.45 ± 0.05 20.72 ± 0.01 -3.51%
+pp2048 @ 16k Context 233.83 ± 0.75 168.49 ± 0.38 133.12 ± 0.06 -27.94%
+tg256 @ 16k Context 27.43 ± 0.25 26.68 ± 0.25 19.32 ± 0.02 -2.73%
+========================================================================================
+* Model: Qwen 27B Q8_0 | GPUs: 2x AMD Instinct MI50/MI60
+* &quot;PCIe Drop %&quot; shows performance loss of Tensor (PCIe 1.0) compared to Tensor (Full).<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1515466114493186048</legend>
+<b>hardware:</b> 5090 desktop, 4070 laptop, 5080 desktop<br><b>model:</b> gemma4-12b<br><b>quant:</b> —<br><b>speed:</b> 19 tps, 96 tps · 19 tok/s, 96 tok/s<br><b>pp:</b> —<br><b>ts:</b> 19, 96<br><b>additional info:</b> I just pulled the trigger on a 5090 desktop. I ran an experiment this morning, google/gemma-4-12b-qat runs at 19 tps on a 4070 laptop, 96 tps on my son&#x27;s 5080 desktop, and i&#x27;m expecting significantly better on a 5090 (dont have that to test)<br></fieldset></td>
+</tr>
+<tr>
+<td valign="top"><fieldset>
+<legend>1496550178063384758</legend>
+<b>hardware:</b> rtx-3090<br><b>model:</b> qwen3.6-27b<br><b>quant:</b> Q4<br><b>speed:</b> 30-35 t/s · 35 tok/s, 35 tok/s<br><b>pp:</b> —<br><b>ts:</b> 35<br><b>additional info:</b> Qwen3.6-27b_Q4_M on 3090 running @ 30-35 t/s out of the box on llama.cpp.<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1496333656883724428</legend>
+<b>hardware:</b> EPYC 7532 + 8x32 DDR4-3200 + 2x R9700s<br><b>model:</b> glm-4<br><b>quant:</b> Q3_K_L<br><b>speed:</b> 12 t/s · 12 tok/s, 12 tok/s<br><b>pp:</b> —<br><b>ts:</b> 12<br><b>additional info:</b> Without any offloading ( -ngl 0 ) or without offloading of the experts ( -ncmoe 0 )?
+I&#x27;m running on an EPYC 7532 + 8x32 DDR4-3200 + 2x R9700s, and I got 12 t/s on GLM-4.7 at Q3_K_L (which is like ~180GB, with 16GB of active weights) with -ncmoe 0 (so just the attention layers were on 1 R9700, all experts in RAM).
+You should probably get better speeds than that on 122B with only 4.7GB of active weights.<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1493611004293025915</legend>
+<b>hardware:</b> 2x 3090s<br><b>model:</b> Gemma 4 31B<br><b>quant:</b> —<br><b>speed:</b> 50 t/s · 50 tok/s, 50 tok/s<br><b>pp:</b> 1200<br><b>ts:</b> 50<br><b>additional info:</b> I like the output/feel of Gemma 4 31B. With the spec decoding I can easily get up to 50 t/s on 2x 3090s on certain tasks with like 1200 pp.
+
+I just used it last night to brainstorm and rebuild my personal website just through my nanobot agent. It was a good partner and did a good job, all while being 2x as fast as 3.5 27B since I am using llama.cpp w/ spec decoding, which I think isn&#x27;t ready yet for Qwen (or the MTP thing they do).<br></fieldset></td>
+</tr>
+<tr>
+<td valign="top"><fieldset>
+<legend>1491861155201683688</legend>
+<b>hardware:</b> n_gpu_layers = 43<br><b>model:</b> qwen3.5-9b<br><b>quant:</b> q8<br><b>speed:</b> Detokenization: 280× faster<br><b>pp:</b> —<br><b>ts:</b> —<br><b>additional info:</b> Heyio
+
+Been building Ion7 ; a full LLM runtime in LuaJIT, on top of llama.cpp. No Python. No HTTP. No subprocess.
+
+ local ion7 = require &quot;ion7.core&quot;
+ion7.init({ log_level = 0 })
+local model = ion7.Model.load(&quot;qwen3.5-9b.gguf&quot;, { n_gpu_layers = 43 })
+local ctx = model:context({ n_ctx = 8192 })
+local vocab = model:vocab()
+local sampler = ion7.Sampler.chain():top_k(40):temp(0.8):dist():build()
+local tokens, n = vocab:tokenize(&quot;Hello from Lua!&quot;, true, false)
+ctx:decode(tokens, n, 0, 0)
+print(vocab:piece(sampler:sample(ctx:ptr(), -1))) 
+
+ vs llama-cpp-python (Qwen3.5-9B Q8, RTX 3060): Benchmark results 
+
+Detokenization: 280× faster 
+
+Generation at full context: 1.53× 
+
+RAM delta: 37% less 
+
+KV snapshot: 14ms in-memory 
+
+0 malloc per generated token
+
+Also ships ion7-grammar (token-level constraints, JSON Schema, CRANE/IterGen, DCCD) and ion7-llm (full chat pipeline, prefix cache, sliding window).
+
+ All MIT: https://github.com/Ion7-Labs 
+
+Still early, would love feedback, opinions, or contributors if any of this resonates with you<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1490462529229557945</legend>
+<b>hardware:</b> Blackwell 6000, 10 GB VRAM, 440W<br><b>model:</b> gemma4-31b<br><b>quant:</b> bf16<br><b>speed:</b> 23 tps · 23 tok/s<br><b>pp:</b> —<br><b>ts:</b> 23<br><b>additional info:</b> I&#x27;m getting 23 tps on Blackwell 6000 with Gemma 4 31B BF16 with max context, still leaving about 10 GB VRAM to spare. GPU power usage maxes out at 440W (out of 600W).<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1490016547698118676</legend>
+<b>hardware:</b> gb10<br><b>model:</b> qwen3.5-35b<br><b>quant:</b> Q4_K_M<br><b>speed:</b> 70+T/s · 70 tok/s<br><b>pp:</b> —<br><b>ts:</b> 70<br><b>additional info:</b> finally getting pretty happy with my gb10 (dgx spark-ish) setup, I&#x27;ve got kokoto TTS, parakeet ASR, qwen3.5 35b (Q4_K_M, 70+T/s, full context), z-image-turbo (~4s/1024x1024) and qwen-image-edit (~14s/1024x1024) all running happily together<br></fieldset></td>
+</tr>
+<tr>
+<td valign="top"><fieldset>
+<legend>1486723280911073362</legend>
+<b>hardware:</b> RTX PRO 6000 Max-Q 96GB, RTX A6000 48GB, 128GB DDR4<br><b>model:</b> qwen3.5-397b<br><b>quant:</b> Q4, Q8 KV cache<br><b>speed:</b> ~13-14 tok/s · 14 tok/s<br><b>pp:</b> —<br><b>ts:</b> 3, 14<br><b>additional info:</b> it&#x27;s alive!!
+
+squeezing qwen3.5-397b Q4 with 128K Q8 KV cache onto this ultra-jank system is getting ~13-14 tok/s:
+
+1x RTX PRO 6000 Max-Q 96GB
+1x RTX A6000 48GB
+128GB DDR4
+PCIe Gen 3 ( )<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1486374178062995535</legend>
+<b>hardware:</b> Macbook M1 Max 64gb<br><b>model:</b> qwen3.5-35b-a3b<br><b>quant:</b> 8bit<br><b>speed:</b> Prefill speed : 483.3 tok/s · 484.39 tok/s, 483.3 tok/s, 41 tok/s, 409.89 tok/s<br><b>pp:</b> —<br><b>ts:</b> 483.3, 407.1, 484.39, 41, 409.89, 41.0, 6.6<br><b>additional info:</b> ────────────────────────────────────────────────────────────
+mlx-community/Qwen3.5-35B-A3B-8bit - Macbook M1 Max 64gb
+────────────────────────────────────────────────────────────
+ Baseline (no KV quant)
+────────────────────────────────────────────────────────────
+Prefill: 36370/36371 [01:15&lt;00:00, 484.39tok/s]
+ Prompt tokens : 36,371
+ Generated tokens: 200
+ Prefill speed : 483.3 tok/s
+ Decode speed : 41.0 tok/s
+ Wall time : 80.2s
+
+────────────────────────────────────────────────────────────
+ TurboQuant 3.5bit
+────────────────────────────────────────────────────────────
+Prefill: 36370/36371 [01:28&lt;00:00, 409.89tok/s]
+ Prompt tokens : 36,371
+ Generated tokens: 200
+ Prefill speed : 407.1 tok/s
+ Decode speed : 6.6 tok/s
+ Wall time : 119.8s
+
+============================================================
+ SUMMARY
+============================================================
+
+ Baseline (no KV quant)
+ Prefill : 483.3 tok/s
+ Decode : 41.0 tok/s
+
+ TurboQuant 3.5bit
+ Prefill : 407.1 tok/s
+ Decode : 6.6 tok/s<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1486150987852025966</legend>
+<b>hardware:</b> 16 GB RX 9070 XT<br><b>model:</b> qwen3.5-35b<br><b>quant:</b> unsloth quant<br><b>speed:</b> 111 t/s · 111 tok/s, 111 tok/s<br><b>pp:</b> —<br><b>ts:</b> 111<br><b>additional info:</b> I just tried Qwen 35b a3b ud q2_k_xl (unsloth quant) with 64k context window and it is pure 111 t/s bliss on my 16 GB RX 9070 XT with no offloading.<br></fieldset></td>
+</tr>
+<tr>
+<td valign="top"><fieldset>
+<legend>1485015727889977384</legend>
+<b>hardware:</b> 5060ti, 3070<br><b>model:</b> qwen3.5-122b<br><b>quant:</b> q3-k-m, q4-k-m<br><b>speed:</b> 140t/s pp @ 2.7k, 14.4t/s tg @ 2k, 57t/s pp @ 2.7k, 15.6t/s tg @ 2k, 979t/s pp @ 2.7k, 20.5t/s tg @ 2k, 969t/s pp @ 55k, ~17.2t/s tg @ 55k · 140 tok/s, 14.4 tok/s, 57 tok/s, 15.6 tok/s<br><b>pp:</b> 140, 57, 979, 969<br><b>ts:</b> 14.4, 15.6, 20.5, 17.2, 57, 979, 969, 140<br><b>additional info:</b> qwen3.5-122b-q3-k-m w/ tools on llama cpp
+single 5060ti:
+140t/s pp @ 2.7k
+14.4t/s tg @ 2k
+5060ti + 3070:
+57t/s pp @ 2.7k
+15.6t/s tg @ 2k
+
+qwen3.5-27b-q4-k-m w/ tools on llama cpp
+5060ti + 3070:
+979t/s pp @ 2.7k
+20.5t/s tg @ 2k
+969t/s pp @ 55k
+~17.2t/s tg @ 55k<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1484547555886108884</legend>
+<b>hardware:</b> nvidia 5060 ti (16GB), 96GB DDR5<br><b>model:</b> qwen3-coder-next<br><b>quant:</b> q4-k-m<br><b>speed:</b> 14.75tok/s, 8tok/s, 26.5 tok/s · 14.75 tok/s, 8 tok/s, 26.5 tok/s, 14.75 tok/s<br><b>pp:</b> —<br><b>ts:</b> 14.75, 8, 26.5<br><b>additional info:</b> So... I ended up getting ik_llama.
+hw: nvidia 5060 ti (16GB), 96GB DDR5
+model: qwen3-coder-next-q4-k-m
+
+ik_llama avg speed: 14.75tok/s
+llama: 8tok/s
+krasis: 26.5 tok/s
+
+There&#x27;s a problem, and in not sure if its me or vibecoding. But krais says it offers OpenAI compatible API. When I try to use it with openclaw, get some weird errors when submitting prompts.<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1483510845135917158</legend>
+<b>hardware:</b> NVIDIA RTX PRO 6000 Blackwell Workstation Edition, VRAM: 97247 MiB<br><b>model:</b> Mistral-Small-4-119B-2603-GGUF-IQ4_XS<br><b>quant:</b> IQ4_XS<br><b>speed:</b> pp512 3494.09 t/s, tg128 189.68 t/s<br><b>pp:</b> —<br><b>ts:</b> 128, 3494.09, 189.68<br><b>additional info:</b> $ ./llama-bench -m ~/docker/data/llama.cpp/Mistral-Small-4-119B-2603-GGUF-IQ4_XS/Mistral-Small-4-119B-2603-UD-IQ4_XS-00001-of-00003.gguf
+ggml_cuda_init: found 1 CUDA devices (Total VRAM: 97247 MiB):
+ Device 0: NVIDIA RTX PRO 6000 Blackwell Workstation Edition, compute capability 12.0, VMM: yes, VRAM: 97247 MiB
+| model | size | params | backend | ngl | test | t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | --: | --------------: | -------------------: |
+| mistral4 ?B IQ4_XS - 4.25 bpw | 60.28 GiB | 118.97 B | CUDA | 99 | pp512 | 3494.09 ± 105.79 |
+| mistral4 ?B IQ4_XS - 4.25 bpw | 60.28 GiB | 118.97 B | CUDA | 99 | tg128 | 189.68 ± 0.86 |
+build: b6c83aad5 (8390) 
+none is getting offloaded to ram<br></fieldset></td>
+</tr>
+<tr>
+<td valign="top"><fieldset>
+<legend>1483170334025978119</legend>
+<b>hardware:</b> Apple M3 Ultra, 512.0GB RAM, 32 CPU cores, 80 GPU cores<br><b>model:</b> qwen3.5-122b<br><b>quant:</b> 4bit<br><b>speed:</b> 54 t/s · 54 tok/s, 54 tok/s, 54 tok/s, 53 tok/s<br><b>pp:</b> —<br><b>ts:</b> 54, 53, 52, 50, 47, 39, 32, 65, 66, 64, 63, 60, 46, 35<br><b>additional info:</b> Qwen3.5-122B-A10-4bit 
+ Apple M3 Ultra, 512.0GB RAM, 32 CPU cores, 80 GPU cores
+0.5k pp 605 tg 54 t/s 69.7GB
+1k pp 861 tg 54 t/s 70.2GB
+2k pp 909 tg 54 t/s 71.5GB
+4k pp 822 tg 53 t/s 71.9GB
+8k pp 772 tg 52 t/s 72.6GB
+16k pp 709 tg 50 t/s 73.8GB
+32k pp 613 tg 47 t/s 76.2GB
+64k pp 468 tg 39 t/s 81.3GB
+128k pp 311 tg 32 t/s 91.7GB 
+ Apple M5 Max, 128.0GB RAM, 18 CPU cores, 40 GPU cores
+0.5k pp 762 tg 65 t/s 69.7GB
+1k pp 1076 tg 66 t/s 70.2GB
+2k pp 1239 tg 66 t/s 71.5GB
+4k pp 1338 tg 64 t/s 71.9GB
+8k pp 1286 tg 63 t/s 72.6GB
+16k pp 1240 tg 60 t/s 73.8GB
+32k pp 1092 tg 54 t/s 76.2GB
+64k pp 852 tg 46 t/s 81.3GB
+128k pp 574 tg 35 t/s 91.7GB<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1483131779400339668</legend>
+<b>hardware:</b> GTX 1650, 4gb vram<br><b>model:</b> Qwen-3.5-9B<br><b>quant:</b> Q_K_M<br><b>speed:</b> 5 tokens per second · 5 tok/s<br><b>pp:</b> —<br><b>ts:</b> 5<br><b>additional info:</b> Wait, if the model is too large, how am I able to run Qwen-3.5-9B Q_K_M on my GTX 1650 with 4gb vram? It works, although I only get about 5 tokens per second<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1481473892936581210</legend>
+<b>hardware:</b> DGX spark<br><b>model:</b> qwen3-coder-next<br><b>quant:</b> NVFP4<br><b>speed:</b> 45000 t/s PP 2048, 95t/s tg512 · 45000 tok/s, 95 tok/s, 45000 tok/s, 95 tok/s<br><b>pp:</b> 45000<br><b>ts:</b> 512, 95, 45000<br><b>additional info:</b> Just benchmarked Nvidia&#x27;s Qwen Coder Next 80B A3B NVFP4 on my DGX spark.
+45000 t/s PP 2048, 95t/s tg512<br></fieldset></td>
+</tr>
+<tr>
+<td valign="top"><fieldset>
+<legend>1481473520528785511</legend>
+<b>hardware:</b> dual 5060ti<br><b>model:</b> unsloth/3.5 35b q8<br><b>quant:</b> q8<br><b>speed:</b> prompt eval time = 2849.51 ms / 2354 tokens (1.21 ms per token, 826.11 tokens per second); eval time = 24183.67 ms / 1404 tokens (17.22 ms per token, 58.06 tokens per second); total time = 27033.18 ms / 3758 tokens · 2354 tok/s, 826.11 tok/s, 1404 tok/s, 58.06 tok/s<br><b>pp:</b> —<br><b>ts:</b> 2354, 826.11, 1404, 58.06<br><b>additional info:</b> prompt eval time = 2849.51 ms / 2354 tokens ( 1.21 ms per token, 826.11 tokens per second)
+ eval time = 24183.67 ms / 1404 tokens ( 17.22 ms per token, 58.06 tokens per second)
+ total time = 27033.18 ms / 3758 tokens 
+
+me with unsloth/3.5 35b q8 dual 5060ti. PP gimped by x1 pcie4<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1481466465910521917</legend>
+<b>hardware:</b> Double RTX 4090<br><b>model:</b> qwen3.5-35b-a3b<br><b>quant:</b> Q8<br><b>speed:</b> 4505.38 tokens/s PP - 94 t/s TG; 1462.37 tokens/s PP - 23.45 t/s TG · 4505.38 tok/s, 94 tok/s, 1462.37 tok/s, 23.45 tok/s<br><b>pp:</b> —<br><b>ts:</b> 94, 23.45, 4505.38, 1462.37<br><b>additional info:</b> Double RTX 4090 - KV Cache Q8
+
+unsloth/Qwen3.5-35B-A3B-Q8_0.gguf
+4505.38 tokens/s PP - 94 t/s TG
+
+unsloth/Qwen3.5-27B-Q8_0.gguf
+1462.37 tokens/s PP - 23.45 t/s TG<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1481349100120182854</legend>
+<b>hardware:</b> dual 4090<br><b>model:</b> qwen3.5-35b-a3b<br><b>quant:</b> Q8<br><b>speed:</b> 1462.37 tokens/s, 23.45 t/s, 3218.70 tokens/s, 99.33 t/s · 1462.37 tok/s, 23.45 tok/s, 3218.7 tok/s, 99.33 tok/s<br><b>pp:</b> —<br><b>ts:</b> 23.45, 99.33, 1462.37, 3218.7<br><b>additional info:</b> Running some new tests with the dual 4090 setup with a 40k token prompt. KV Cache is Q8, Context set to 128k
+ unsloth/Qwen3.5-27B-GGUF Q8 1462.37 tokens/s PP 23.45 t/s TG
+unsloth/Qwen3.5-35B-A3B-GGUF Q8 3218.70 tokens/s 99.33 t/s TG<br></fieldset></td>
+</tr>
+<tr>
+<td valign="top"><fieldset>
+<legend>1480320394966859796</legend>
+<b>hardware:</b> single 6000, 5090<br><b>model:</b> minimax-m2.5<br><b>quant:</b> q3-k<br><b>speed:</b> 20 tk/s generation, 200 for prompt processing · 20 tok/s, 20 tok/s<br><b>pp:</b> —<br><b>ts:</b> 20<br><b>additional info:</b> running MiniMax 2.5 Q3 on my single 6000 and goddamn is it slow lol. Getting 20 tk/s generation and 200 for prompt processing. When ever I get my electrical sorted, going to try adding my 5090 and offloading layers to that to see if it helps.<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1479198528273383516</legend>
+<b>hardware:</b> Macbook Pro M1 Max 64GB<br><b>model:</b> qwen3.5-35b-a3b<br><b>quant:</b> 5.5bit<br><b>speed:</b> Token Gen: 45 tok/s, 39 tok/s, 23 tok/s · 45 tok/s, 39 tok/s, 23 tok/s, 10 tok/s<br><b>pp:</b> —<br><b>ts:</b> 10, 20, 45, 39, 23, 344, 330<br><b>additional info:</b> inferencerlabs/Qwen3.5-35B-A3B-MLX-5.5bit - Token Gen: 45 tok/s (KV Cache 8bit LMStudio)
+inferencerlabs/Qwen3.5-35B-A3B-MLX-9bit - Token Gen: 39 tok/s (KV Cache 8bit LMStudio)
+mlx-community/Qwen3.5-35B-A3B-6bit - Token Gen: 23 tok/s (KV Cache not supported in LMStudio)
+
+unsloth/Qwen3.5-35B-A3B-GGUF:MXFP4_MOE - Token Gen 10 tok/s - PP 344 tok/s - KV Cache 8bit
+unsloth/Qwen3.5-35B-A3B-GGUF:UD-Q4_K_XL - Token Gen 20 tok/s - PP 330 tok/s - KV Cache 8bit
+
+All tests done with 40-44k context window fill parsing a 70 page PDF and summarizing it.
+
+Hardware: Macbook Pro M1 Max 64GB<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1478455512868585682</legend>
+<b>hardware:</b> 9950x, 256GB ddr5, 6000mt machine, 6000 blackwell<br><b>model:</b> glm-4.7<br><b>quant:</b> Q4<br><b>speed:</b> 5.8 tps · 5.8 tok/s<br><b>pp:</b> —<br><b>ts:</b> 5.8<br><b>additional info:</b> Not Qwen but on a 9950x 256GB ddr5 6000mt machine with 6000 blackwell I&#x27;m getting about 5.8 tps on a Q4 of a GLM 4.7 (about 202 gb model) just for reference.<br></fieldset></td>
+</tr>
+<tr>
+<td valign="top"><fieldset>
+<legend>1478441851362213928</legend>
+<b>hardware:</b> 5090<br><b>model:</b> qwen3.5-27b<br><b>quant:</b> Q5_K_L<br><b>speed:</b> 52 tok/s · 52 tok/s<br><b>pp:</b> —<br><b>ts:</b> 52<br><b>additional info:</b> On my 5090 I was getting 52 tok/s generation with Qwen 3.5 27B Q5_K_L, for a comparison point.<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1478340131596271707</legend>
+<b>hardware:</b> Ryzen 7940hs 128gb + egpu 5060ti 16gb<br><b>model:</b> qwen3.5-35b-a3b<br><b>quant:</b> —<br><b>speed:</b> 422,55 t/s · 55 tok/s, 82 tok/s, 1 tok/s, 3 tok/s<br><b>pp:</b> —<br><b>ts:</b> 55, 82, 1, 3<br><b>additional info:</b> i guess ik-llamap.cpp ist just different, as the logs are simliar to llama.cpp --verbose but less verbose. Basically prompt processing can also be viewed in real time. But just run a anaylsis on a 2k java lines of code on Ryzen 7940hs 128gb + egpu 5060ti 16gb, and result shocked me:
+
+./bin/llama-cli -m ../../models/qwen3.5/Qwen3.5-35B-A3B-MXFP4_MOE.gguf -p &quot;Create a list of classes and methods, that should be extracted from VermietungService into these classes. At the current point of time this class is containing functionality from different domain areas. Don&#x27;t generate code. Don&#x27;t write code. Use classname and class methods to show the resulting classes. Don&#x27;t explain anything. $(cat test.java)&quot; -t 8 -ngl 999 -fa on --no-mmap --n-cpu-moe 22
+
+ik-llama.cpp
+[ Prompt: 422,55 t/s | Generation: 39,82 t/s ]
+total time: 1m30,384s 
+llama.cpp
+[ Prompt: 123,1 t/s | Generation: 36,3 t/s ]
+total time: 6m8,379s<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1478255201516261578</legend>
+<b>hardware:</b> M1 Max 64GB<br><b>model:</b> qwen3.5-9b<br><b>quant:</b> 8bit<br><b>speed:</b> 38.54tok/sec · 38.54 tok/s, 17.3 tok/s, 26.5 tok/s<br><b>pp:</b> —<br><b>ts:</b> 38.54, 17.3, 26.5<br><b>additional info:</b> New tests with an M1 Max 64GB:
+ qwen3.5-35b-a3b@8bit - 38.54tok/sec (43k of the context window filled)
+qwen3.5-9b-mlx@bf-16 - 17.3tok/sec (40k of the context window filled) 
+qwen3.5-9b-mlx@9bit - 26.5tok/sec (44k of the context window filled)<br></fieldset></td>
+</tr>
+<tr>
+<td valign="top"><fieldset>
+<legend>1478112319484592220</legend>
+<b>hardware:</b> i5-1145g7 cpu only<br><b>model:</b> qwen3-coder-0.8<br><b>quant:</b> q8_0<br><b>speed:</b> 12t/s · 12 tok/s, 12 tok/s, 12 tok/s<br><b>pp:</b> —<br><b>ts:</b> 12<br><b>additional info:</b> qwen3.5-0.8b q8_0 ran 12t/s on i5-1145g7 cpu only, lm studio<br></fieldset></td>
+<td valign="top"><fieldset>
+<legend>1468725965420236801</legend>
+<b>hardware:</b> 4070 12gb + 64gb ddr5 6000mhz + 7950x<br><b>model:</b> qwen3-coder-next<br><b>quant:</b> q4_0<br><b>speed:</b> 476.17 tokens per second · 29883 tok/s, 307.05 tok/s, 1672 tok/s, 25.54 tok/s<br><b>pp:</b> —<br><b>ts:</b> 29883, 307.05, 1672, 25.54<br><b>additional info:</b> with (4070 12gb + 64gb ddr5 6000mhz + 7950x)
+
+llama-server -m &quot;C:\Users\maxkr.lmstudio\models\unsloth\Qwen3-Coder-Next-GGUF\Qwen3-Coder-Next-Q4_K_M.gguf&quot; --ctx-size $(1024*40) --batch-size 512 --parallel 1 --threads 12 --flash-attn on -ctvd q4_0 -ctkd q4_0 --fit on --temp 1.0 --top-p 0.95 --min-p 0.01 --top-k 40 --jinja
+
+and 
+
+llama_params_fit_impl: projected to use 47426 MiB of device memory vs. 11014 MiB of free device memory
+llama_params_fit_impl: cannot meet free memory target of 1024 MiB, need to reduce device memory by 37436 MiB
+llama_params_fit_impl: context size set by user to 40960 -&gt; no change
+llama_params_fit_impl: with only dense weights in device memory there is a total surplus of 6947 MiB
+llama_params_fit_impl: filling dense-only layers back-to-front:
+llama_params_fit_impl: - CUDA0 (NVIDIA GeForce RTX 4070): 49 layers, 4038 MiB used, 6975 MiB free
+llama_params_fit_impl: converting dense-only layers to full layers and filling them front-to-back with overflow to next device/system memory:
+llama_params_fit_impl: - CUDA0 (NVIDIA GeForce RTX 4070): 49 layers (42 overflowing), 9891 MiB used, 1122 MiB free
+
+and a random 30k token input prompt (some log), i get
+
+slot init_sampler: id 0 | task 3 | init sampler, took 2.34 ms, tokens: text = 29883, total = 29883
+slot update_slots: id 0 | task 3 | created context checkpoint 1 of 8 (pos_min = 29818, pos_max = 29818, size = 75.376 MiB)
+slot print_timing: id 0 | task 3 |
+prompt eval time = 97323.22 ms / 29883 tokens ( 3.26 ms per token, 307.05 tokens per second)
+ eval time = 65468.14 ms / 1672 tokens ( 39.16 ms per token, 25.54 tokens per second)
+ total time = 162791.36 ms / 31555 tokens
+slot release: id 0 | task 3 | stop processing: n_tokens = 31554, truncated = 0<br></fieldset></td>
+<td></td>
+</tr>
+</table>
+</body>
+</html>

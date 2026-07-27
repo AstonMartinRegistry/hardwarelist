@@ -1,0 +1,1476 @@
+{
+  "meta": {
+    "server": "LocalLLM",
+    "month": "2025-08",
+    "category": "hardware",
+    "message_count": 209,
+    "source_file": "/Users/danielk/Desktop/projects/discorddata/jsonstrimmed/localllmbymonth/2025-08.json",
+    "model": "gpt-oss-120b",
+    "generated_at": "2026-07-19T17:16:08.513423+00:00"
+  },
+  "messages": [
+    {
+      "id": "1406010078246736054",
+      "timestamp": "Friday, August 15, 2025 1:22\u202fPM",
+      "content": "Im building a homelab for this, and plan on hosting a suite of specialized llms for different tasks, with one in particular managing things / acting as the assistant. Im curious what you all think about the p40? I know there's some 3d printing / cooling challenges. But is it worth it to go this route? I've heard since it's enterprise and older it can have some software incompatibilities etc. \n\nMy current short list of cards are:\nP40, 4060 ti(16gb), 5060 ti(16gb), 3090 ti(24). I'd like to spend as little as possible but just curious what yalls experiences would lean me towards",
+      "why": "User lists potential GPUs (P40, 4060\u202fti, 5060\u202fti, 3090\u202fti) for a homelab.",
+      "extracted": "P40, 4060 ti, 5060 ti, 3090 ti"
+    },
+    {
+      "id": "1406010664299790510",
+      "timestamp": "Friday, August 15, 2025 1:24\u202fPM",
+      "content": "Depends if you care more about size or speed, the p40 is shockingly slow..",
+      "why": "User comments that the P40 is slow, referencing hardware performance.",
+      "extracted": "p40"
+    },
+    {
+      "id": "1406011066365776043",
+      "timestamp": "Friday, August 15, 2025 1:26\u202fPM",
+      "content": "i wouldn't bother with the pascal cards",
+      "why": "User advises against using Pascal\u2011generation cards.",
+      "extracted": "pascal cards"
+    },
+    {
+      "id": "1406011427755655251",
+      "timestamp": "Friday, August 15, 2025 1:27\u202fPM",
+      "content": "So I currently have a 4080 16gb in my workstation with 128gb of ram and a 9900x, but I dont want to run it continously on there, and I game on that machine. Single models seem to work well on my 4080 16gb. I do have an extra 2080 ti 11gb but that card is pretty old.",
+      "why": "User provides detailed workstation specs for LLM usage.",
+      "extracted": "4080 16gb, 128gb ram, 9900x, 2080 ti 11gb"
+    },
+    {
+      "id": "1406011993042849883",
+      "timestamp": "Friday, August 15, 2025 1:29\u202fPM",
+      "content": "I think a 4060ti with offloading to get to 24gb (and reasonably fast RAM) will be faster than a p40",
+      "why": "User suggests a 4060\u202fti with offloading to reach 24\u202fGB VRAM.",
+      "extracted": "4060ti"
+    },
+    {
+      "id": "1406014440033357946",
+      "timestamp": "Friday, August 15, 2025 1:39\u202fPM",
+      "content": "So im either gonna build something from scratch, or my networking sys admin cousin reccommended a poweredge 720/740, or build from parts i have(i9 9900k, 32gb ram, 2080ti, Asus maximus ?z920? Which i already have)",
+      "why": "User mentions a build with i9\u202f9900k, 32\u202fGB RAM, and a 2080\u202fti.",
+      "extracted": "i9 9900k, 32gb ram, 2080ti"
+    },
+    {
+      "id": "1406014951704760330",
+      "timestamp": "Friday, August 15, 2025 1:41\u202fPM",
+      "content": "Also, MoE need less VRAM so they often are the best choice",
+      "why": "User notes that MoE models require less VRAM, referencing memory requirements.",
+      "extracted": "VRAM"
+    },
+    {
+      "id": "1408504075447959624",
+      "timestamp": "Friday, August 22, 2025 10:32\u202fAM",
+      "content": "Connect that to your HVAC and you could run the entire house's heating and warm water with it, granted you do enough inference :) 1650 seems little for the PSU, just the GPUs would peak with 2400",
+      "why": "Mentions a 1650\u202fW PSU and GPUs peaking at 2400\u202fW.",
+      "extracted": "1650 ... 2400"
+    },
+    {
+      "id": "1408517252923396198",
+      "timestamp": "Friday, August 22, 2025 11:24\u202fAM",
+      "content": "oof, I cant offload some of larger models to ram no?",
+      "why": "Mentions inability to offload larger models to RAM.",
+      "extracted": "ram"
+    },
+    {
+      "id": "1408517362612965517",
+      "timestamp": "Friday, August 22, 2025 11:25\u202fAM",
+      "content": "vLLM already has the option to offload some excesses to RAM",
+      "why": "Notes vLLM can offload excess to RAM.",
+      "extracted": "RAM"
+    },
+    {
+      "id": "1408522478728515805",
+      "timestamp": "Friday, August 22, 2025 11:45\u202fAM",
+      "content": "remember to pick context length, and off load to ram, and perhaps rope yarn factor",
+      "why": "Suggests picking context length and off\u2011loading to RAM.",
+      "extracted": "ram"
+    },
+    {
+      "id": "1408525045256421537",
+      "timestamp": "Friday, August 22, 2025 11:55\u202fAM",
+      "content": "might just copy and change the swap space since I only have 32gbs",
+      "why": "States having only 32\u202fGB of system RAM.",
+      "extracted": "32gbs"
+    },
+    {
+      "id": "1408526801856233622",
+      "timestamp": "Friday, August 22, 2025 12:02\u202fPM",
+      "content": "I run it headless / graphicsless so I could use 97% of vram",
+      "why": "Mentions using 97\u202f% of VRAM by running headless.",
+      "extracted": "vram"
+    },
+    {
+      "id": "1408354936970018846",
+      "timestamp": "Friday, August 22, 2025 12:39\u202fAM",
+      "content": "remember that CPU RAM is pretty slow compared to VRAM\nif you are investing, might as well keep an eye for stuff like the GMKtec AI PC ( 128 GB of VRAM). Well we will even get better",
+      "why": "discusses the relative speed of CPU RAM vs VRAM and mentions a high\u2011VRAM PC",
+      "extracted": "128 GB of VRAM"
+    },
+    {
+      "id": "1408356781406556201",
+      "timestamp": "Friday, August 22, 2025 12:47\u202fAM",
+      "content": "Whats the best general model I can run on a singular 5080 and 32gbs dd5 6000 ram? is ollama still the preferred way to run local llms on windows?",
+      "why": "asks for a model that fits a given GPU and RAM configuration",
+      "extracted": "5080, 32gbs dd5 6000 ram"
+    },
+    {
+      "id": "1408357957527273553",
+      "timestamp": "Friday, August 22, 2025 12:51\u202fAM",
+      "content": "also linux can run in headless (graphicsless) mode so no RAM or VRAM is wasted",
+      "why": "mentions headless (graphics\u2011less) mode to avoid wasting RAM or VRAM",
+      "extracted": "headless (graphicsless) mode"
+    },
+    {
+      "id": "1408358058039705670",
+      "timestamp": "Friday, August 22, 2025 12:52\u202fAM",
+      "content": "yeah I used to run arch but the performance drop on the 50 series is too great. I loose about 25% compared to windows in most dx12 games. I have a server running proxmox for general use but it has a 1650 Super which I dont think is powerful enough",
+      "why": "describes a server with a 1650\u202fSuper GPU and comments on 50\u2011series performance",
+      "extracted": "1650 Super"
+    },
+    {
+      "id": "1408358148451860571",
+      "timestamp": "Friday, August 22, 2025 12:52\u202fAM",
+      "content": "That\u2019s how I use Ubuntu, only consumes 13MB from GPU.",
+      "why": "states that Ubuntu only consumes a small amount of GPU memory",
+      "extracted": "13MB from GPU"
+    },
+    {
+      "id": "1408358676032655362",
+      "timestamp": "Friday, August 22, 2025 12:54\u202fAM",
+      "content": "eh dont really feel like using up storage space. is the difference really that substantial? also 50 series drivers are worse on linux rn no?",
+      "why": "comments on the quality of 50\u2011series drivers on Linux",
+      "extracted": "50 series drivers"
+    },
+    {
+      "id": "1408358927644491807",
+      "timestamp": "Friday, August 22, 2025 12:55\u202fAM",
+      "content": "no idea, have a 3090 =/",
+      "why": "mentions owning an RTX\u202f3090 GPU",
+      "extracted": "3090"
+    },
+    {
+      "id": "1408361085857435719",
+      "timestamp": "Friday, August 22, 2025 1:04\u202fAM",
+      "content": "with a couple rtx 6000 pros you can get close =)",
+      "why": "Mentions having a couple of RTX 6000 Pro GPUs.",
+      "extracted": "rtx 6000 pros"
+    },
+    {
+      "id": "1408361195097952276",
+      "timestamp": "Friday, August 22, 2025 1:04\u202fAM",
+      "content": "how close can I get with one rtx 5080",
+      "why": "Asks about capability with a single RTX 5080 GPU.",
+      "extracted": "rtx 5080"
+    },
+    {
+      "id": "1408362915546791958",
+      "timestamp": "Friday, August 22, 2025 1:11\u202fAM",
+      "content": "an NVIDIA RTX 5070 TI with 16 GB of RAM can run Qwen3 8B with AWQ and KV FP8 with around 60k context length\nit's more than enough for commenting / explaining code and summarizing text",
+      "why": "Specifies an NVIDIA RTX 5070 Ti with 16\u202fGB of RAM.",
+      "extracted": "NVIDIA RTX 5070 TI with 16 GB of RAM"
+    },
+    {
+      "id": "1408364310262054963",
+      "timestamp": "Friday, August 22, 2025 1:16\u202fAM",
+      "content": "i mean now 1tb of vram would be 250k dollars at least right?",
+      "why": "Discusses the cost of 1\u202fTB of VRAM.",
+      "extracted": "1tb of vram"
+    },
+    {
+      "id": "1408364759593521182",
+      "timestamp": "Friday, August 22, 2025 1:18\u202fAM",
+      "content": "1tb of dedicated vram is insane",
+      "why": "Comments on 1\u202fTB of dedicated VRAM.",
+      "extracted": "1tb of dedicated vram"
+    },
+    {
+      "id": "1410984237615681667",
+      "timestamp": "Friday, August 29, 2025 6:47\u202fAM",
+      "content": "Currently using CPU inferencing for reading speed at qwen3 instruct 235b. Curious what kind of GPU options can I include to try and get the tokens/sec faster. E.g. I know some do partial offload etc",
+      "why": "Asks about GPU options to improve token throughput",
+      "extracted": "GPU options"
+    },
+    {
+      "id": "1410987287696900206",
+      "timestamp": "Friday, August 29, 2025 6:59\u202fAM",
+      "content": "if I add my gpu i only gain a few tok/s inference but i lose a lot of prompt processing speed",
+      "why": "Notes adding a GPU changes token/s and prompt speed",
+      "extracted": "gpu"
+    },
+    {
+      "id": "1410994032267624591",
+      "timestamp": "Friday, August 29, 2025 7:26\u202fAM",
+      "content": "There are offloading techniques to let you get big speed on that VRAM for the large MoE models, and they will likely run faster on your setup than the dense 70b. As long as you have normal system RAM enough to hold the rest of the model, then something like Qwen 235b only has 22b active parameters which more than fits in your 42GB, or even GLM 4.5 is something like 400b but 32b active parameters.\n\nSo really the question with your 42GB of VRAM is- how much system RAM do you have alongside it? If a decent bit, you actually might be able to run a lot more than you think",
+      "why": "Mentions 42GB VRAM and sufficient system RAM for large models",
+      "extracted": "42GB of VRAM"
+    },
+    {
+      "id": "1410994812588654704",
+      "timestamp": "Friday, August 29, 2025 7:29\u202fAM",
+      "content": "As its covering both answers, mine is 256GB of cpu RAM,",
+      "why": "Reports having 256GB of CPU RAM",
+      "extracted": "256GB of cpu RAM"
+    },
+    {
+      "id": "1410998694936969339",
+      "timestamp": "Friday, August 29, 2025 7:45\u202fAM",
+      "content": "yeah i have like total 200gb worth of models i aint loading all of them",
+      "why": "States having about 200\u202fGB of models, indicating storage/VRAM usage.",
+      "extracted": "200gb"
+    },
+    {
+      "id": "1410999148349620397",
+      "timestamp": "Friday, August 29, 2025 7:46\u202fAM",
+      "content": "I used to have a post about my setup on reddit before I got my account nuked, but Ive got close to a terabyte of 800GB/s unified RAM available across some macs. That's why. But seriously you wont get me to shut up if I start talking about it so let me go get that script lol",
+      "why": "Describes having close to a terabyte of 800\u202fGB/s unified RAM across Macs.",
+      "extracted": "close to a terabyte of 800GB/s unified RAM"
+    },
+    {
+      "id": "1407071142518456413",
+      "timestamp": "Monday, August 18, 2025 11:38\u202fAM",
+      "content": "Fwiw you can get a 24GB AMD card for < 1k USD",
+      "why": "Mentions availability of a 24GB AMD GPU",
+      "extracted": "24GB AMD card"
+    },
+    {
+      "id": "1407077634998796419",
+      "timestamp": "Monday, August 18, 2025 12:04\u202fPM",
+      "content": "I'm wondering what kind of stuff I could run with two P2000s that are owned by a school I know... Maybe with some tool calling? Lol",
+      "why": "References two P2000 GPUs owned by a school",
+      "extracted": "two P2000s"
+    },
+    {
+      "id": "1407094826914156677",
+      "timestamp": "Monday, August 18, 2025 1:12\u202fPM",
+      "content": "Hey guys, working on a personal project right now. I'm trying to normalize a dataset with 2M+ records using an LLM into a JSON format. Currently I'm getting decent results with nous-hermes-2-mistral-7b-dpo. However, even though it's fast on my 4090. It would still take like 3 weeks to normalize this data. Wondering if anyone that's familiar with models good at fast data extraction/normalization. NuExtract looks promising but I'm not familiar with the performance",
+      "why": "Notes fast performance on a specific GPU",
+      "extracted": "4090"
+    },
+    {
+      "id": "1407098346241265795",
+      "timestamp": "Monday, August 18, 2025 1:26\u202fPM",
+      "content": "I'm thinking my getting a used M1 Mac Studio for running LLMs, either 32gb or 64gb. Does this sound like a good idea ?",
+      "why": "Considers a Mac Studio with specific RAM configurations for LLM work",
+      "extracted": "M1 Mac Studio, 32GB, 64GB"
+    },
+    {
+      "id": "1407100762529599588",
+      "timestamp": "Monday, August 18, 2025 1:36\u202fPM",
+      "content": "I'd probably begin with caching the model state to just after your prompt so the only thing that's changing is the row data. We have someone in here getting thousands of tokens per second on a 4090 using insrancing",
+      "why": "Mentions a 4090 GPU used for high\u2011throughput token generation",
+      "extracted": "4090"
+    },
+    {
+      "id": "1407103565108871300",
+      "timestamp": "Monday, August 18, 2025 1:47\u202fPM",
+      "content": "Considering the throughout of the RAM it might, the used price could also be quite low, and not to forget the efficiency... I wonder how viable a cluster would be huh",
+      "why": "Talks about RAM throughput and cluster efficiency",
+      "extracted": "RAM"
+    },
+    {
+      "id": "1406931215834943498",
+      "timestamp": "Monday, August 18, 2025 2:22\u202fAM",
+      "content": "Hey everyone \n\nI\u2019m Shubham and I work with the team at Qubrid - we provide full-GPU cloud VMs (A100/H100) so people can run their own LLMs privately with full SSH/Jupyter access (basically like your own \u201clocal\u201d box in the cloud).\n\nI\u2019m here mostly to learn, share infra tips, and help where I can - especially around vLLM, multi-GPU inference and RAG setups. So if anyone ever needs help troubleshooting or wants to try a dedicated GPU (no fractional sharing), feel free to ping me!\n\nLooking forward to hanging out and building with you all",
+      "why": "offers A100/H100 GPUs for cloud VMs",
+      "extracted": "A100/H100"
+    },
+    {
+      "id": "1407118896820916254",
+      "timestamp": "Monday, August 18, 2025 2:48\u202fPM",
+      "content": "used 3090 still king imo",
+      "why": "States continued use of a 3090 GPU",
+      "extracted": "3090"
+    },
+    {
+      "id": "1406951412868448297",
+      "timestamp": "Monday, August 18, 2025 3:42\u202fAM",
+      "content": "great stuff bro, hopefully i'll be able to afford my own h100 at some point",
+      "why": "expresses desire to afford an H100 GPU",
+      "extracted": "h100"
+    },
+    {
+      "id": "1406963978969681950",
+      "timestamp": "Monday, August 18, 2025 4:32\u202fAM",
+      "content": "Hi all,\n\nI currently get 47 TPS on my 4080S gaming PC running qwen3-coder 6 bit quant. I\u2019m using llama.cpp with -fa -ngl 99 \u2014n-cpu moe 25.\n\nIs this reasonable performance or can I squeeze out more?",
+      "why": "reports running on a 4080S gaming PC",
+      "extracted": "4080S gaming PC"
+    },
+    {
+      "id": "1406965376977469550",
+      "timestamp": "Monday, August 18, 2025 4:38\u202fAM",
+      "content": "Getting around 47 TPS on a 4080S with Qwen-3 Coder in 6-bit using llama.cpp with -fa -ngl 99 --n-cpu-moe 25 actually sounds about right. That high ngl plus 6-bit quant can be pretty heavy on the GPU, so your numbers make sense. You could maybe squeeze out a bit more by tweaking ngl or --n-cpu-moe, checking for thermal throttling, or trying streaming/batching.",
+      "why": "discusses the heavy load on a 4080 GPU",
+      "extracted": "4080"
+    },
+    {
+      "id": "1406966892022861825",
+      "timestamp": "Monday, August 18, 2025 4:44\u202fAM",
+      "content": "Yes the 1b is good enough for summarization, but i was looking for smaller model for more token/s i've a old laptop...",
+      "why": "mentions using an old laptop",
+      "extracted": "old laptop"
+    },
+    {
+      "id": "1406969538414776370",
+      "timestamp": "Monday, August 18, 2025 4:54\u202fAM",
+      "content": "if you're running on CPU i recommend running via onnx model, it should be a bit faster",
+      "why": "recommends running on CPU for speed",
+      "extracted": "CPU"
+    },
+    {
+      "id": "1407164769525432442",
+      "timestamp": "Monday, August 18, 2025 5:50\u202fPM",
+      "content": "I made a dumb mistake with my homelab build, and my GPU won't clear the DIMM slots on my MB. This is in a tower workstation, but using a server style MB. I don't have the room for a vertical mount kit either. I'm wondering if anyone has used something like this, to give just a little more clearance?\n\n https://www.amazon.com/dp/B0DHTL5ZVP?ref=ppx_yo2ov_dt_b_fed_asin_title&th=1 \n\nObviously this means the port end of the GPU will not line up perfectly with the cutout, but I think I can make do with that. \nAlso, would be great if we had a hardware channel.",
+      "why": "Describes a GPU clearance issue in a tower workstation",
+      "extracted": "GPU, DIMM slots, server\u2011style motherboard"
+    },
+    {
+      "id": "1407166385360207943",
+      "timestamp": "Monday, August 18, 2025 5:56\u202fPM",
+      "content": "Back in the 2023 days of LocalLlama, a lot of folks used risers and had great luck with them.\n\nWith that said, the reviews on this particular one would probably have me looking elsewhere",
+      "why": "References the use of riser cards for GPU installation",
+      "extracted": "risers"
+    },
+    {
+      "id": "1407171139486224404",
+      "timestamp": "Monday, August 18, 2025 6:15\u202fPM",
+      "content": "I had EXACT same issue. I used a similar riser card to fit 3 gpus into x570 board",
+      "why": "Mentions using a riser card to fit three GPUs on an x570 board",
+      "extracted": "riser card, 3 GPUs, x570 board"
+    },
+    {
+      "id": "1407173902312013905",
+      "timestamp": "Monday, August 18, 2025 6:26\u202fPM",
+      "content": "Which card did you use, if I may ask? This is the only one I could find. Lots of riser cables, some vertical mounts, but not much for something to simply extend the slot a bit. I did not think it would be possible to end up in this situation, but this is my first build in 20 years.",
+      "why": "Asks about the specific graphics card and mounting options",
+      "extracted": "card, riser cables, vertical mounts"
+    },
+    {
+      "id": "1407174210366734376",
+      "timestamp": "Monday, August 18, 2025 6:27\u202fPM",
+      "content": "The gpus I own are 3 3090s. 1 asus tuf (2slot), 3090fe (3slot) and gainward 3090ti (3 slot i believe)\n\ni could not fit the 3rd card because the bottom 2 pcie slots are closer to eachother than the top 2.",
+      "why": "Lists three 3090 GPUs and PCIe slot constraints",
+      "extracted": "3\u202f\u00d7\u202f3090s, ASUS TUF, 3090fe, Gainward 3090ti, PCIe slot spacing"
+    },
+    {
+      "id": "1407175139002683424",
+      "timestamp": "Monday, August 18, 2025 6:31\u202fPM",
+      "content": "Apple computers have the RAM capacity, but not enough compute power\nNVIDIA is the opposite situation, enough compute but stingy with RAM \nthe market is prime for a takeover",
+      "why": "Compares RAM capacity of Apple machines with compute power of NVIDIA GPUs",
+      "extracted": "Apple computers (RAM), NVIDIA GPUs (compute)"
+    },
+    {
+      "id": "1406995320654663851",
+      "timestamp": "Monday, August 18, 2025 6:37\u202fAM",
+      "content": "Hey guys, total noobie here for running local llm's kinda, I've run some small models on an ubuntu vm with an RTX 4000 ADA but ran into issues on a couple of them, this was with basic openwebui etc and I really want to dig deeper into running my own.\n\nThe only thing I can't quite grasp is what hardware people are using! GPUs are so expensive at the moment, I have an AMD Ryzen 9 9950x3d, RTX 4070Ti (12GB) and 64GB DDR5 high speed memory, the GPU is the biggest let down for AI models.\n\nI also have an Intel i9 10850K, RTX 4000 ADA 20GB and 64GB DDR4 which seems okay but right now just battling to get good combatibility in Linux on it / Proxmox to run a containerised docker for Llama.\n\nMy question is, without spending thousands on a 24GB card, or a RTX 4090/5090, what are you guys using to run models? Seems like you need atleast 24GB of VRAM to run something half decent or am I just missing something entirely",
+      "why": "lists multiple hardware specs (AMD Ryzen\u202f9\u202f9950x3d, RTX\u202f4070Ti 12GB, 64GB DDR5, Intel i9\u202f10850K, RTX\u202f4000\u202fADA 20GB)",
+      "extracted": "AMD Ryzen 9 9950x3d, RTX 4070Ti (12GB), 64GB DDR5, Intel i9 10850K, RTX 4000 ADA 20GB"
+    },
+    {
+      "id": "1407002833336795207",
+      "timestamp": "Monday, August 18, 2025 7:06\u202fAM",
+      "content": "GPU VRAM is usually the main bottleneck for running larger LLMs locally. Your Ryzen + 4070Ti or i9 + 4000 ADA setups are solid for smaller models or quantized versions, but once you hit 13B+ models, 24GB VRAM really helps. \n\nThat said, you can often get around this with 4-bit or 8-bit quantization, CPU + GPU offloading, or by using high-VRAM cloud platforms that let you spin up large models on-demand. Some services even provide ready-to-use high-performance GPU instances with fine-tuning and RAG templates, so you can experiment and scale models without worrying about compatibility or spending thousands on new hardware. If you want, DM me and I can suggest a few cloud options since I\u2019m not sure if posting names is allowed here.",
+      "why": "Discusses GPU/CPU setups and VRAM requirements for running larger models",
+      "extracted": "Ryzen + 4070Ti, i9 + 4000 ADA, 24GB VRAM"
+    },
+    {
+      "id": "1409557005752074320",
+      "timestamp": "Monday, August 25, 2025 8:16\u202fAM",
+      "content": "Success! My first homelab is up and running!\nProxmox 9\nIntel Core 7 20threads\n3090 FE 24GB\n64GB DDR5\n\ngoing through the motions to set everything up. passing the GPU drivers through is a real pain.\n\nSetting up both llama.cpp and ollama, and open web ui to start",
+      "why": "Provides a hardware spec list for a homelab: Intel Core i7 20\u2011thread, 3090 FE 24\u202fGB, 64\u202fGB DDR5.",
+      "extracted": "Intel Core 7 20threads, 3090 FE 24GB, 64GB DDR5"
+    },
+    {
+      "id": "1406418356550111352",
+      "timestamp": "Saturday, August 16, 2025 4:24\u202fPM",
+      "content": "Does anyone have a reccommendation for a super fast, smart, light weight model to handle incoming voice prompts, that I could then route away from if it's something beyond it's paygrade? I'm only working with a 4080 16gb, and struggling with how to structure this. I'm trying out the Qwen3 coder 0.8 using qwencode for coding stuff, and so far that's been going well, but it could be nice to have another super light weight to handle surface layer stuff so I could run the coder, the lightweight, and the main brain, so to speak all under 16gb",
+      "why": "specifies a single GPU with 16\u202fGB VRAM (RTX\u202f4080) as the hardware limit",
+      "extracted": "4080 16gb"
+    },
+    {
+      "id": "1406466525619032085",
+      "timestamp": "Saturday, August 16, 2025 7:35\u202fPM",
+      "content": "Parakeet by Nvidia, no question. Runs 600x realtime on a 4090. It'll burn rubber on a 4080. It's light as hell, so you can pretty easily run it alongside the rest of your stack without taking up too much vram. I frequently run it alongside kokoro (100x realtime voice output) and a LLM on the same 24gb for a fully high-speed low latency voice chat.",
+      "why": "mentions running Parakeet on a 4090 and also on a 4080 with 24\u202fGB VRAM for the rest of the stack",
+      "extracted": "4090, 4080, 24gb"
+    },
+    {
+      "id": "1406313712649900134",
+      "timestamp": "Saturday, August 16, 2025 9:28\u202fAM",
+      "content": "docker is the only way for me to run vLLM with newest tech since otherwise I would have to compile for nightly and that is a rabbit hole I regret going down because there is some ludicrous requirement in version matching for everything in the toolchain to be able to compile correctly for Blackwell GPUs",
+      "why": "References a specific GPU architecture used for inference.",
+      "extracted": "Blackwell GPUs"
+    },
+    {
+      "id": "1409069019377696768",
+      "timestamp": "Saturday, August 23, 2025 11:57\u202fPM",
+      "content": "they've got nvlink and most people undervolt their cards if they're running them 24/7 anyway",
+      "why": "Mentions NVLink connectivity between GPUs.",
+      "extracted": "nvlink"
+    },
+    {
+      "id": "1408755637558706226",
+      "timestamp": "Saturday, August 23, 2025 3:11\u202fAM",
+      "content": "512gb... That sounds pricey",
+      "why": "Comments on a 512\u202fGB storage size being pricey.",
+      "extracted": "512gb"
+    },
+    {
+      "id": "1408780323210268695",
+      "timestamp": "Saturday, August 23, 2025 4:50\u202fAM",
+      "content": "Add in that it's \"Apple 512GB\" and it's probably double the price you're thinking",
+      "why": "References an Apple device with 512\u202fGB storage.",
+      "extracted": "512GB"
+    },
+    {
+      "id": "1411504356662050876",
+      "timestamp": "Saturday, August 30, 2025 5:14\u202fPM",
+      "content": "Ok we were just talking about the possibility of China offering cheap vram a few days ago",
+      "why": "discusses the possibility of cheap VRAM from China",
+      "extracted": "cheap vram"
+    },
+    {
+      "id": "1411540461138612346",
+      "timestamp": "Saturday, August 30, 2025 7:37\u202fPM",
+      "content": "oh I don't mean it's not a recent card, but that others already knew about this card from what I'm reading, and it's not that impressive",
+      "why": "talks about a recent graphics card that isn\u2019t impressive",
+      "extracted": "card"
+    },
+    {
+      "id": "1406698432332038335",
+      "timestamp": "Sunday, August 17, 2025 10:57\u202fAM",
+      "content": "I wish someone would just release a 256GB vram GPU",
+      "why": "Expresses desire for a GPU with a large amount of VRAM",
+      "extracted": "256GB vram GPU"
+    },
+    {
+      "id": "1406698754781872259",
+      "timestamp": "Sunday, August 17, 2025 10:58\u202fAM",
+      "content": "Isn't there like this new AI startup that has one with DRAM sticks?",
+      "why": "Mentions a startup having a GPU with DRAM sticks",
+      "extracted": "DRAM sticks"
+    },
+    {
+      "id": "1406704363988058347",
+      "timestamp": "Sunday, August 17, 2025 11:20\u202fAM",
+      "content": "Afaik it's dual channel. it is a wanky GPU",
+      "why": "Notes that the GPU is dual\u2011channel",
+      "extracted": "dual channel"
+    },
+    {
+      "id": "1406705371258556508",
+      "timestamp": "Sunday, August 17, 2025 11:24\u202fAM",
+      "content": "I'm definitely intrigued. And at 384GB it has an actual chance",
+      "why": "References a 384\u202fGB memory size",
+      "extracted": "384GB"
+    },
+    {
+      "id": "1406708166921552022",
+      "timestamp": "Sunday, August 17, 2025 11:36\u202fAM",
+      "content": "IDK how yall are but i cannot wait for next gen hardware. Medusa Point, Nova Lake, new gen gpus, tesntorrent hardware and more",
+      "why": "Mentions upcoming GPU architectures and new\u2011gen hardware",
+      "extracted": "Medusa Point, Nova Lake, new gen gpus"
+    },
+    {
+      "id": "1406714689332842576",
+      "timestamp": "Sunday, August 17, 2025 12:01\u202fPM",
+      "content": "also epyc does actually hit the advertised numbers if you choose the right cpu",
+      "why": "Mentions EPYC CPUs meeting advertised numbers",
+      "extracted": "epyc"
+    },
+    {
+      "id": "1406721630075621477",
+      "timestamp": "Sunday, August 17, 2025 12:29\u202fPM",
+      "content": "I think the sweet spot may be with the ryzen AI series.",
+      "why": "Suggests the Ryzen AI series as a sweet spot",
+      "extracted": "ryzen AI series"
+    },
+    {
+      "id": "1406722823485001800",
+      "timestamp": "Sunday, August 17, 2025 12:34\u202fPM",
+      "content": "the more you scale up (aka using bigger models) the more bandwidth you need, o4 mini level on q8 is like 120gb minimum without context and headroom. On the ryzen ai max not only you wouldnt fit, but you would also get unbarable speeds,\n\n250gb/s is only really viable in the 32b-62b range if we are really pushing it",
+      "why": "Discusses required memory bandwidth and size for large models",
+      "extracted": "120gb minimum, 250gb/s"
+    },
+    {
+      "id": "1406724968070385675",
+      "timestamp": "Sunday, August 17, 2025 12:42\u202fPM",
+      "content": "there are probably benchmarks out there, the b series have a couple of gpus out already",
+      "why": "Talks about the B\u2011series GPUs that are already available",
+      "extracted": "b series GPUs"
+    },
+    {
+      "id": "1406725122777157633",
+      "timestamp": "Sunday, August 17, 2025 12:43\u202fPM",
+      "content": "There is a dual version too.. nice",
+      "why": "Notes the existence of a dual version of the hardware",
+      "extracted": "dual version"
+    },
+    {
+      "id": "1406725232546283540",
+      "timestamp": "Sunday, August 17, 2025 12:43\u202fPM",
+      "content": "A lot cheaper than the A6000..",
+      "why": "Compares price to the Nvidia A6000 GPU",
+      "extracted": "A6000"
+    },
+    {
+      "id": "1406747663348662374",
+      "timestamp": "Sunday, August 17, 2025 2:12\u202fPM",
+      "content": "https://www.reddit.com/r/LocalLLaMA/comments/1mt2iev/gptoss20b_at_10000_tokenssecond_on_a_4090_sure/",
+      "why": "mentions using a 4090 GPU",
+      "extracted": "4090"
+    },
+    {
+      "id": "1406747958254239898",
+      "timestamp": "Sunday, August 17, 2025 2:14\u202fPM",
+      "content": "Well, that was a fun one. 10k tokens/second with 100% effective tool calling is hilarious off a single 4090 ;p",
+      "why": "mentions a single 4090 GPU",
+      "extracted": "4090"
+    },
+    {
+      "id": "1406748033089278086",
+      "timestamp": "Sunday, August 17, 2025 2:14\u202fPM",
+      "content": "I'd upvote you if I could. Nice work on this. I really didn't realize the 4090 was capable of this level of throughput. I greatly underestimated this thingy",
+      "why": "mentions the 4090 GPU capability",
+      "extracted": "4090"
+    },
+    {
+      "id": "1406580646955978912",
+      "timestamp": "Sunday, August 17, 2025 3:09\u202fAM",
+      "content": "3960x with a very old GPU 256gb of ram but highest I've ever seen it use was 96gb",
+      "why": "lists a 3960X CPU, an old GPU, 256\u202fGB of RAM and notes peak memory usage of 96\u202fGB",
+      "extracted": "3960x, 256gb of ram, old GPU"
+    },
+    {
+      "id": "1406581053941874789",
+      "timestamp": "Sunday, August 17, 2025 3:10\u202fAM",
+      "content": "it runs at 19 tokens/s entirely on cpu on my ryzen 7600 with 32gb ddr5 at 5600 (using ik_llama)",
+      "why": "states the inference runs on a Ryzen\u202f7600 CPU with 32\u202fGB DDR5 RAM",
+      "extracted": "ryzen 7600, 32gb ddr5"
+    },
+    {
+      "id": "1406595724803575858",
+      "timestamp": "Sunday, August 17, 2025 4:09\u202fAM",
+      "content": "I don't think it's just about speed but that KV cache limit \nwell you have 256 GB of RAM to play with",
+      "why": "mentions having 256\u202fGB of RAM available for LLM workloads",
+      "extracted": "256 GB of RAM"
+    },
+    {
+      "id": "1406595969835073628",
+      "timestamp": "Sunday, August 17, 2025 4:10\u202fAM",
+      "content": "256GB of ram and 4TB of optane as a pagefile due to shenanigans I had in place before LLM's but really those large models really do want GPU's,",
+      "why": "describes a system with 256\u202fGB RAM and a 4\u202fTB Optane pagefile",
+      "extracted": "256GB of ram, 4TB of optane"
+    },
+    {
+      "id": "1406606645399912629",
+      "timestamp": "Sunday, August 17, 2025 4:52\u202fAM",
+      "content": "This is how I build and run it currently, for reference:\n\n $ cmake -B build -DGGML_CUDA=ON -DGGML_CUDA_F16=ON -DGGML_CUDA_FA_ALL_QUANTS=ON -DCMAKE_CUDA_ARCHITECTURES=120 -DCMAKE_BUILD_TYPE=Release . && cmake --build build --config Release -j 32 && CUDA_VISIBLE_DEVICES=0 ./build/bin/llama-server \\\n -m /mnt/nas/models/unsloth/GLM-4.5-Air-GGUF/GLM-4.5-Air-Q4_K_S-00001-of-00002.gguf \\\n --ctx-size 131072 \\\n --flash-attn \\\n --gpu-layers 99 \\\n --threads $(nproc) --threads-batch $(nproc) \\\n --jinja \\\n -v",
+      "why": "Provides a build command with CUDA flags and GPU layer settings, indicating hardware configuration.",
+      "extracted": "GGML_CUDA=ON -DGGML_CUDA_F16=ON -DGGML_CUDA_FA_ALL_QUANTS=ON"
+    },
+    {
+      "id": "1406613708490145983",
+      "timestamp": "Sunday, August 17, 2025 5:20\u202fAM",
+      "content": "Unified memory is so sick",
+      "why": "Mentions \"Unified memory\", a hardware feature.",
+      "extracted": "Unified memory"
+    },
+    {
+      "id": "1406642357973287034",
+      "timestamp": "Sunday, August 17, 2025 7:14\u202fAM",
+      "content": "The crazy thing is that's just one 4090 running a 20b ;p",
+      "why": "States that a single 4090 GPU is used to run a 20b model.",
+      "extracted": "4090"
+    },
+    {
+      "id": "1406642561795489885",
+      "timestamp": "Sunday, August 17, 2025 7:15\u202fAM",
+      "content": "That's almost 200 agents running independently simultaneously off a single 4090 running tools ;p",
+      "why": "Describes 200 agents running off a single 4090 GPU.",
+      "extracted": "4090"
+    },
+    {
+      "id": "1406643606684696697",
+      "timestamp": "Sunday, August 17, 2025 7:19\u202fAM",
+      "content": "Just one 4090.",
+      "why": "Mentions having just one 4090 GPU.",
+      "extracted": "4090"
+    },
+    {
+      "id": "1406643624501973112",
+      "timestamp": "Sunday, August 17, 2025 7:19\u202fAM",
+      "content": "Also, how much SSD space are you using lol",
+      "why": "Asks about SSD space usage, indicating storage hardware.",
+      "extracted": "SSD"
+    },
+    {
+      "id": "1406643717464522822",
+      "timestamp": "Sunday, August 17, 2025 7:19\u202fAM",
+      "content": "Shrug, it's running off a 2tb drive, each agent has a 100 megabyte docker they can run python in.",
+      "why": "Notes running off a 2\u202fTB drive and each agent using a 100\u202fMB Docker container.",
+      "extracted": "2tb drive, 100 megabyte docker"
+    },
+    {
+      "id": "1406643862172205156",
+      "timestamp": "Sunday, August 17, 2025 7:20\u202fAM",
+      "content": "Surely it's an SSD right? Ngl I could really see using that with 2tb ssds in a mirror",
+      "why": "Discusses using 2\u202fTB SSDs in a mirror configuration.",
+      "extracted": "2tb ssds"
+    },
+    {
+      "id": "1406643920032497815",
+      "timestamp": "Sunday, August 17, 2025 7:20\u202fAM",
+      "content": "It's one 2tb ssd, yeah, but it all runs off the GPU.",
+      "why": "Mentions a single 2\u202fTB SSD and that everything runs off the GPU.",
+      "extracted": "2tb ssd, GPU"
+    },
+    {
+      "id": "1406644008297566210",
+      "timestamp": "Sunday, August 17, 2025 7:21\u202fAM",
+      "content": "Yeah but does the GPU really load 200 models in?",
+      "why": "Questions whether the GPU can load 200 models, referencing GPU capability.",
+      "extracted": "GPU"
+    },
+    {
+      "id": "1406644684171776122",
+      "timestamp": "Sunday, August 17, 2025 7:23\u202fAM",
+      "content": "What would be smarter... 2x 3090s with 48GB of VRAM or just one 4090",
+      "why": "Compares hardware options: 2\u202f\u00d7\u202f3090 GPUs with 48\u202fGB VRAM versus one 4090.",
+      "extracted": "2x 3090s with 48GB of VRAM, one 4090"
+    },
+    {
+      "id": "1406645790390096063",
+      "timestamp": "Sunday, August 17, 2025 7:28\u202fAM",
+      "content": "well yeah but I'd only do this on my server which currently only has a RX580 8GB",
+      "why": "Specifies the GPU available on the server: RX580 with 8\u202fGB VRAM.",
+      "extracted": "RX580 8GB"
+    },
+    {
+      "id": "1406645846971383848",
+      "timestamp": "Sunday, August 17, 2025 7:28\u202fAM",
+      "content": "So I'd definitely go for 24GB Cram",
+      "why": "States a desire for 24\u202fGB of system RAM (Cram).",
+      "extracted": "24GB"
+    },
+    {
+      "id": "1406645891280011308",
+      "timestamp": "Sunday, August 17, 2025 7:28\u202fAM",
+      "content": "The old 580",
+      "why": "Refers to the older GPU \"580\" (RX580).",
+      "extracted": "580"
+    },
+    {
+      "id": "1406645908703154248",
+      "timestamp": "Sunday, August 17, 2025 7:28\u202fAM",
+      "content": "Got a 5700 after it",
+      "why": "Mentions having a Radeon 5700 GPU.",
+      "extracted": "5700"
+    },
+    {
+      "id": "1406645964474810378",
+      "timestamp": "Sunday, August 17, 2025 7:28\u202fAM",
+      "content": "But my 3080 if ofc better",
+      "why": "Notes that a 3080 GPU would be better, indicating hardware capability.",
+      "extracted": "3080"
+    },
+    {
+      "id": "1406646043134787705",
+      "timestamp": "Sunday, August 17, 2025 7:29\u202fAM",
+      "content": "I've got a 3060ti and a 3070 and a 3080ti sitting under my TV, lol",
+      "why": "Lists multiple GPUs (3060ti, 3070, 3080ti) that are available.",
+      "extracted": "3060ti, 3070, 3080ti"
+    },
+    {
+      "id": "1406646691263811634",
+      "timestamp": "Sunday, August 17, 2025 7:31\u202fAM",
+      "content": "I've got like 4 pcs laying around, including a Xeon 6-core from 2009 lol, but also like 2 ITX systems and a few full sized",
+      "why": "Describes a Xeon 6\u2011core CPU from 2009 as part of the hardware pool.",
+      "extracted": "Xeon 6-core"
+    },
+    {
+      "id": "1406647104822050856",
+      "timestamp": "Sunday, August 17, 2025 7:33\u202fAM",
+      "content": "Should all fit inside 24gb, which is bananas ;p",
+      "why": "Mentions that everything should fit inside 24\u202fGB of RAM.",
+      "extracted": "24GB"
+    },
+    {
+      "id": "1406647607131897946",
+      "timestamp": "Sunday, August 17, 2025 7:35\u202fAM",
+      "content": "I mean you call it a potato but for all of that on just a 4090 that is just wild",
+      "why": "References a single 4090 GPU handling the workload.",
+      "extracted": "4090"
+    },
+    {
+      "id": "1406647955552862342",
+      "timestamp": "Sunday, August 17, 2025 7:36\u202fAM",
+      "content": "Compared to H800s this is cheap",
+      "why": "Compares cost to H800 GPUs, indicating the hardware in question.",
+      "extracted": "H800s"
+    },
+    {
+      "id": "1406648074549330020",
+      "timestamp": "Sunday, August 17, 2025 7:37\u202fAM",
+      "content": "Once they get the 6000 pro up and running properly...",
+      "why": "Talks about getting a \"6000 pro\" GPU up and running.",
+      "extracted": "6000 pro"
+    },
+    {
+      "id": "1406653944486297721",
+      "timestamp": "Sunday, August 17, 2025 8:00\u202fAM",
+      "content": "Hm, you're doing 150-190 tok/s on a 4090 with llama.cpp? Wonder if I'm missing some compilation flags, I get around 180-190 on a RTX Pro 6000 currently",
+      "why": "discusses token throughput on a 4090 and compares to an RTX\u202fPro\u202f6000",
+      "extracted": "4090, RTX Pro 6000"
+    },
+    {
+      "id": "1406654322560991323",
+      "timestamp": "Sunday, August 17, 2025 8:02\u202fAM",
+      "content": "Holy hell; so am I reading the github right that the backend on that vllm? I knew it could parallel process but that's not what I imagined. My 4090 might be getting a workout this coming week",
+      "why": "references a 4090 possibly being heavily utilized",
+      "extracted": "4090"
+    },
+    {
+      "id": "1406654462910660729",
+      "timestamp": "Sunday, August 17, 2025 8:02\u202fAM",
+      "content": "I obviously have not been giving the 4090 the credit its due",
+      "why": "acknowledges not giving the 4090 enough credit",
+      "extracted": "4090"
+    },
+    {
+      "id": "1406655269236379838",
+      "timestamp": "Sunday, August 17, 2025 8:05\u202fAM",
+      "content": "indeed, I think it takes ~65GB VRAM in total with maximum context",
+      "why": "states the model uses about 65\u202fGB VRAM with maximum context",
+      "extracted": "65GB VRAM"
+    },
+    {
+      "id": "1406655415437230181",
+      "timestamp": "Sunday, August 17, 2025 8:06\u202fAM",
+      "content": "Yeah, I was honestly impressed that the 120b ran well on 64gb ddr4 (3600) and a 5900x with a 4090 (24gb). At 131k getting the 23-30 t/s is still pretty good for a 120b model",
+      "why": "details system specs: 64\u202fGB DDR4 (3600), Ryzen\u202f5900X, and a 4090 with 24\u202fGB VRAM",
+      "extracted": "64gb ddr4 (3600), 5900x, 4090 (24gb)"
+    },
+    {
+      "id": "1406657257122300095",
+      "timestamp": "Sunday, August 17, 2025 8:13\u202fAM",
+      "content": "always something to upgrade next... Migrating from SATA drives to SSD now",
+      "why": "mentions upgrading storage from SATA drives to SSDs",
+      "extracted": "SATA drives to SSD"
+    },
+    {
+      "id": "1406671355935461396",
+      "timestamp": "Sunday, August 17, 2025 9:09\u202fAM",
+      "content": "seems like a pretty useful paper actually, glad they included comparisons with nvidia hardware, and not just Apple silicon in isolation. Seems to be made by students though, and as SomeOddCodeGuy said, it's not peer reviewed",
+      "why": "References comparisons with Nvidia hardware",
+      "extracted": "nvidia hardware"
+    },
+    {
+      "id": "1409070270638981230",
+      "timestamp": "Sunday, August 24, 2025 12:02\u202fAM",
+      "content": "CUDA is still king",
+      "why": "References CUDA as the primary compute platform.",
+      "extracted": "CUDA"
+    },
+    {
+      "id": "1409073892080746648",
+      "timestamp": "Sunday, August 24, 2025 12:16\u202fAM",
+      "content": "you aint training nothing on 100gb bro",
+      "why": "Talks about a 100GB memory limit for training.",
+      "extracted": "100gb"
+    },
+    {
+      "id": "1409259412895301755",
+      "timestamp": "Sunday, August 24, 2025 12:33\u202fPM",
+      "content": "But that's the only use case I have for the Mac Studio 512. I have a 128GB Macbook Pro and it gets the same tokens/sec out of the models it can load. I mainly use Qwen 3 Coder 30b a3b 8bit.",
+      "why": "Lists hardware: Mac Studio 512 and a 128\u202fGB MacBook Pro.",
+      "extracted": "Mac Studio 512, 128GB Macbook Pro"
+    },
+    {
+      "id": "1409259934293430282",
+      "timestamp": "Sunday, August 24, 2025 12:35\u202fPM",
+      "content": "How odd. The Macbook should definitely be slower. Maybe its because you're using smaller models, so you're not hitting the memory throughput limit yet. \n\nBut that's a good setup, because it gives you a ton of options. If support ever comes to lcpp for GLM 4.5V, you could probably squeeze the q6 of that on your macbook and use it for your vision model",
+      "why": "Refers to a MacBook and its memory throughput.",
+      "extracted": "Macbook"
+    },
+    {
+      "id": "1409260920038887465",
+      "timestamp": "Sunday, August 24, 2025 12:39\u202fPM",
+      "content": "Dude I forgot about that model, but I mostly use MLX format and mlx already added support for vision on that model. I'm downloading the 6bit for the macbook pro now. I'm going to get the 8bit on the studio afterwards",
+      "why": "Mentions downloading models for a MacBook Pro and a Studio machine.",
+      "extracted": "macbook pro, studio"
+    },
+    {
+      "id": "1409263456254693646",
+      "timestamp": "Sunday, August 24, 2025 12:49\u202fPM",
+      "content": "Also, I do agree about memory being necessary on Mac. With the way context processing time gets worse the bigger context gets, you gotta rely heavily on memory systems to keep it going.\n\nI keep my 2 \"assistant\" bots in SillyTavern since I like how it handles named personas better than openwebui, and the \"SomeOddCodeBot\" one is up to about 2300 messages. If I was trying to balance the full context of that with every send, I'd probably get 1 message a day in. Probably a million tokens now.\n\nThough my little mini pc running ST still about locks up with every message sent/recieved; I guess from it trying to actually add a new json element to the chat array lol",
+      "why": "Describes a mini PC that locks up when handling chat JSON.",
+      "extracted": "mini pc"
+    },
+    {
+      "id": "1409263648458932326",
+      "timestamp": "Sunday, August 24, 2025 12:50\u202fPM",
+      "content": "I'm still 4m left to download... stupid WIFI limits to about 100MB/s",
+      "why": "Notes Wi\u2011Fi speed limits of about 100\u202fMB/s.",
+      "extracted": "100MB/s"
+    },
+    {
+      "id": "1409263788167004220",
+      "timestamp": "Sunday, August 24, 2025 12:51\u202fPM",
+      "content": "Im wired ethernet and thats about all I get so I cant say anything",
+      "why": "Mentions being on wired Ethernet.",
+      "extracted": "wired ethernet"
+    },
+    {
+      "id": "1409264262370824308",
+      "timestamp": "Sunday, August 24, 2025 12:53\u202fPM",
+      "content": "I've got 2GB asymetrical",
+      "why": "States having 2\u202fGB of asymmetric memory.",
+      "extracted": "2GB"
+    },
+    {
+      "id": "1409266715191410728",
+      "timestamp": "Sunday, August 24, 2025 1:02\u202fPM",
+      "content": "6bit of GLM 4.5V/Air should be about 80 gigs. Not sure what MLX's kvcache would be for that model, though... could be the problem.\n\nBut on a 128GB macbook, you could try running this to see if it gets you there. This would leave 20GB for the system\n\nsudo sysctl iogpu.wired_limit_mb=108000",
+      "why": "Suggests running a model on a 128\u202fGB MacBook, leaving 20\u202fGB for the system.",
+      "extracted": "128GB macbook"
+    },
+    {
+      "id": "1409292567346155700",
+      "timestamp": "Sunday, August 24, 2025 2:45\u202fPM",
+      "content": "It's a weird goal, but mostly oriented at Mac users. Ive never really had a clear vision for Wilmer. I started it back in early Llama 2 days because there werent any semantic routers and I wanted one. Then I added workflows to it and became obsessed with that. Then I got frustrated that Mac users were frustrated with speed, so I started trying to find a way to give them their cake and eat it, too. \n\nAt this point the repo is just a testament to my tendency to be a dog in a squirrel park.",
+      "why": "Talks about Mac users being frustrated with speed.",
+      "extracted": "Mac"
+    },
+    {
+      "id": "1409131197048688661",
+      "timestamp": "Sunday, August 24, 2025 4:04\u202fAM",
+      "content": "To be fair, all hardware is memory limited :) I just want my training runs to finish faster with larger batches, and be able to run Good Enough LLMs locally, 96GB is plenty of VRAM for me to do so :)",
+      "why": "States having 96GB of VRAM for training runs.",
+      "extracted": "96GB"
+    },
+    {
+      "id": "1409136943899475989",
+      "timestamp": "Sunday, August 24, 2025 4:27\u202fAM",
+      "content": "Not really, for example a 512gb mac is WAY less memory limited",
+      "why": "Mentions a 512GB Mac as being less memory\u2011limited.",
+      "extracted": "512gb"
+    },
+    {
+      "id": "1401791097176326225",
+      "timestamp": "Sunday, August 3, 2025 9:57\u202fPM",
+      "content": "Im trying to setup a Local LLI , I have a 3070 ti (laptop) 8gb vram, 16 gb ram, and 12th Gen Intel(R) Core(TM) i7-12700H",
+      "why": "Provides GPU, VRAM, RAM, and CPU specs for local LLM setup.",
+      "extracted": "3070 ti (laptop) 8gb vram, 16 gb ram, and 12th Gen Intel(R) Core(TM) i7-12700H"
+    },
+    {
+      "id": "1411941555308068915",
+      "timestamp": "Sunday, August 31, 2025 10:11\u202fPM",
+      "content": "It's probably the most asked question here but I have an RTX 3090 and 32 Gigs of RAM in my PC and the max context length any model supports is 32k, I want to get a minumum of 128k. My motherboard won't fully support another RTX 3090, will adding a 96 GB of RAM make it possible?\n\nThanks.",
+      "why": "has an RTX\u202f3090 and 32\u202fGB RAM, asks if adding 96\u202fGB RAM will allow 128\u202fk context length",
+      "extracted": "RTX 3090, 32 Gigs of RAM, 96 GB RAM"
+    },
+    {
+      "id": "1411807171485630495",
+      "timestamp": "Sunday, August 31, 2025 1:17\u202fPM",
+      "content": "would 550w psu be enough for xeon 2680 v4 + mi50",
+      "why": "asks whether a 550\u202fW PSU is sufficient for a Xeon\u202f2680\u202fv4 and an MI50 GPU",
+      "extracted": "550w psu, xeon 2680 v4, mi50"
+    },
+    {
+      "id": "1411820108111937547",
+      "timestamp": "Sunday, August 31, 2025 2:09\u202fPM",
+      "content": "Anyone use Visual models locally? I've been using InternVL 3.5 14B for a website workflow, but about to start working on a more involved step with visual support and automation something similar to \"Claude Plays Pokemon\" with some soft toolcalling on a single RTX 3060 12GB.\n\nWas wondering if anyone's tried the other newer Visual models if there was any notes or updated benchmarks what's working the best for understanding and toolcalling.",
+      "why": "mentions using a single RTX\u202f3060 with 12\u202fGB VRAM for visual models",
+      "extracted": "RTX 3060 12GB"
+    },
+    {
+      "id": "1411821709538889862",
+      "timestamp": "Sunday, August 31, 2025 2:15\u202fPM",
+      "content": "so is 550w enough with 200w tdp limit",
+      "why": "asks if a 550\u202fW PSU is enough given a 200\u202fW TDP limit",
+      "extracted": "550w, 200w tdp"
+    },
+    {
+      "id": "1411664774483152926",
+      "timestamp": "Sunday, August 31, 2025 3:51\u202fAM",
+      "content": "I'm guessing I need atleast some level of GPU VRAM? any clue on what parts I should look at shifting, e.g. I have a 1660ti, but doubt its 6GB will make much of a dent?",
+      "why": "mentions having a 1660ti GPU with 6\u202fGB VRAM",
+      "extracted": "1660ti, 6GB"
+    },
+    {
+      "id": "1411902655139418153",
+      "timestamp": "Sunday, August 31, 2025 7:37\u202fPM",
+      "content": "The system also has a 3960X for the cpu. So been getting by on CPU inference. I've since found that the core part of oss to offload is about 5GB so will be giving it a try to get a bit faster. But agree the gpus weak in comparison",
+      "why": "states the system has a 3960X CPU",
+      "extracted": "3960X"
+    },
+    {
+      "id": "1411903375913779272",
+      "timestamp": "Sunday, August 31, 2025 7:39\u202fPM",
+      "content": "Threadripper?!",
+      "why": "mentions Threadripper",
+      "extracted": "Threadripper"
+    },
+    {
+      "id": "1411726022654689310",
+      "timestamp": "Sunday, August 31, 2025 7:55\u202fAM",
+      "content": "same. let's see some competition for big VRAM options",
+      "why": "asks for competition with big VRAM options",
+      "extracted": "big VRAM options"
+    },
+    {
+      "id": "1405649015982391348",
+      "timestamp": "Thursday, August 14, 2025 1:27\u202fPM",
+      "content": "Does anyone have experience with set-ups for Android? I just bought a 1+ and it is much slower than my old Iphone 12 with Pocketpal",
+      "why": "Asks about Android device performance compared to an iPhone, referencing hardware platforms.",
+      "extracted": "Android, iPhone 12"
+    },
+    {
+      "id": "1405496585131135066",
+      "timestamp": "Thursday, August 14, 2025 3:21\u202fAM",
+      "content": "Hello, I currently have an RTX 4090 and 32GB of DDR5 RAM. My primary interest is running local llms for coding. Is it worth upgrading my RAM to 96-128GB to run GLM-4 Air, or should I simply use Qwen3-Coder?",
+      "why": "provides GPU and RAM specs (RTX\u202f4090, 32\u202fGB DDR5 RAM)",
+      "extracted": "RTX 4090"
+    },
+    {
+      "id": "1405543621092184104",
+      "timestamp": "Thursday, August 14, 2025 6:28\u202fAM",
+      "content": "16gb of VRAM and 32gb of RAM should be ok to run a small model if you use a GGUF quant.",
+      "why": "states 16\u202fGB VRAM and 32\u202fGB RAM as sufficient for a small model",
+      "extracted": "16gb of VRAM"
+    },
+    {
+      "id": "1405546936085385290",
+      "timestamp": "Thursday, August 14, 2025 6:41\u202fAM",
+      "content": "was worried about my local ai waifu dreams would end here\nwell my specs are\nryzen 7 pro 5850U(8c/16t) \n32 gb ram ddr4 3200mhz \nvega 8 graphics.",
+      "why": "lists CPU, RAM and GPU specs for a local AI setup",
+      "extracted": "ryzen 7 pro 5850U(8c/16t)"
+    },
+    {
+      "id": "1405548743532478614",
+      "timestamp": "Thursday, August 14, 2025 6:48\u202fAM",
+      "content": "I mean that should work if you give the GPU enough vram",
+      "why": "mentions needing enough VRAM on the GPU",
+      "extracted": "GPU enough vram"
+    },
+    {
+      "id": "1405549099847123035",
+      "timestamp": "Thursday, August 14, 2025 6:50\u202fAM",
+      "content": "Yeah then that\u2019s why, your VRAM usage shows to be almost maxed",
+      "why": "notes that VRAM usage is almost maxed",
+      "extracted": "VRAM usage"
+    },
+    {
+      "id": "1405549496213049436",
+      "timestamp": "Thursday, August 14, 2025 6:51\u202fAM",
+      "content": "he's using an iGPU, his VRAM is shared with his System RAM",
+      "why": "describes an iGPU with VRAM shared with system RAM",
+      "extracted": "iGPU"
+    },
+    {
+      "id": "1405549677289410675",
+      "timestamp": "Thursday, August 14, 2025 6:52\u202fAM",
+      "content": "I wonder if the browser is taking 400mb of the d-vram",
+      "why": "speculates the browser may be using 400\u202fMB of dedicated VRAM",
+      "extracted": "400mb of the d-vram"
+    },
+    {
+      "id": "1405550101283340409",
+      "timestamp": "Thursday, August 14, 2025 6:54\u202fAM",
+      "content": "I mean you could still try. I dunno how integrated graphics are gonna perform compared to a standalone GPU but check Unsloth. https://huggingface.co/unsloth/Qwen3-8B-GGUF",
+      "why": "compares integrated graphics to a standalone GPU",
+      "extracted": "integrated graphics"
+    },
+    {
+      "id": "1405550313695612939",
+      "timestamp": "Thursday, August 14, 2025 6:55\u202fAM",
+      "content": "Also make sure if your using llamacpp that you go with the vulkan version, I don't think those integrated Vega chips do well with HIP/ROCm",
+      "why": "refers to integrated Vega chips and Vulkan backend",
+      "extracted": "integrated Vega chips"
+    },
+    {
+      "id": "1405555078378557560",
+      "timestamp": "Thursday, August 14, 2025 7:14\u202fAM",
+      "content": "Given how you've got 32GB of ram that you can allocate differently I'd say at least 8B",
+      "why": "mentions having 32\u202fGB of RAM",
+      "extracted": "32GB of ram"
+    },
+    {
+      "id": "1405555386135613481",
+      "timestamp": "Thursday, August 14, 2025 7:15\u202fAM",
+      "content": "Bro has 32GB of ram, I really wouldn't constrain to 2B. Especially because even at 7b it can be white wonky",
+      "why": "notes 32\u202fGB of RAM on the system",
+      "extracted": "32GB of ram"
+    },
+    {
+      "id": "1405555644379037737",
+      "timestamp": "Thursday, August 14, 2025 7:16\u202fAM",
+      "content": "yeah, but i am talking about people who may play the game. most of them probably wont have 32gb of ram(most of them will probably have 8/16gb of ram)",
+      "why": "talks about users having 32\u202fGB, 8\u202fGB or 16\u202fGB RAM",
+      "extracted": "32gb of ram"
+    },
+    {
+      "id": "1405555719104888994",
+      "timestamp": "Thursday, August 14, 2025 7:16\u202fAM",
+      "content": "But if your game also needs a ton of RAM, then you would need a smaller model.",
+      "why": "mentions RAM requirements for a game",
+      "extracted": "RAM"
+    },
+    {
+      "id": "1405556147762495508",
+      "timestamp": "Thursday, August 14, 2025 7:18\u202fAM",
+      "content": "For reference, usually a model\u2019s total file size equals the amount of VRAM needed to run it with a gigabyte or two on top, depending on cache size used.",
+      "why": "relates model file size to VRAM needed",
+      "extracted": "VRAM"
+    },
+    {
+      "id": "1405557109340373143",
+      "timestamp": "Thursday, August 14, 2025 7:22\u202fAM",
+      "content": "Stheno Q4_K_M is 4.92 GB, so you should still have a fair bit of RAM work with even then?",
+      "why": "states the model size is 4.92\u202fGB",
+      "extracted": "4.92 GB"
+    },
+    {
+      "id": "1405558131441930400",
+      "timestamp": "Thursday, August 14, 2025 7:26\u202fAM",
+      "content": "Like I said I dunno how integrated graphics are gonna behave but the less programs you got open at the same time the better since the integrated graphics are pulling from the RAM.",
+      "why": "discusses integrated graphics pulling from RAM",
+      "extracted": "integrated graphics"
+    },
+    {
+      "id": "1405560674096123963",
+      "timestamp": "Thursday, August 14, 2025 7:36\u202fAM",
+      "content": "Hey guys. So, after ~9 years of running my rock solid GTX1080Ti I've migrated to the Radeon RX9700XT (16 GB VRAM). I've played with ollama.cpp yesterday for the first time, I've decided to skip ROCm altogether and go straight to Vulkan backend. After some errors and trials I managed to run unsloth-Qwen3-30B-A3B-UD-Q4_K_XL.gguf with 8096 ctx at stable ~40 tk/s. I need a very rough reference point: is this performance within the expected margin? Or is there room for improvement (w/o the quality loss/further quantization)?",
+      "why": "lists GTX\u202f1080\u202fTi and Radeon\u202fRX9700XT (16\u202fGB VRAM)",
+      "extracted": "GTX1080Ti, Radeon RX9700XT (16 GB VRAM)"
+    },
+    {
+      "id": "1405560889100206163",
+      "timestamp": "Thursday, August 14, 2025 7:37\u202fAM",
+      "content": "Nothing 2A plus 12 GB version. Tokens per second is quite low.",
+      "why": "refers to a 12\u202fGB version of the model",
+      "extracted": "12 GB"
+    },
+    {
+      "id": "1405583850783899709",
+      "timestamp": "Thursday, August 14, 2025 9:08\u202fAM",
+      "content": "I actually have a 24GB AMD card in my regular desktop PC, with 64GB system RAM - what is tensor overriding?",
+      "why": "Provides GPU and system RAM specifications.",
+      "extracted": "24GB AMD card, 64GB system RAM"
+    },
+    {
+      "id": "1405588452136976475",
+      "timestamp": "Thursday, August 14, 2025 9:26\u202fAM",
+      "content": "Yes it\u2019s for Moe, for example you could run Q235B 2507 with a single 24gb GPU and enough RAM",
+      "why": "Mentions a single 24\u202fGB GPU as part of the setup.",
+      "extracted": "24gb GPU"
+    },
+    {
+      "id": "1405773415142658089",
+      "timestamp": "Thursday, August 14, 2025 9:41\u202fPM",
+      "content": "we need our rich 5090/rtx 6000 pro having members to kick down a couple boosts =)",
+      "why": "mentions GPU models 5090/rtx 6000 pro",
+      "extracted": "5090/rtx 6000 pro"
+    },
+    {
+      "id": "1408344173236588667",
+      "timestamp": "Thursday, August 21, 2025 11:56\u202fPM",
+      "content": "I tried setting 128k context on qwen3-coder:30b and I got this error:\n model requires more system memory (41.1 GiB) than is available (36.3 GiB) \n\nI have an RTX 3090, 32GB RAM, and a 14700KF processor. Do I need more RAM?",
+      "why": "provides GPU, system RAM, and CPU specs while troubleshooting a memory error",
+      "extracted": "RTX 3090, 32GB RAM, 14700KF processor"
+    },
+    {
+      "id": "1408036648335314965",
+      "timestamp": "Thursday, August 21, 2025 3:34\u202fAM",
+      "content": "Hi all,\n\nI've been going into LLMs for a couple of months now and I've touched on much of what is out there.\nFor a month, I've also been using visual models in comfyui to make images/videos.\nI would also really like to go into music/sound creation, but I am not sure what is the SOTA for real-time audio generation (preferably on-device!). \n\nI've found https://magenta.withgoogle.com/magenta-realtime which seems to be exactly what I am looking for (since I want to create a continuous stream of music, not a full song) but even with a 3080 12GB, it is not able to do real-time audio generation it seems.\n\nAre there any real-time audio generation models that are less resource-intensive?",
+      "why": "states having a 3080 12GB GPU",
+      "extracted": "3080 12GB"
+    },
+    {
+      "id": "1408079871401529474",
+      "timestamp": "Thursday, August 21, 2025 6:26\u202fAM",
+      "content": "Thanks for your input anyway! \n\nI'm having a REALLY hard time getting anything audio-related working. \nMusicgen needs flash attention (I've got a Turing card, 2080) which I can not get anymore and I also can not build myself because my CUDA, python and pytorch are too new for the 1.09 version of flash-attention. Flash attention-2 is \"coming soon\" to Turing cards since 2023.\nAudiocraft might work but it depends on outdated libraries that are not available for my setup anymore.\n\nSo: it's either downgrade my whole setup and break all other comfyui compatability (Creating a new venv does not work because of the fact that CUDA is handled system-wide) or just forget about it.",
+      "why": "mentions a Turing\u2011card 2080 GPU",
+      "extracted": "2080"
+    },
+    {
+      "id": "1408127697644818504",
+      "timestamp": "Thursday, August 21, 2025 9:36\u202fAM",
+      "content": "Has anyone set up infiniband at home? I have a 4090 in one box, a 5090 in another, and I'd like to set up infiniband between them just to learn about how to configure it and play with some distributed training/inference. I bought some connectx-3 cards for like $25 on ebay but apparently they're so old the drivers aren't available for anything newer than ubuntu 20.04",
+      "why": "has a 4090 and a 5090 GPU and is trying to set up infiniband with connectx\u20113 cards",
+      "extracted": "4090, 5090, connectx-3"
+    },
+    {
+      "id": "1410873303870214144",
+      "timestamp": "Thursday, August 28, 2025 11:26\u202fPM",
+      "content": "Are 70B dead? There havnt been any New 70B recently which kinda sucks because I cant Run anything larger (at high Speed), I only have 42GB of VRAM. Also the huge Gap in model sizes means I'd need a huge Upgrade to Run anything Bigger.",
+      "why": "States having 42GB of VRAM",
+      "extracted": "42GB of VRAM"
+    },
+    {
+      "id": "1410790879714607226",
+      "timestamp": "Thursday, August 28, 2025 5:59\u202fPM",
+      "content": "If you can get a little more RAM, then running Qwen3 30b a3b on CPU would probably be really bearable",
+      "why": "Suggests needing more RAM to run the model on CPU",
+      "extracted": "more RAM"
+    },
+    {
+      "id": "1410791408482258984",
+      "timestamp": "Thursday, August 28, 2025 6:01\u202fPM",
+      "content": "maybe i should just bite the bullet and buy two 32gb sticks",
+      "why": "Considers buying two 32GB RAM sticks",
+      "extracted": "two 32gb sticks"
+    },
+    {
+      "id": "1410791762338906266",
+      "timestamp": "Thursday, August 28, 2025 6:02\u202fPM",
+      "content": "q4 is really good speed, i'm already running it, 32gigs and 8gb ram, i'm just contemplating if the performance boost of q4 to q8 is worth it",
+      "why": "Mentions having 8GB RAM and 32GB VRAM",
+      "extracted": "8gb ram, 32gigs"
+    },
+    {
+      "id": "1410808383006572615",
+      "timestamp": "Thursday, August 28, 2025 7:08\u202fPM",
+      "content": "Hey guys if anyone's training gpt-oss locally we at Unsloth just released a new update to support 60K context for it on a 80GB GPU! \nWe also collabed with Hugging Face to fix some implementation issues in transformers! https://www.reddit.com/r/LocalLLaMA/comments/1n2jraj/gptoss_finetuning_now_with_60k_context_length_and/",
+      "why": "References an 80GB GPU for training",
+      "extracted": "80GB GPU"
+    },
+    {
+      "id": "1407408916362690662",
+      "timestamp": "Tuesday, August 19, 2025 10:00\u202fAM",
+      "content": "Anyone have recommendations on a Coding cli/vibe coding application? I want it to run entirely locally on my network. Currently im using qwencode but im a little underwhelmed with it. I'd personally love to be able to ssh in via putty or something but when I do that with qwencode(hosted on my raspberry pi 5), I dont get all the additional element and context id get from using something like powershell. (My llm is hosted via lm studio on a beefier 4080 machine).",
+      "why": "mentions Raspberry Pi 5 and a 4080 machine",
+      "extracted": "raspberry pi 5, 4080"
+    },
+    {
+      "id": "1407596084661850123",
+      "timestamp": "Tuesday, August 19, 2025 10:24\u202fPM",
+      "content": "TIL AMD GPUs can run LLMs. \n\n https://youtu.be/fhp-s4alsS4?feature=shared",
+      "why": "notes that AMD GPUs are capable of running LLMs",
+      "extracted": "AMD GPUs"
+    },
+    {
+      "id": "1407418748855386195",
+      "timestamp": "Tuesday, August 19, 2025 10:39\u202fAM",
+      "content": "It wont have quite the same parallel processing power, but scroll up either in this channel or General to see an example of what 200 of those qwen3 coder 30b models running locally on a 4090 looks like =D Its absolutely wild.",
+      "why": "references a 4090 GPU",
+      "extracted": "4090"
+    },
+    {
+      "id": "1407448271235973340",
+      "timestamp": "Tuesday, August 19, 2025 12:36\u202fPM",
+      "content": "Doesnt have to be very small. Imagine an agent like this:\n\nYou load up Qwen3-30b-a3b. You want to know what plants cats are allergic to, so you go find a wiki article that you think has the info, give it to the LLM and ask it to find the answer to your question in the article. Because the 4090 is fast, it responds almost instantly- you picked the wrong article, and there was no info. So you go grab another article, do it again.\n\nNow imagine you get tired of that, so you write a program. The program asks the LLM to write some keywords to search wikipedia, pulls the article found by those keywords, gives it to the LLM. Asks the LLM if that has the answer. If the LLM says no? Do it again. Keep doing it until either the LLM says \"yes\", or you hit some hard coded \"only try this number of times\" counter, at which point the program gives up.\n\nThat's an agent.\n\nBut because its happening so fast on that card, you realize you could have 2 of them running. So write another program to \"orchestrate\" making sure the two do the same work (looking for your answer) without stepping on each others toes or duplicating effort. Now you have 2 agents.\n\nThen you just spin up 198 more of them lol",
+      "why": "mentions the 4090 GPU enabling fast responses",
+      "extracted": "4090"
+    },
+    {
+      "id": "1407275032350294067",
+      "timestamp": "Tuesday, August 19, 2025 1:08\u202fAM",
+      "content": "the Strix Halo minipcs have been out for a while, I've been doing extensive testing on them, they're decent for medium size MoEs (100-200B max) but tbt, if you're not worried about form factor 3-4 3090s is a much better way to go. if you're serious about the minipcs, framework desktop i think is most interesting if you want a mini-itx board (it a pcie x4 slot as well), and for minipc the beelink one actually looks like the best specced (big vapor chamber, 10gbe, array mic and speakers) https://www.bee-link.com/products/beelink-gtr9-pro-amd-ryzen-ai-max-395",
+      "why": "suggests using 3\u20114 RTX\u202f3090 GPUs for larger MoEs",
+      "extracted": "3-4 3090s"
+    },
+    {
+      "id": "1407278870796828723",
+      "timestamp": "Tuesday, August 19, 2025 1:23\u202fAM",
+      "content": "yeah I don't care about form factor for a personal server \nbut what's the price of that ? 3-4 3090 ?",
+      "why": "asks price for 3\u20114 RTX\u202f3090 GPUs",
+      "extracted": "3-4 3090"
+    },
+    {
+      "id": "1407466080502415473",
+      "timestamp": "Tuesday, August 19, 2025 1:47\u202fPM",
+      "content": "8 cores at full force for minutes",
+      "why": "notes using 8 CPU cores at full force",
+      "extracted": "8 cores"
+    },
+    {
+      "id": "1407289594319470593",
+      "timestamp": "Tuesday, August 19, 2025 2:06\u202fAM",
+      "content": "i know what the problem is, he's got one rtx 6000 too many, if he donated one to me everything would be perfect",
+      "why": "mentions an extra RTX\u202f6000 GPU",
+      "extracted": "rtx 6000"
+    },
+    {
+      "id": "1407474152016974027",
+      "timestamp": "Tuesday, August 19, 2025 2:19\u202fPM",
+      "content": "Ah this is on a 24gb card, I'm actually going out to pick up a 3090 24gb this evening",
+      "why": "mentions a 24\u202fGB GPU and a 3090 24\u202fGB card",
+      "extracted": "24gb card, 3090"
+    },
+    {
+      "id": "1407474197340618783",
+      "timestamp": "Tuesday, August 19, 2025 2:19\u202fPM",
+      "content": "Yeah, I'm rolling a 4090.",
+      "why": "states using a 4090 GPU",
+      "extracted": "4090"
+    },
+    {
+      "id": "1407474568599441600",
+      "timestamp": "Tuesday, August 19, 2025 2:21\u202fPM",
+      "content": "Hell, the 24gb fits so well you can actually do some silly things... like... I'm sitting here running it my voice stack for fun right now on the same card.",
+      "why": "refers to a 24\u202fGB card that fits the workload",
+      "extracted": "24gb"
+    },
+    {
+      "id": "1407476120919605279",
+      "timestamp": "Tuesday, August 19, 2025 2:27\u202fPM",
+      "content": "Yeah, it works well. Like\u2026 here, I don\u2019t want to bother doing a screen recording but I pulled the phone out for ya. This is just a nonsense chat frontend I built for giggles. You can hear the 4090 churning in the background because it\u2019s running a 50 agent live stack doing some work\u2026 then I opened this up to chat with a 51st agent at the same time. This is all realtime performance - while - 50 other agents are running in the background, lol",
+      "why": "Mentions the GPU used for the workload",
+      "extracted": "4090"
+    },
+    {
+      "id": "1407488165908058225",
+      "timestamp": "Tuesday, August 19, 2025 3:15\u202fPM",
+      "content": "200 of them in a 4090!",
+      "why": "references a GPU model when stating a quantity",
+      "extracted": "4090"
+    },
+    {
+      "id": "1407311809433702400",
+      "timestamp": "Tuesday, August 19, 2025 3:34\u202fAM",
+      "content": "I'm a bit out of the loop, but guessing there is a lot of work going on to make running llm's at scale easier on AMD?",
+      "why": "refers to AMD as a platform for scaling LLMs",
+      "extracted": "AMD"
+    },
+    {
+      "id": "1407312558330740807",
+      "timestamp": "Tuesday, August 19, 2025 3:37\u202fAM",
+      "content": "for throughput, largely is just a matter of having high concurrency. these are some tests from earlier this year on an A10G (~3090 compute, even less MBW). As you can see it can push throughput on an 8B model of close to 2000 tok/s at c=32",
+      "why": "reports tests on an A10G GPU",
+      "extracted": "A10G"
+    },
+    {
+      "id": "1407326730112209017",
+      "timestamp": "Tuesday, August 19, 2025 4:33\u202fAM",
+      "content": "New 5070 will have 24gb according to rumors at $750",
+      "why": "talks about the upcoming RTX\u202f5070 GPU with 24\u202fGB VRAM",
+      "extracted": "5070"
+    },
+    {
+      "id": "1407331115517083712",
+      "timestamp": "Tuesday, August 19, 2025 4:51\u202fAM",
+      "content": "Im on my laptop",
+      "why": "states they are on a laptop",
+      "extracted": "laptop"
+    },
+    {
+      "id": "1407332407581085709",
+      "timestamp": "Tuesday, August 19, 2025 4:56\u202fAM",
+      "content": "Same* but ive got a very simple laptop",
+      "why": "mentions having a simple laptop",
+      "extracted": "simple laptop"
+    },
+    {
+      "id": "1407359153269117073",
+      "timestamp": "Tuesday, August 19, 2025 6:42\u202fAM",
+      "content": "I\u2019m new to ai but I have a 5070ti how big of a model can I actually run",
+      "why": "asks what model size can run on a RTX\u202f5070ti",
+      "extracted": "5070ti"
+    },
+    {
+      "id": "1407361753481871400",
+      "timestamp": "Tuesday, August 19, 2025 6:53\u202fAM",
+      "content": "Um 16 gb ram and a normal side",
+      "why": "notes having 16\u202fGB RAM",
+      "extracted": "16 gb ram"
+    },
+    {
+      "id": "1407363892480442448",
+      "timestamp": "Tuesday, August 19, 2025 7:01\u202fAM",
+      "content": "A 5070ti has 16 GB GDDR7, so you can run models up to GPT-OSS 20b with a tiny context window (10,000 token context window, but you can get more if you use the system memory, it will just be slower) , 30b if you offload some of the model to system memory as well (But quite slow!) \n\nBut I think the sweet spot for usability will be Qwen3 2507 14b",
+      "why": "describes the RTX\u202f5070ti GPU with 16\u202fGB GDDR7",
+      "extracted": "5070ti"
+    },
+    {
+      "id": "1407380479786614835",
+      "timestamp": "Tuesday, August 19, 2025 8:07\u202fAM",
+      "content": "The issue I've been running into with that approach on the local LLM side of things is that it really blows up the context window. Like in the demo, even with a duplicate fetch call the prompt processing is still really fast, but when you start thinking about loading in multiple websites at once thats when my poor little 6800xt starts to struggle.\n\nI think the fix for this is to take a vector database approach, so we can retrieve relavent chunks and avoid duplicate information. No idea how this will effect the citation system that I want to see, so it may be the case that I have to find a way to attatch metadata to the chunks or just give up on proper citations neither of which sound fun to me.",
+      "why": "mentions a 6800xt GPU struggling with context windows",
+      "extracted": "6800xt"
+    },
+    {
+      "id": "1407381739281846385",
+      "timestamp": "Tuesday, August 19, 2025 8:12\u202fAM",
+      "content": "Not too bad, I use GPT-OSS-20b for the summarization and 120b version for the main assistant. But I'm kind of running it on non-consumer hardware, so not sure how helpful it is for the average user of local models :/",
+      "why": "runs on non\u2011consumer hardware",
+      "extracted": "non-consumer hardware"
+    },
+    {
+      "id": "1407382882724352111",
+      "timestamp": "Tuesday, August 19, 2025 8:17\u202fAM",
+      "content": "Gotcha, I'm really focused on being able to run this on gaming desktops, and maybe CPU inference with gpt-oss-20b, but I wonder if I going integrate that approach into the system prompt so we can use the same \"powerful\" model to make that decision of what's important to the user. But I see what you're saying, maybe a smaller model finetuned for summarization can produce better results with the same resources",
+      "why": "targets gaming desktops and CPU inference",
+      "extracted": "gaming desktops, CPU inference"
+    },
+    {
+      "id": "1407400639948001290",
+      "timestamp": "Tuesday, August 19, 2025 9:27\u202fAM",
+      "content": "What's the current best way to run model on a phone. New phone with 16gb arrives tomorrow and want to give it a try",
+      "why": "phone with 16\u202fGB RAM",
+      "extracted": "phone with 16gb"
+    },
+    {
+      "id": "1407402182533320704",
+      "timestamp": "Tuesday, August 19, 2025 9:33\u202fAM",
+      "content": "Wouldnt it just run on the CPU?",
+      "why": "CPU inference",
+      "extracted": "CPU"
+    },
+    {
+      "id": "1407402669295009994",
+      "timestamp": "Tuesday, August 19, 2025 9:35\u202fAM",
+      "content": "NPU would be so much more efficient tho :3",
+      "why": "mentions NPU as efficient for inference",
+      "extracted": "NPU"
+    },
+    {
+      "id": "1409865221937561742",
+      "timestamp": "Tuesday, August 26, 2025 4:41\u202fAM",
+      "content": "Would Jet-Nemotron architecture mean anything for CPU inference?",
+      "why": "Asks about CPU inference suitability for Jet\u2011Nemotron architecture.",
+      "extracted": "CPU"
+    },
+    {
+      "id": "1410060009697710160",
+      "timestamp": "Tuesday, August 26, 2025 5:35\u202fPM",
+      "content": "And the insane thing is it's parsing, like, 60 frames while keeping my poor 5070ti alive, while I just recently had a hard time squeezing 16 frames for Gemma 3 4B. Whatever they cooked, it's awesome.",
+      "why": "References a 5070\u202fTi GPU used for video frame parsing",
+      "extracted": "5070ti"
+    },
+    {
+      "id": "1405415972143366226",
+      "timestamp": "Wednesday, August 13, 2025 10:01\u202fPM",
+      "content": "I wouldnt personally.(i mean you can also slot in the 3080 why not?) keep the 5090 for prefill and build an epyc server around it to offload what you cant fit",
+      "why": "User suggests keeping the 5090 for prefill and building an EPYC server, mentioning multiple hardware components.",
+      "extracted": "5090, 3080, epyc server"
+    },
+    {
+      "id": "1405416506996555817",
+      "timestamp": "Wednesday, August 13, 2025 10:03\u202fPM",
+      "content": "I think a 2x 4090 48gb machine would be a better alternative to Mac studio, should be able to handle large amount of text while running a decent 32B Q8 model",
+      "why": "User proposes a 2\u202f\u00d7\u202f4090 48\u202fGB machine as an alternative to a Mac\u202fStudio.",
+      "extracted": "2x 4090 48gb"
+    },
+    {
+      "id": "1405418166653419632",
+      "timestamp": "Wednesday, August 13, 2025 10:10\u202fPM",
+      "content": "you can fit a 100b model on q8 on 96gb vram?",
+      "why": "User asks if a 100B model can fit on 96\u202fGB VRAM when quantized, referencing VRAM capacity.",
+      "extracted": "96gb vram"
+    },
+    {
+      "id": "1405420086419783744",
+      "timestamp": "Wednesday, August 13, 2025 10:17\u202fPM",
+      "content": "how much is 2x 4090 48gb btw?",
+      "why": "User inquires about the price of a 2\u202f\u00d7\u202f4090 48\u202fGB setup, indicating hardware interest.",
+      "extracted": "2x 4090 48gb"
+    },
+    {
+      "id": "1405428783980351609",
+      "timestamp": "Wednesday, August 13, 2025 10:52\u202fPM",
+      "content": "Chinese are selling 2x 4090 48GB water-cooled workstations at 8k USD",
+      "why": "User reports Chinese sellers offering 2\u202f\u00d7\u202f4090 48\u202fGB water\u2011cooled workstations.",
+      "extracted": "2x 4090 48GB"
+    },
+    {
+      "id": "1405383166465937418",
+      "timestamp": "Wednesday, August 13, 2025 7:50\u202fPM",
+      "content": "hey folks. wanted to ask if someone can point me in the right direction.\n\nMy dumbass bought a 5090 before actually researching because I managed to snag a founder edition. The plans were quite ambitious but now im realizing I cant even run qwen 30b with context. I have a 3080 laying around too and wanted to know if its even worth trying to use dual GPUs for running LLMs.\n\nThe ambitious plan I mentioned earlier was to run a local version of claude code basically (with another wrapper on top) but use the open source gemini cli tool to do that (there's a PR that opens it up to use local models)",
+      "why": "User mentions owning an RTX\u202f5090 and a 3080 and wonders about dual\u2011GPU inference.",
+      "extracted": "5090, 3080"
+    },
+    {
+      "id": "1405397151282106418",
+      "timestamp": "Wednesday, August 13, 2025 8:46\u202fPM",
+      "content": "it'd be kinda cool potentially if we could have channels based on what machines people are looking to use for inference, I'm definitely not always up-to-date on teh best way to use my hardware but this must vary a ton between the single-3090s, M* Studios, and 12 3090 power plant killers",
+      "why": "User talks about inference hardware variations such as single\u20113090s and a 12\u2011GPU 3090 setup.",
+      "extracted": "single-3090s, 12 3090"
+    },
+    {
+      "id": "1405407558776131656",
+      "timestamp": "Wednesday, August 13, 2025 9:27\u202fPM",
+      "content": "I am eyeing an M2 Ultra Mac Studio with 128GB unified memory for $5k CAD and wondering what I should be comparing it against (including difficult of sourcing eg. 3080s)",
+      "why": "User is evaluating an M2 Ultra Mac\u202fStudio with 128\u202fGB unified memory and compares it to sourcing 3080 GPUs.",
+      "extracted": "M2 Ultra Mac Studio with 128GB unified memory, 3080s"
+    },
+    {
+      "id": "1405410473960280105",
+      "timestamp": "Wednesday, August 13, 2025 9:39\u202fPM",
+      "content": "There are performance considerations someone more familiar with MLX could help with, but also consider your experience with setting up hardware and how you'd lay out multiple cards. If you'd want to even match 96GB VRAM you are looking at 4x 24gb cards which is going to need either a server chassis or an uncommon configuration. As an alternative you could look into a single 24gb GPU utilizing decent RAM and tensor overriding",
+      "why": "User discusses matching 96\u202fGB VRAM with 4\u202f\u00d7\u202f24\u202fGB cards or a single 24\u202fGB GPU.",
+      "extracted": "96GB VRAM, 4x 24gb cards, single 24gb GPU"
+    },
+    {
+      "id": "1405410568709607424",
+      "timestamp": "Wednesday, August 13, 2025 9:39\u202fPM",
+      "content": "hmm, where'd you buy that? Ideally you could grab an M2 on the refurb store but I'm not seeing any with 128gb+ ram atm",
+      "why": "User asks about acquiring an M2 with 128\u202fGB+ RAM, referencing hardware specs.",
+      "extracted": "M2, 128gb+ ram"
+    },
+    {
+      "id": "1407772756367376544",
+      "timestamp": "Wednesday, August 20, 2025 10:06\u202fAM",
+      "content": "new to hosting llms, was wondering what would be an ideal model for coding with a 5070ti and 7800x3d w 32gb ddr4? Asking cause I am using qwen 30b a3b q4 with great performance but it loses context so fast.",
+      "why": "lists specific GPU, CPU and RAM specs while looking for a suitable coding model",
+      "extracted": "5070ti, 7800x3d, 32gb ddr4"
+    },
+    {
+      "id": "1407846784033755227",
+      "timestamp": "Wednesday, August 20, 2025 3:00\u202fPM",
+      "content": "Hey all, kinda new to self-hosted AI, not sure where to start with models etc. I have a RTX3060 6GB GPU, 32GB system RAM, Ryzen 9 CPU, running Linux (Arch). Where's a good guide to start, and how do I pick which models/size/etc to use? And what can I reasonably expect to be able to do with such an (apparently ) underwhelming GPU (text/code gen/agentic/TTS/STT/image/video/etc)? I've got so far as getting Open WebUI set up with some janky model, it generates text... OKish? Obviously not Claude-worthy but I wouldn't expect anything remotely close to that on my hardware",
+      "why": "provides GPU, system RAM and CPU details and asks what can be done with that hardware",
+      "extracted": "RTX3060 6GB, 32GB system RAM, Ryzen 9"
+    },
+    {
+      "id": "1407688136120602644",
+      "timestamp": "Wednesday, August 20, 2025 4:30\u202fAM",
+      "content": "guys, I'm thinking to get mi50, but I just wanted to confirm. it should work with any consumer motherboard and CPU right? and I couldn't find image/video generation benchmarks for mi50 did you guys find it anywhere? or if you have mi50 how well does it work with image generation models?",
+      "why": "asks whether the mi50 GPU works with consumer motherboards and CPUs",
+      "extracted": "mi50"
+    },
+    {
+      "id": "1407705180283076780",
+      "timestamp": "Wednesday, August 20, 2025 5:37\u202fAM",
+      "content": "should work with consumer PC but your bios needs to have Above 4G decoding & Rebar settings",
+      "why": "mentions BIOS requirements (Above 4G decoding & Rebar) for consumer PCs",
+      "extracted": "Above 4G decoding & Rebar"
+    },
+    {
+      "id": "1407716166205444236",
+      "timestamp": "Wednesday, August 20, 2025 6:21\u202fAM",
+      "content": "Ah, I'll keep on with ATX, large but compatibility and can reuse the same design for more stuff. But yeah, GPU heat is getting kind of ridiculous",
+      "why": "discusses using an ATX form\u2011factor case for a GPU build",
+      "extracted": "ATX"
+    },
+    {
+      "id": "1407719912549519462",
+      "timestamp": "Wednesday, August 20, 2025 6:36\u202fAM",
+      "content": "hey guys, joined today. i have a multigpu setup (2 x 3090 at the moment, soon 4). \n\ni run ubuntu server 22.04 and already managed to run ollama and llama.cpp. where i struggle though, is setting up vllm.\ni already managed to get the docker running.. well, it doesnt crash but i cant connect to it^^\n\nis anyone in here experienced with my setup and vllm and could guide me in the right direction?",
+      "why": "describes a multi\u2011GPU setup with two 3090 cards and plans for four",
+      "extracted": "2 x 3090"
+    },
+    {
+      "id": "1407725949205745695",
+      "timestamp": "Wednesday, August 20, 2025 7:00\u202fAM",
+      "content": "but comfey ui can use rocm backend right, i should be able to get it working with old rocm",
+      "why": "asks about using the ROCm backend with older ROCm versions",
+      "extracted": "ROCm backend"
+    },
+    {
+      "id": "1410335107520401471",
+      "timestamp": "Wednesday, August 27, 2025 11:48\u202fAM",
+      "content": "You can also try a vllm setup, but your gpus may be wildly too old for that.",
+      "why": "suggests a vllm setup may be limited by old GPUs",
+      "extracted": "gpus"
+    },
+    {
+      "id": "1410194881917358173",
+      "timestamp": "Wednesday, August 27, 2025 2:31\u202fAM",
+      "content": "Hello, I am interested in any input on realistically using older 480/580 or vega gpus in multi-gpu or distributed setups (4 g and 8 gb). I experimented with it ealier this year and it really didnt end well (llama rpc is crap even on 16 gb vegas with localai, and ollama cant do shit), but I feel like I must be missing something. I have a huge amount of vram that I can put to use if the software can efficiently use everything.\n\nRelated is https://www.reddit.com/r/LocalLLaMA/comments/1j1mpuf/repurposing_old_rx_580_gpus_need_advice/ .",
+      "why": "Discusses using older 480/580 or Vega GPUs (4\u202fGB/8\u202fGB) in multi\u2011GPU setups",
+      "extracted": "480/580, vega"
+    }
+  ]
+}

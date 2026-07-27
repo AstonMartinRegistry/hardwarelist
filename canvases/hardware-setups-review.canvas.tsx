@@ -1,0 +1,6464 @@
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Checkbox,
+  H1,
+  Pill,
+  Row,
+  Select,
+  Stack,
+  Stat,
+  Text,
+  TextInput,
+  useCanvasState,
+  useHostTheme,
+} from "cursor/canvas";
+
+const SETUP_REVIEW_DATA = {
+  "count": 383,
+  "by_tier": {
+    "full": 168,
+    "hw_speed_model": 173,
+    "inferred_model": 27,
+    "hw_speed_benchmark": 11,
+    "hw_speed": 4
+  },
+  "setups": [
+    {
+      "id": "1522393765757587496",
+      "month": "2026-07",
+      "timestamp": "Thursday, July 2, 2026 5:09\u202fPM",
+      "tier": "full",
+      "model": "glm-5.2",
+      "hardware": "4x dgx sparks",
+      "quantization": "INT4 and FP8 kv cache",
+      "speed": "20 tokens a second \u00b7 20 tok/s",
+      "message": "per that caculator 4x dgx sparks is 20 tokens a second with GLM5.2 with INT4 and FP8 kv cache?\n\nDoes that sound right?",
+      "tps": [
+        20.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1522918693309382768",
+      "month": "2026-07",
+      "timestamp": "Saturday, July 4, 2026 3:55\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "2x RTX Pro 6000 Max-Q (96GB), 8x RTX 3090 (24GB), 2x RTX 5090 (32GB), 128GB DDR5 RAM, Threadripper 9960x",
+      "quantization": "8bit quant",
+      "speed": "tps of 400-500 \u00b7 400 tok/s",
+      "message": "Not a very useful metric because it depends on context, prefill dominates in some circumstances, etc... but I think I got an aggregate tps of 400-500 at one point with the 8bit quant of qwen 3.6 35b a3b.",
+      "tps": [
+        400.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1522987209722953780",
+      "month": "2026-07",
+      "timestamp": "Saturday, July 4, 2026 8:27\u202fAM",
+      "tier": "full",
+      "model": "glm-5.2",
+      "hardware": "4x Dgx sparks",
+      "quantization": "NVFP4",
+      "speed": "20 tokens a second \u00b7 20 tok/s, 20 tok/s",
+      "message": "Anything faster than 20 tokens a second would be worth it.\n\nI saw someone getting 20 tokens a second with NVFP4 with glm5.2 with 4x Dgx sparks. But that\u2019s 16k instead of 10k",
+      "tps": [
+        20.0,
+        20.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1523052957233315940",
+      "month": "2026-07",
+      "timestamp": "Saturday, July 4, 2026 12:48\u202fPM",
+      "tier": "full",
+      "model": "qwen3.5-27b",
+      "hardware": "two 5060 ti's",
+      "quantization": "q8",
+      "speed": "14tk/s \u00b7 14 tok/s, 14 tok/s, 14 tok/s",
+      "message": "Qwen 27b dense will run at like 14tk/s with two 5060 ti's on q8 (best case scenario)",
+      "tps": [
+        14.0,
+        14.0,
+        14.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1523411305850212362",
+      "month": "2026-07",
+      "timestamp": "Sunday, July 5, 2026 12:32\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "4x 5060 ti",
+      "quantization": "INT8-Autoround",
+      "speed": "Output token throughput (tok/s): 274.26 \u00b7 5354.11ms TTFT, 1961.24ms TTFT",
+      "message": "did a benchmark at 8 concurrency with INT8-Autoround with unquantized KV cache of Qwen3.6-27B.\n\nWith the 4x 5060 ti's.\n\n ============ Serving Benchmark Result ============\nSuccessful requests: 150 \nFailed requests: 0 \nMaximum request concurrency: 8 \nBenchmark duration (s): 2240.18 \nTotal input tokens: 3307200 \nTotal generated tokens: 614400 \nRequest throughput (req/s): 0.07 \nOutput token throughput (tok/s): 274.26 \nPeak output token throughput (tok/s): 104.00 \nPeak concurrent requests: 10.00 \nTotal token throughput (tok/s): 1750.57 \n---------------Time to First Token----------------\nMean TTFT (ms): 5354.11 \nMedian TTFT (ms): 1961.24 \nP90 TTFT (ms): 18384.43 \nP95 TTFT (ms): 27653.41 \nP99 TTFT (ms): 47726.86 \n-----Time per Output Token (excl. 1st token)------\nMean TPOT (ms): 27.37 \nMedian TPOT (ms): 26.59 \nP90 TPOT (ms): 32.38 \nP95 TPOT (ms): 33.65 \nP99 TPOT (ms): 42.01 \n---------------Inter-token Latency----------------\nMean ITL (ms): 93.72 \nMedian ITL (ms): 80.81 \nP90 ITL (ms): 82.84 \nP95 ITL (ms): 83.98 \nP99 ITL (ms): 706.95 \n----------------End-to-end Latency----------------\nMean E2EL (ms): 117432.48 \nMedian E2EL (ms): 112275.04 \nP90 E2EL (ms): 138500.87 \nP95 E2EL (ms): 165912.41 \nP99 E2EL (ms): 192595.94 \n---------------Speculative Decoding---------------\nAcceptance rate (%): 80.74 \nAcceptance length: 3.42 \nDrafts: 180831 \nDraft tokens: 542493 \nAccepted tokens: 438027 \nPer-position acceptance (%):\n Position 0: 90.73 \n Position 1: 80.14 \n Position 2: 71.36 \n==================================================",
+      "tps": [],
+      "ttft_ms": [
+        5354.11,
+        1961.24
+      ]
+    },
+    {
+      "id": "1524081836274487336",
+      "month": "2026-07",
+      "timestamp": "Tuesday, July 7, 2026 8:57\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "around 29gb for the model itself",
+      "quantization": "Q6_K",
+      "speed": "2800t/s \u00b7 2800 tok/s, 1200 tok/s, 80 tok/s, 2800 tok/s",
+      "message": "[Qwen3.6 27B MTP Q6]\nmodel = C:\\Users\\maxkr\\.lmstudio\\models\\unsloth\\Qwen3.6-27B-MTP-GGUF\\Qwen3.6-27B-Q6_K.gguf\nctx-size = 131072\nspec-type = draft-mtp\nspec-draft-n-max = 3\n\ntemperature = 0.6\ntop-p = 0.95\ntop-k = 20\nmin-p = 0.0\npresence-penalty = 0.0\nrepeat-penalty = 1.0\n\nfitt = 2048\nctk = q8_0\nctv = q8_0\n\nreasoning = on\nreasoning-budget = 16384\nchat-template-kwargs = {\"preserve_thinking\": true} \n\nThis config (parallel = 1 as well, but thats further up in the config), for agentic coding it starts around 2800t/s PP, drops to ~1200t/s around 100k. Token Gen is around 80t/s for chatting where MTP does functionally nothing, up to 130-140 where it does basically everything. averages around 110-115 for toolcalls of writing code\n\n/edit: this also uses around 29gb for the model itself, with windows overhead etc. that means i have ~1gb free, which is enough for videos + chrome etc, and veeeeeeeeery light games.",
+      "tps": [
+        2800.0,
+        1200.0,
+        80.0,
+        2800.0,
+        1200.0,
+        80.0,
+        2800.0,
+        1200.0,
+        80.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1524921550220951723",
+      "month": "2026-07",
+      "timestamp": "Thursday, July 9, 2026 4:33\u202fPM",
+      "tier": "full",
+      "model": "minimax-m2.7",
+      "hardware": "20G ram and 4G vram",
+      "quantization": "Q4",
+      "speed": "2-5 tok per sec",
+      "message": "I was able to run minimax 2.7 Q4\nHeavily NVMe mmap\n\n20G ram and 4G vram\n\nGot 2-5 tok per sec\n\nLooks perfect to me\nAnother big llm in my pockets",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1525042695930904606",
+      "month": "2026-07",
+      "timestamp": "Friday, July 10, 2026 12:35\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "5090",
+      "quantization": "q6",
+      "speed": "120t/s \u00b7 120 tok/s, 120 tok/s, 120 tok/s",
+      "message": "steal a 5090 and use qwen3.6 27b q6 +MTP at 120t/s",
+      "tps": [
+        120.0,
+        120.0,
+        120.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1525140734628597782",
+      "month": "2026-07",
+      "timestamp": "Friday, July 10, 2026 7:04\u202fAM",
+      "tier": "full",
+      "model": "Deepseek flash",
+      "hardware": "Xeon 2696 v2, 160GB ECC DDR3 RAM, p100 16GB, 3060 12GB, 3050 6GB",
+      "quantization": "Q4",
+      "speed": "4 t/s \u00b7 4 tok/s, 4 tok/s",
+      "message": "Yo. I got a dual Xeon 2696 v2, 160GB ECC DDR3 RAM. 3 GPUs (p100 16GB, 3060 12GB, 3050 6GB no power connector). Dual PSU, one connects p100 and 3060, other one for CPUs and motherboard. I'm able to load Deepseek flash Q4 and get 4 t/s. But for some reason my computer crashes randomly. Can anyone help?",
+      "tps": [
+        4.0,
+        4.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1525789083937538218",
+      "month": "2026-07",
+      "timestamp": "Sunday, July 12, 2026 2:01\u202fAM",
+      "tier": "full",
+      "model": "qwen3.5-35b",
+      "hardware": "cuda 13.3",
+      "quantization": "Q5 K M to Q6 XL",
+      "speed": "10-12 t/ks faster",
+      "message": "What a good day I upgrade from Q 5 K M to Q6 XL on the new unsloth MTP model for qwen 35b with cuda 13.3 and the newest turboquant and i average about 10-12 t/ks faster and saved 4.3 vram.",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1525810426628145303",
+      "month": "2026-07",
+      "timestamp": "Sunday, July 12, 2026 3:25\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "4x 5060 ti's",
+      "quantization": "INT8",
+      "speed": "Input token throughput (tok/s): 177.35 \u00b7 200 tok/s \u00b7 7504.07ms TTFT, 7382.56ms TTFT",
+      "message": "Interesting, I tried using SG lang for Minachist/Qwen3.6-27B-INT8-Autoround with :\n\n8 concurrency\n\nTP=4\n\nMTP\n\n16K batch tokens\n\n200K context\n\nBfloat16 KV Cache\n\n4x 5060 ti's (4 lanes of gen 4 per card - bifurcation (8Gb/s bandwidth) per card\n\nAnd TTFT (prefill + token gen) was much lower than with VLLM at 8 concurrency.\n\nFrom memory prefill/ttft was horrible at 8 concurrency with VLLM at 15+ seconds.\n\nsglang seems to be showing better benchmarks overall\n\n```\n\n============ Serving Benchmark Result ============\nBackend: sglang-oai\nTraffic request rate: inf \nMax request concurrency: 8 \nSuccessful requests: 200 \nBenchmark duration (s): 348.87 \nTotal input tokens: 61870 \nTotal input text tokens: 61870 \nTotal generated tokens: 44525 \nTotal generated tokens (retokenized): 44476 \nRequest throughput (req/s): 0.57 \nInput token throughput (tok/s): 177.35 \nOutput token throughput (tok/s): 127.63 \nPeak output token throughput (tok/s): 76.00 \nPeak concurrent requests: 11 \nTotal token throughput (tok/s): 304.97 \nConcurrency: 7.84 \nAccept length: 2.50 \n----------------End-to-End Latency----------------\nMean E2E Latency (ms): 13679.23 \nMedian E2E Latency (ms): 12234.78 \nP90 E2E Latency (ms): 23320.88 \nP95 E2E Latency (ms): 28160.07 \nP99 E2E Latency (ms): 34531.84 \n---------------Time to First Token----------------\nMean TTFT (ms): 7504.07 \nMedian TTFT (ms): 7382.56 \nP90 TTFT (ms): 11857.75 \nP95 TTFT (ms): 12946.72 \nP99 TTFT (ms): 16279.74 \n-----Time per Output Token (excl. 1st token)------\nMean TPOT (ms): 31.24 \nMedian TPOT (ms): 26.88 \nP90 TPOT (ms): 40.12 \nP95 TPOT (ms): 51.57 \nP99 TPOT (ms): 133.01 \n---------------Inter-Token Latency----------------\nMean ITL (ms): 27.90 \nMedian ITL (ms): 18.30 \nP90 ITL (ms): 31.83 \nP95 ITL (ms): 54.90 \nP99 ITL (ms): 196.80 \nMax ITL (ms): 3217.83 \n==================================================\n```",
+      "tps": [
+        200.0
+      ],
+      "ttft_ms": [
+        7504.07,
+        7382.56
+      ]
+    },
+    {
+      "id": "1526391187722866858",
+      "month": "2026-07",
+      "timestamp": "Monday, July 13, 2026 5:53\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "RTX Quadro 4000, AMD BC-250, GbE",
+      "quantization": "Q4_K_M, q8_0",
+      "speed": "~100t/s pp, ~20t/s generation \u00b7 100 tok/s, 20 tok/s, 100 tok/s, 20 tok/s",
+      "message": "Got qwen3.6 27b on a kind of fairly weird/sketchy setup; RTX Quadro 4000 + 1x AMD BC-250 (40CU, 1.8Ghz) connected via GbE haha xP\n\nSurprisingly seems to mostly work xD\nWith llama.cpp RPC (cuda backend on the RTX, vulkan on the BC-250)\n\n...though performance isn't really great (still, better than running on CPU ig).\nI get about ~100t/s pp and ~20t/s generation with this:\n llama-server --backend-sampling --n-gpu-layers -1 --rpc 192.168.100.10:50052 --jinja --cache-ram 32768 -fa on --model /opt/models/bottlecapai/ThinkingCap-Qwen3.6-27B-GGUF/ThinkingCap-Qwen3.6-27B-Q4_K_M.gguf --cache-type-k q8_0 --cache-type-v q8_0 --ctx-size 65536 --temp 1.0 --top-p 0.95 --top-k 64 -b 4096 -ub 1024 --spec-type draft-mtp --spec-draft-n-max 2 \n\nnot sure if you have more ideas/things worth trying haha.\nI have another BC-250 I can connect, but I suspect it won't help with tok/s (since this is pipeline parallelism)",
+      "tps": [
+        100.0,
+        20.0,
+        100.0,
+        20.0,
+        100.0,
+        20.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1521819610251526174",
+      "month": "2026-07",
+      "timestamp": "Wednesday, July 1, 2026 3:07\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "LTX2.3 22b",
+      "hardware": "mac mini m4",
+      "quantization": "",
+      "speed": "32min for 8s video",
+      "message": "Im using LTX2.3 22b distilled on my mac mini m4, with default settings, 8 seconds of video takes me around 32min",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1521872617856831488",
+      "month": "2026-07",
+      "timestamp": "Wednesday, July 1, 2026 6:38\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "minimax-m2.7",
+      "hardware": "256gb 2133mhz DDR4 + 5090 x16 PCIe gen3",
+      "quantization": "q6-k",
+      "speed": "6tps \u00b7 6 tok/s",
+      "message": "I'm going to try an experiment: minimax-m2.7 q6 on a 256gb 2133mhz ddr4 + 5090 x16 pcie gen3. I wonder if it will load and what partial offload tg vs pure cpu tg, it going to take 10 hours to dl the gguf. I'm going to guess 6tps",
+      "tps": [
+        6.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1522960126254911543",
+      "month": "2026-07",
+      "timestamp": "Saturday, July 4, 2026 6:39\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-35b",
+      "hardware": "gpu",
+      "quantization": "",
+      "speed": "40-60 tokens per sec (with gpu) to 25-30 tokens per sec (CPU only) \u00b7 60 tok/s, 30 tok/s",
+      "message": "i used the same model (qwen 3.6 35B), so not quite what you said, but performance is down from 40-60 tokens per sec (with gpu) to 25-30 tokens per sec (CPU only)",
+      "tps": [
+        60.0,
+        30.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1523591978552660050",
+      "month": "2026-07",
+      "timestamp": "Monday, July 6, 2026 12:30\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "glm-5.2",
+      "hardware": "4x 3090s",
+      "quantization": "",
+      "speed": "9.4tps \u00b7 9.4 tok/s",
+      "message": "guess this glm5.2 setup is going to be in testing all night, decent performance so far for ~190GB DDR4 2133 and 4x 3090s though (9.4tps / 131k context)",
+      "tps": [
+        9.4
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1524069510880034867",
+      "month": "2026-07",
+      "timestamp": "Tuesday, July 7, 2026 8:08\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-35b",
+      "hardware": "2.2\u202fgb",
+      "quantization": "",
+      "speed": "50 t/s, 3 sec per image \u00b7 50 tok/s, 50 tok/s",
+      "message": "When the two are loaded Qwen3.6 35b takes about 50 t/s and sd1.5 about 3 sec per image. Sd spikes at 2.2 gb",
+      "tps": [
+        50.0,
+        50.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1524155518019571884",
+      "month": "2026-07",
+      "timestamp": "Tuesday, July 7, 2026 1:49\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-27b",
+      "hardware": "5070 Ti 16GB",
+      "quantization": "",
+      "speed": "20 tok/s for 27B \u00b7 20 tok/s",
+      "message": "my 5070 Ti 16GB is foaming at this, 20 tok/s for 27B https://www.reddit.com/r/LocalLLaMA/comments/1txpqru/maybe_kv_cache_offload_to_ram_isnt_bad/",
+      "tps": [
+        20.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1524156269919731842",
+      "month": "2026-07",
+      "timestamp": "Tuesday, July 7, 2026 1:52\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-27b",
+      "hardware": "5070 Ti",
+      "quantization": "",
+      "speed": "8 tok/s \u00b7 8 tok/s",
+      "message": "I think last time I ran 27B I got 8 tok/s in LM Studio, same 5070 Ti",
+      "tps": [
+        8.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1524461244881440778",
+      "month": "2026-07",
+      "timestamp": "Wednesday, July 8, 2026 10:04\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "8B",
+      "hardware": "3900x",
+      "quantization": "bf16-full",
+      "speed": "100k gflops, 5000 token prefill",
+      "message": "chatgpt reckons the ballpark GFLOPS for 5000 token prefill on an 8B model is 100k gflops. my 3900x can do theoretically do 1.5 FP32 TFLOP/s. I don't know about computer starved. In territory i'm not sure about though",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1525042527240192080",
+      "month": "2026-07",
+      "timestamp": "Friday, July 10, 2026 12:34\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "2080ti",
+      "quantization": "",
+      "speed": "100+ tok",
+      "message": "2080ti 35b gets 100+ tok",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1525120394498150602",
+      "month": "2026-07",
+      "timestamp": "Friday, July 10, 2026 5:43\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "3060ti",
+      "quantization": "",
+      "speed": "39 tps \u00b7 39 tok/s",
+      "message": "I'm running qwen3.6 35b-a3b MTP at 39 tps stable on my 3060ti",
+      "tps": [
+        39.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1525888743716687912",
+      "month": "2026-07",
+      "timestamp": "Sunday, July 12, 2026 8:37\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "IQ3_XXS",
+      "hardware": "RX 7900 XTX, 192GB DDR5",
+      "quantization": "iq3-xxs",
+      "speed": "5 tok/s \u00b7 5 tok/s",
+      "message": "I have two RX 7900 XTX, and 192GB of DDR5, and was only able to hit 5 tok/s at IQ3_XXS\n\nAnd the quality of output was not what I would consider \"acceptable\". My first prompt was \"Hello\" and it responded in chinese",
+      "tps": [
+        5.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1525950526712451183",
+      "month": "2026-07",
+      "timestamp": "Sunday, July 12, 2026 12:42\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-27b",
+      "hardware": "3080 10gb",
+      "quantization": "",
+      "speed": "2 t/s, 60t/s pp, 5t/s decode \u00b7 2 tok/s, 60 tok/s, 5 tok/s, 2 tok/s",
+      "message": "my \u201crig\u201d is fucked lol. all i have is a pc w 3080 10gb which does like 2 t/s on 27b and a 32gb m4 mac mini which doesn\u2019t have the ram to run it really. i\u2019m using rpc to split across them both and get like 60t/s pp and 5t/s decode",
+      "tps": [
+        2.0,
+        60.0,
+        5.0,
+        2.0,
+        60.0,
+        5.0,
+        60.0,
+        5.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1526239519396073622",
+      "month": "2026-07",
+      "timestamp": "Monday, July 13, 2026 7:50\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "glm-5.2",
+      "hardware": "6x RTX 5090",
+      "quantization": "",
+      "speed": "6.84 tok/s \u00b7 6.84 tok/s",
+      "message": "Detailed GPU experiment: GLM-5.2 on 6x RTX 5090 \u2014 full expert residency across VRAM+RAM reaches 6.84 tok/s single-request decode.",
+      "tps": [
+        6.84
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1526247719361056839",
+      "month": "2026-07",
+      "timestamp": "Monday, July 13, 2026 8:23\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-35b",
+      "hardware": "k40",
+      "quantization": "",
+      "speed": "20-25 tokens per second \u00b7 25 tok/s",
+      "message": "Tbf, larger models work in \u201cemail mode\u201d. On my k40\u2019s that I modded im getting about 20-25 tokens per second generation speed for qwen 3.6 for example, the 35B one. Like its useable enough for me",
+      "tps": [
+        25.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1526289704239235183",
+      "month": "2026-07",
+      "timestamp": "Monday, July 13, 2026 11:10\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "glm-5.2",
+      "hardware": "RTX 5070 Laptop (8 GB), Ryzen AI 7 350, 32 GB RAM",
+      "quantization": "",
+      "speed": "~0.3 tok/s, ~0.2 tok/s \u00b7 0.3 tok/s, 0.2 tok/s",
+      "message": "Hey,\n\nI finally got GLM 5.2 (UD-IQ1_M) to run locally.\n\nHardware:\n\nRTX 5070 Laptop (8 GB)\nRyzen AI 7 350\n32 GB RAM\nSamsung Gen4 NVMe SSD\n\nCurrent performance:\n\nPrompt: ~0.3 tok/s\nGeneration: ~0.2 tok/s\n\nResource usage:\n\n~3.7 GB VRAM\n~31 GB RAM\nSSD at 100% utilization\nCPU around 50-60%\n\nI spent quite a while testing different configurations:\n\nGPU layers\nthread count\ncache sizes\ninternal NVMe vs external HDD\nreasoning on/off\n\nThe bottleneck appears to be streaming experts rather than GPU compute.\n\nIt's honestly pretty crazy seeing a 744B MoE actually run on a consumer laptop, even if it's slow.\n\nHas anyone managed to squeeze noticeably higher throughput from similar hardware?",
+      "tps": [
+        0.3,
+        0.2
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1511452586237104208",
+      "month": "2026-06",
+      "timestamp": "Tuesday, June 2, 2026 12:32\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-35b",
+      "hardware": "AMD APU, 7840U, 780M, 32GB",
+      "quantization": "Q4_K_XL",
+      "speed": "Gen TPS 21.4",
+      "message": "o/ - I have been experimenting with persistent ssd backed kv cache and other improvements to help improve llama.cpp performance on my AMD APU based devices ( 7840U / 780M / 32GB, etc) - thought I'd share incase it was interesting to anyone else.\n\nIt wouldn't make sense if you have a GPU, but it might if you're like me and you don't. \n\n #### Qwen3.6-35B (Q4_K_XL, 35B MoE, hybrid)\n\n| Size | Tokens | Cold TTFT | Warm TTFT | Speedup | Gen TPS |\n|--------|--------|-----------------|-----------|---------|---------|\n| Small | ~1243 | 8.8s | 0.4s | 20.1x | 21.4 |\n| Medium | ~5409 | 39.1s | 0.6s | 61.9x | 20.7 |\n| Large | ~15.7K | 125.1s (2.1min) | 1.1s | 117.8x | 19.0 | \n\n https://github.com/fewtarius/llama-ai \n https://github.com/fewtarius/llama.cpp",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1513513482761535519",
+      "month": "2026-06",
+      "timestamp": "Monday, June 8, 2026 5:02\u202fAM",
+      "tier": "full",
+      "model": "gemma4-31b",
+      "hardware": "3090ti, ~24GB, >8GB gpu",
+      "quantization": "4bit qat",
+      "speed": "45t/s \u00b7 45 tok/s, 45 tok/s, 45 tok/s",
+      "message": "if we taking actual coding out of the equation, which models is better. gemma4 31b needs like ~24GB with mtp and vision. tested it on 3090ti, 45t/s, sometimes more. gemma4 qat 12b seems to be popular now but still needs >8GB gpu, to run the 4bit qat, being a dense model.",
+      "tps": [
+        45.0,
+        45.0,
+        45.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1513574700649943101",
+      "month": "2026-06",
+      "timestamp": "Monday, June 8, 2026 9:05\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "5090",
+      "quantization": "int4 autoround",
+      "speed": "80t/s \u00b7 80 tok/s, 80 tok/s, 80 tok/s",
+      "message": "WSL on Windows is ok if you are forced to be on it. I get over 80t/s with Intel's Qwen 3.6 27B int4 autoround quant with vLLM on my 5090, and it's rock solid memory wise",
+      "tps": [
+        80.0,
+        80.0,
+        80.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1515451912810528889",
+      "month": "2026-06",
+      "timestamp": "Saturday, June 13, 2026 1:24\u202fPM",
+      "tier": "full",
+      "model": "gemma4-31b",
+      "hardware": "24Gb",
+      "quantization": "q8_0, IQ4_XS",
+      "speed": "78.12 t/s, 68.55 t/s \u00b7 78.12 tok/s, 68.55 tok/s, 42.89 tok/s, 16384 tok/s",
+      "message": "My speed champion for single card was using the beellama.cpp fork with DFlash ( 78.12 t/s 42.89% acceptance on writing python.)\nHIP_VISIBLE_DEVICES=0 build-rocm/bin/llama-server -hf \"$TARGET_HF\" -hfd \"Anbeeld/gemma-4-31B-it-DFlash-GGUF:IQ4_XS\" --spec-type dflash --no-spec-dm-adaptive --spec-draft-n-max 16 --spec-draft-p-min 0.0 --spec-draft-ctx-size 1024 --spec-dflash-cross-ctx 1024 --spec-draft-temp auto --host 0.0.0.0 --port 8080 -fa on --reasoning on --reasoning-loop-min-tokens 16384 -ngl 999 -ngld 999 -fit off --temp 1.0 --top-p 0.95 --top-k 64 --ctx-size 32768 -np 1 --threads 8 --mmap --no-mmproj -sm none -ctk q8_0 -ctv q8_0 -ctkd q8_0 -ctvd q8_0 -b 2048 -ub 512 --metrics --log-timestamps\n\nI've deleted the repo and build files, but that was working on my 24Gb last night, maybe that'll get you going? \n\nI just tried this config to run mainline, with mtp on 24Gb of ram. (68.55 t/s 58% acceptance.)\n GGML_CUDA_ALLREDUCE=nccl HIP_VISIBLE_DEVICES=0 build-rocm-rccl/bin/llama-server -hf \"unsloth/gemma-4-31b-it-GGUF:UD-Q4_K_XL\" --spec-type draft-mtp --spec-draft-n-max 10 --host 0.0.0.0 --port 8080 -fa on --reasoning on -ngl 999 -fit off --temp 1.0 --top-p 0.95 --top-k 64 -np 1 --threads 8 --mmap --cache-ram 0 -ctk f16 -ctv f16 -b 2048 -ub 512 --metrics --log-timestamps\n\nI think the NVIDIA versions of those commands should fit in 24Gb?",
+      "tps": [
+        78.12,
+        68.55,
+        42.89,
+        16384.0,
+        58.0,
+        78.12,
+        68.55
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1515856192189104241",
+      "month": "2026-06",
+      "timestamp": "Sunday, June 14, 2026 4:11\u202fPM",
+      "tier": "full",
+      "model": "llama 2 7B",
+      "hardware": "AMD GPUs, 32GB, 512 GB/s",
+      "quantization": "Q4_0",
+      "speed": "1250 t/s PP, 70 t/s TG, 1000 t/s PP, 55 t/s TG \u00b7 1250 tok/s, 70 tok/s, 1000 tok/s, 55 tok/s",
+      "message": "They're AMD GPUs. 32GB, 512 GB/s speed. The MI50 32GB used to be the cheapest high-capacity GPU, but those have gone up in price so V620s are the new king(?).\nThey're solid for the price. According to the llama 2 7B Q4_0 tests on the l.cpp GitHub, 25%-ish better performance than the P40 (and 8GB more VRAM).\nV620: 1250 t/s PP and 70 t/s TG\nP40: 1000 t/s PP and 55 t/s TG",
+      "tps": [
+        1250.0,
+        70.0,
+        1000.0,
+        55.0,
+        1250.0,
+        70.0,
+        1000.0,
+        55.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1515866977988644984",
+      "month": "2026-06",
+      "timestamp": "Sunday, June 14, 2026 4:54\u202fPM",
+      "tier": "full",
+      "model": "qwen3.5-27b",
+      "hardware": "2x AMD Instinct MI50/MI60",
+      "quantization": "Q8_0",
+      "speed": "256.29 t/s, 180.34 t/s, 147.99 t/s, 28.45 t/s, 27.45 t/s, 20.72 t/s, 233.83 t/s, 168.49 t/s, 133.12 t/s, 27.43 t/s, 26.68 t/s, 19.32 t/s \u00b7 20 tok/s, 20 tok/s",
+      "message": "You should be able to get +20 t/s generation easy with two V620 in tensor parallel, here's some numbers from my own setup:\n\n ========================================================================================\nTest Scenario Tensor (Full) Tensor (PCIe 1.0) Layer Split PCIe Drop %\n========================================================================================\npp2048 (Prefill) 256.29 \u00b1 0.15 180.34 \u00b1 0.03 147.99 \u00b1 0.03 -29.63%\ntg256 (Decoding) 28.45 \u00b1 0.06 27.45 \u00b1 0.05 20.72 \u00b1 0.01 -3.51%\npp2048 @ 16k Context 233.83 \u00b1 0.75 168.49 \u00b1 0.38 133.12 \u00b1 0.06 -27.94%\ntg256 @ 16k Context 27.43 \u00b1 0.25 26.68 \u00b1 0.25 19.32 \u00b1 0.02 -2.73%\n========================================================================================\n* Model: Qwen 27B Q8_0 | GPUs: 2x AMD Instinct MI50/MI60\n* \"PCIe Drop %\" shows performance loss of Tensor (PCIe 1.0) compared to Tensor (Full).",
+      "tps": [
+        20.0,
+        20.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1515925193145581578",
+      "month": "2026-06",
+      "timestamp": "Sunday, June 14, 2026 8:45\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "dual 3060's",
+      "quantization": "Q6_K_XL",
+      "speed": "~260 pp/sec; ~170 pp/sec",
+      "message": "I'm running dual 3060's in my PC, and I'm trying to isolate a performance problem. So I run Qwen3.6-35B-A3B-UD-Q6_K_XL, with -c 131072 and the MOE offloaded to the cpu. Using -dev CUDA0 and I get ~260 pp/sec I run it on -dev CUDA1, and I'm only getting 170 pp/sec. Both have similar tg/sec. The only diff between the two cards is one is running on a PCIE16x that's direct to the cpu, and the other is running PCIE8x that's direct to the CPU... Could that be the difference?",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1515932546544832553",
+      "month": "2026-06",
+      "timestamp": "Sunday, June 14, 2026 9:14\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "m1 max",
+      "quantization": "a4b-qat",
+      "speed": "52.76 tokens/sec, 3.37 secs to first token, 18.91 tokens/sec, 0.87 secs to first token \u00b7 52.76 tok/s, 18.91 tok/s",
+      "message": "oh i tried gemma 4 today on my m1 max (macbook pro) and compared it to one of the qwen models, used a really simple prompt, gemma4 was a lot worse than qwen:\n\ngpu: m1 max base model\n\nmodel: google/gemma4-26b-a4b-qat\nprompt: write me a javascript mandelbrot function that runs in a browser\nresults: generation: 52.76 tokens/sec, 3.37 secs to first token, no data on prompt processing\n\nmodel: qwen3.6-27b-mlx\nprompt: write me a javascript mandelbrot function that runs in a browser\nresults: generation: 18.91 tokens/sec, 0.87 secs to first token, no data on prompt processing\n\ncomments: image quality and code was much better on qwen, pan and zoom in/out worked (unlike gemma4)",
+      "tps": [
+        52.76,
+        18.91
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1516415534948941885",
+      "month": "2026-06",
+      "timestamp": "Tuesday, June 16, 2026 5:13\u202fAM",
+      "tier": "full",
+      "model": "Gemma-4 MeroMero 31B",
+      "hardware": "RTX 5060 Ti 16GB + RTX 3060 12GB",
+      "quantization": "IQ4_XS",
+      "speed": "14.6 tokens/s \u00b7 14.6 tok/s",
+      "message": "hey guys, I am currently running a local Gemma-4 MeroMero 31B IQ4_XS model on KoboldCPP, setting layers so that the 5060 Ti handles most of the workload in a dual GPU setup (RTX 5060 Ti 16GB + RTX 3060 12GB). My current speed is 14.6 tokens/s. If I replace the 3060 with an RTX 5070 Ti, what speed can I expect compared to the old combo?",
+      "tps": [
+        14.6
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1516929660016001256",
+      "month": "2026-06",
+      "timestamp": "Wednesday, June 17, 2026 3:16\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "M4 Mac Mini with 16GB",
+      "quantization": "4bit",
+      "speed": "14 tokens/s \u00b7 14 tok/s",
+      "message": "GLM 5.2 is optimizing the fuck out of my M4 Mac Mini with 16GB. It got Qwen 3.6 27B 4bit running at 14 tokens/s on a bag of potato chips",
+      "tps": [
+        14.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1517053479015944192",
+      "month": "2026-06",
+      "timestamp": "Wednesday, June 17, 2026 11:28\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "16GB M1 Pro Mac",
+      "quantization": "~3 bits, TurboQuant",
+      "speed": "10 t/s \u00b7 10 tok/s, 10 tok/s",
+      "message": "Qwen 3.6 27B ~3 bits with no vision and TurboQuant around 10 t/s no MTP or DFlash on my 16GB M1 Pro Mac from 2021",
+      "tps": [
+        10.0,
+        10.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1517327460646256764",
+      "month": "2026-06",
+      "timestamp": "Thursday, June 18, 2026 5:37\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "2x 5060 ti\u2019s",
+      "quantization": "Q6_K",
+      "speed": "30 tokens a second \u00b7 30 tok/s",
+      "message": "Hey peeps.\n\nTrying out a Q6_K quant of qwen 3.6 27b to see the tokens per second on 2x 5060 ti\u2019s\n\nRunning it with p2p enabled and without MTP.\n\nGetting 30 tokens a second.",
+      "tps": [
+        30.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1517354364006826015",
+      "month": "2026-06",
+      "timestamp": "Thursday, June 18, 2026 7:24\u202fPM",
+      "tier": "full",
+      "model": "qwen3.5-27b",
+      "hardware": "AMD Instinct MI50/MI60",
+      "quantization": "Q8_0",
+      "speed": "pp2048 256.29",
+      "message": "If I'm remembering correctly, MTP wasn't that big of an improvement on the MI50 (probably because of the compute limitations), but here's my numbers running Q8 with two cards:\n\n ========================================================================================\nTest Scenario Tensor (Full) Tensor (PCIe 1.0) Layer Split PCIe Drop %\n========================================================================================\npp2048 (Prefill) 256.29 \u00b1 0.15 180.34 \u00b1 0.03 147.99 \u00b1 0.03 -29.63%\ntg256 (Decoding) 28.45 \u00b1 0.06 27.45 \u00b1 0.05 20.72 \u00b1 0.01 -3.51%\npp2048 @ 16k Context 233.83 \u00b1 0.75 168.49 \u00b1 0.38 133.12 \u00b1 0.06 -27.94%\ntg256 @ 16k Context 27.43 \u00b1 0.25 26.68 \u00b1 0.25 19.32 \u00b1 0.02 -2.73%\n========================================================================================\n* Model: Qwen 27B Q8_0 | GPUs: 2x AMD Instinct MI50/MI60\n* \"PCIe Drop %\" shows performance loss of Tensor (PCIe 1.0) compared to Tensor (Full).",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1517588707744419910",
+      "month": "2026-06",
+      "timestamp": "Friday, June 19, 2026 10:55\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "2 5060 ti's 16GB",
+      "quantization": "FP8",
+      "speed": "2500",
+      "message": "waiting on the delivery of 2 5060 ti's to confirm. but if your use case is only inference, this might be the strat while GPU prices are inflated. The downside is finetuning and non inference tasks wouldn't be viable on this setup. But 4x 5060 ti's 16GB for 64GB total should be able to run Qwen/Qwen3.6-27B-FP8 with 4 concurrency and 262144 context with bfloat16 KV cache.\n\nThe tokens per second will be interesting to confirm with this setup.\n\nBut you could run Q8/FP8 quant with max context for roughly 2500 total (guestimating). Pickup an old ryzen CPU that has 16 dedicated lanes to the first PCI x16 slot, bifurcate it into x4 lanes of gen 4 pci and have a 5060 ti on each of the 4 oculink 4x lanes. CPU + DDR4 RAM would be maybe 300-500, motherboard maybe 150, PSU probably 200, case price idunno.\n\nAnd you can get 5060 ti's for 400 to 450 USD each if you watch for deals on slickdeals or etc.\n\nCompared to spending 3000 for 2x 3090's where you will be limited to 48GB or RAM or 2x 4090's for 6000, 2x 5090's for 8000+ its a solid strat for inference only use case",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1518350155672322108",
+      "month": "2026-06",
+      "timestamp": "Sunday, June 21, 2026 1:21\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "4x 5060 ti 16gb for 64 gb total",
+      "quantization": "FP8",
+      "speed": "70 tokens /second \u00b7 70 tok/s, 70 tok/s",
+      "message": "4x 5060 ti 16gb for 64 gb total. Able to run Qwen/Qwen3.6-27b-FP8 with bf16 kv cache, 262K context, 4 concurrency, and 16k batch tokens at 70 tokens /second",
+      "tps": [
+        70.0,
+        70.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1518800715328524389",
+      "month": "2026-06",
+      "timestamp": "Monday, June 22, 2026 7:11\u202fPM",
+      "tier": "full",
+      "model": "26B-A4B",
+      "hardware": "CPU only",
+      "quantization": "Q4_K_XL",
+      "speed": "64 tok/s \u00b7 64 tok/s",
+      "message": "Wow I'm getting 64 tok/s on 26B-A4B Q4_K_XL on CPU only now. Also PP is usually more like 250+ but this was a short prompt so I guess it wasn't enough to get a good measure.",
+      "tps": [
+        64.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1520011391426236517",
+      "month": "2026-06",
+      "timestamp": "Friday, June 26, 2026 3:22\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "two Macs with Thunderbolt",
+      "quantization": "q4",
+      "speed": "5 tokens/s \u00b7 5 tok/s",
+      "message": "I do get 5 tokens/s on q4 27b if I link my two Macs with Thunderbolt. That\u2019s without MTP",
+      "tps": [
+        5.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1511525947000623144",
+      "month": "2026-06",
+      "timestamp": "Tuesday, June 2, 2026 5:24\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "minimax-m2.5",
+      "hardware": "4090",
+      "quantization": "",
+      "speed": "7tk/s \u00b7 7 tok/s, 7 tok/s, 7 tok/s",
+      "message": "hey, i'm trying to toy around with LFM2.5 8B A1B but i'm getting a rather shocking 7tk/s on a 4090",
+      "tps": [
+        7.0,
+        7.0,
+        7.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1512652218178994256",
+      "month": "2026-06",
+      "timestamp": "Friday, June 5, 2026 7:59\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-27b",
+      "hardware": "rtx6k",
+      "quantization": "",
+      "speed": "20ish",
+      "message": "rtx6k can handle 20ish nonstop parallel requests for qwen 3.6 27b (on vllm). i think it depends on the use you're aiming for. using coding agents will require a beefier setup",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1514257913408127196",
+      "month": "2026-06",
+      "timestamp": "Wednesday, June 10, 2026 6:20\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-27b",
+      "hardware": "rx 9070xt",
+      "quantization": "q3-k",
+      "speed": "15-20t/s \u00b7 20 tok/s, 20 tok/s, 20 tok/s",
+      "message": "I tried using lllamacpp vulkan and qwen 27b q3 on my rx 9070xt and i get like 15-20t/s output",
+      "tps": [
+        20.0,
+        20.0,
+        20.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1514426816348160062",
+      "month": "2026-06",
+      "timestamp": "Wednesday, June 10, 2026 5:31\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "80gb dense model",
+      "hardware": "1.9tb/s",
+      "quantization": "",
+      "speed": "20tk/s \u00b7 20 tok/s, 20 tok/s, 20 tok/s",
+      "message": "to run bigger models you need more bandwidth. Lets say you're trying to run a 80gb dense model on 1.9tb/s. That will only yield about 20tk/s at full theorotical bandwidth",
+      "tps": [
+        20.0,
+        20.0,
+        20.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1514557469270212689",
+      "month": "2026-06",
+      "timestamp": "Thursday, June 11, 2026 2:10\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "deepseek-v4-flash",
+      "hardware": "32gb ram i3 13100f",
+      "quantization": "",
+      "speed": "0.5tps \u00b7 0.5 tok/s",
+      "message": "Any tips for making deepseek v4-flash run faster I have 32gb ram i3 13100f running it in wsl it's using about 15gb ram getting 0.5tps and not maxing out any comments getting 70 percent nvme 40 CPU and ram has a few GB left",
+      "tps": [
+        0.5
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1515272131540291656",
+      "month": "2026-06",
+      "timestamp": "Saturday, June 13, 2026 1:30\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "rtx 3090",
+      "quantization": "",
+      "speed": "150token/seconds",
+      "message": "so with diffusiongemma we are trading accuracy vs speed. it's not that interesting no? after all I have around 150token/seconds on qwen3.6-35b-A3b running on a rtx 3090 , which is enough fast to be usable and far more intelligent than diffusiongemma",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1515466114493186048",
+      "month": "2026-06",
+      "timestamp": "Saturday, June 13, 2026 2:21\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "gemma4-12b",
+      "hardware": "5090 desktop, 4070 laptop, 5080 desktop",
+      "quantization": "",
+      "speed": "19 tps, 96 tps \u00b7 19 tok/s, 96 tok/s",
+      "message": "I just pulled the trigger on a 5090 desktop. I ran an experiment this morning, google/gemma-4-12b-qat runs at 19 tps on a 4070 laptop, 96 tps on my son's 5080 desktop, and i'm expecting significantly better on a 5090 (dont have that to test)",
+      "tps": [
+        19.0,
+        96.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1515886723773497414",
+      "month": "2026-06",
+      "timestamp": "Sunday, June 14, 2026 6:12\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "Rtx 3060 12gb, Xeon 2650 v4, 32 RAM",
+      "quantization": "",
+      "speed": "35.20 t/s \u00b7 2.301 tok/s, 35.2 tok/s, 35.2 tok/s",
+      "message": "Rtx 3060 12gb + Xeon 2650 v4 + 32 RAM\n2.301 tokens | 1min 5s | 35.20 t/s\n\nIs it good?\nllama-server.exe ^\n -m \"C:\\Users\\Rafael\\Downloads\\models\\Qwen3.6-35B-A3B-APEX-MTP-I-Compact.gguf\" ^\n -ngl all ^\n -t 16 ^\n --n-cpu-moe 15 ^\n -c 90000 ^\n -b 2048 ^\n -ub 1024 ^\n --no-mmap ^\n --ctx-checkpoints 128 ^\n --mlock ^\n --prio 2 ^\n --prio-batch 2 ^\n -fa on ^\n -ctk turbo3_tcq ^\n -ctv turbo3_tcq ^\n -np 1 ^\n --port 8080",
+      "tps": [
+        2.301,
+        35.2,
+        35.2
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1515890938432720896",
+      "month": "2026-06",
+      "timestamp": "Sunday, June 14, 2026 6:29\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-27b",
+      "hardware": "RTX 5070 Ti 16 GB, 32 GB of RAM, Ryzen 9900X",
+      "quantization": "",
+      "speed": "2.5 tokens per second \u00b7 2.5 tok/s",
+      "message": "all good - I've just downloaded Qwen 3.6 27B model and I'm not sure if there's any config I can adjust, but it's taking like 2.5 tokens per second?\n\nRTX 5070 Ti 16 GB\n32 GB of RAM\nRyzen 9900X",
+      "tps": [
+        2.5
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1516132197806112922",
+      "month": "2026-06",
+      "timestamp": "Monday, June 15, 2026 10:28\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-27b",
+      "hardware": "2x MI50 32GB",
+      "quantization": "fp16, q8",
+      "speed": "185.88 tokens per second \u00b7 185.88 tok/s, 167 tok/s, 20.84 tok/s, 50 tok/s",
+      "message": "2x MI50 32GB with Qwen 27B Q8 / FP16 gives this at agentic coding contexts:\n\n19.18.577.068 I slot print_timing: id 0 | task 0 | prompt eval time = 717955.95 ms / 133456 tokens ( 5.38 ms per token, 185.88 tokens per second )\n\n19.43.889.896 I slot print_timing: id 0 | task 70 | eval time = 8014.40 ms / 167 tokens ( 47.99 ms per token, 20.84 tokens per second )\n\nNot that big of an improvement honestly, you double the cards and only get +50 t/s on pp and +5 t/s on tg.",
+      "tps": [
+        185.88,
+        167.0,
+        20.84,
+        50.0,
+        5.0,
+        50.0,
+        5.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1516137662405283982",
+      "month": "2026-06",
+      "timestamp": "Monday, June 15, 2026 10:49\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-27b",
+      "hardware": "2 v100",
+      "quantization": "",
+      "speed": "60-80tok/s \u00b7 80 tok/s, 80 tok/s",
+      "message": "Nah I'm probably doing what Black Jesus suggested B70 or AMD V620, I'm just searching some benchs or trying to rent to do my test case, I'm aiming for at least have Qwen3.6-27B at 60-80tok/s I prove that with 2 v100, but I'm really concerned about cooling and idle power and of course spending it on a 10year platofrm that could die on me at any moment",
+      "tps": [
+        80.0,
+        80.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1516938205935697961",
+      "month": "2026-06",
+      "timestamp": "Wednesday, June 17, 2026 3:50\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-27b",
+      "hardware": "16GB Mac mini",
+      "quantization": "",
+      "speed": "14 t/s \u00b7 14 tok/s, 14 tok/s",
+      "message": "Okay so we\u2019re at 14 t/s @64k context for Qwen 3.6 27B on the 16GB Mac mini",
+      "tps": [
+        14.0,
+        14.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1517125045686636664",
+      "month": "2026-06",
+      "timestamp": "Thursday, June 18, 2026 4:13\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "gemma4-e4b",
+      "hardware": "i5 / 16gb ram / rtx 2070",
+      "quantization": "",
+      "speed": "fast \u00b7 4000 tok/s, 120 tok/s",
+      "message": "hello ! i'm running gemma4 e4b locally to classify court documents. my config is relatively old (2019 i5 / 16gb ram / rtx 2070). model is running fast and without any problems on normal questions but as soon as I try to pass court documents (whom are around ~4000 tokens) the model starts to answer, get it clearly (no hallucination, it gives me information from the document) and stops after outputing a few tokens (from my test, it stops after outputing ~120 tokens). It's not telling me a clear refusal, it's rather answering exactly how I want but stopping mid sentence\n\ni tried disabling thinking (still same problem)\n\ni have a \"weird\" guess that the model may stop due to the court documents describing criminal activities; but for now, the only documents I passed to the model involves petty crime (shoplifting, DUI...)\n\nit's my first time trying local models for this task, where do you think it is coming from ? and if it's coming from the model, what would be a good alternative to gemma ? my main objective is having the fastest token output, i'd rather have a few hallucinations than a slow model as i've got thousands of documents to classify",
+      "tps": [
+        4000.0,
+        120.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1517603737701580831",
+      "month": "2026-06",
+      "timestamp": "Friday, June 19, 2026 11:55\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "deepseek",
+      "hardware": "k80s",
+      "quantization": "",
+      "speed": "4 tok/s \u00b7 4 tok/s",
+      "message": "well, if i feel like putting in untold hours of work to get 4 tok/s on deepseek on my k80s at 100x the power cost of openrouter, only to be told to knock that off by IT, I will be sure to come back and update you guys",
+      "tps": [
+        4.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1518076972503404635",
+      "month": "2026-06",
+      "timestamp": "Saturday, June 20, 2026 7:15\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "gemma4-26b",
+      "hardware": "dual 6248R",
+      "quantization": "",
+      "speed": "38-40 tok/s generation \u00b7 40 tok/s",
+      "message": "Hey FYI I didn't abandon this NUMA mirror thing! I had Opus 4.8 add model weight and KV mirroring on ik_llama.cpp today! I am hoping to put it on github tonight or tomorrow if you want to try it.\n\nI also upgraded my R740 to dual 6248R to get the extra AVX512 enhancements, and populated all my memory channels now have 768 GB total.\n\nGetting 38-40 tok/s generation on gemma4 26b a4b and close to 300 pp with all cores. Decent results for pure CPU!",
+      "tps": [
+        40.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1518293289122529412",
+      "month": "2026-06",
+      "timestamp": "Sunday, June 21, 2026 9:35\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "llama-server, Granite",
+      "hardware": "i5-12500T, 16GB RAM, GTX 1050Ti with 4GB VRAM, i7-7700HQ, 16GB RAM",
+      "quantization": "",
+      "speed": "10 t/s \u00b7 10 tok/s, 10 tok/s",
+      "message": "Just figured I'd introduce myself (doesn't seem to be an #introductions channel). I've been playing with llama-server some locally, mostly out of curiosity out of what I can get it to do on my existing computers.\n\nI'm mostly using it on a little HP 400 G9 Mini with an i5-12500T (unfortunately 12th-gen, so no AVX512 -- bought it mostly as a small server) with 16GB of RAM, though I've ended up with a set of models that are reasonably fast on it. I've been particularly impressed with some of the MoE Granite models. Only machine I have with a GPU is a Lenovo Y520 from 2017 (i7-7700HQ, 16GB RAM, GTX 1050Ti with 4GB VRAM); that machine ends up about half the speed on the HP, but with the GPU is about 10 t/s faster.\n\n(Have also played with it on my cheap 2023 Motorola phone, just becasue I can.)\n\nMight end up setting up more infrastructure; I think I've convinced my network-geek roommate to ditch his Perplexity subscription.",
+      "tps": [
+        10.0,
+        10.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1519339453959635056",
+      "month": "2026-06",
+      "timestamp": "Wednesday, June 24, 2026 6:52\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-35b",
+      "hardware": "3 p100s",
+      "quantization": "",
+      "speed": "~45 tokens per second decode and ~400 tokens per second prompt processing \u00b7 45 tok/s, 400 tok/s",
+      "message": "im also running qwen3.6 35b on 3 p100s with ~45 tokens per second decode and ~400 tokens per second prompt processing",
+      "tps": [
+        45.0,
+        400.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1519435160246943926",
+      "month": "2026-06",
+      "timestamp": "Wednesday, June 24, 2026 1:12\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "ddr5 6000",
+      "quantization": "q4",
+      "speed": "50t/s \u00b7 50 tok/s, 50 tok/s, 50 tok/s",
+      "message": "if its ddr5 6000, you can expect to get around 50t/s from the 35b q4",
+      "tps": [
+        50.0,
+        50.0,
+        50.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1519435616448676013",
+      "month": "2026-06",
+      "timestamp": "Wednesday, June 24, 2026 1:14\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "gpt-oss-120b",
+      "hardware": "192 GB RAM, 6000 MHz",
+      "quantization": "",
+      "speed": "18 tokens per second, 40-50 tok/second \u00b7 18 tok/s",
+      "message": "I was running 192 GB RAM (2 times 2x48 GB) for a little while, which prevented me from using the XMP profile (they were identical kits but bought at separate times). gpt-oss 120b speeds were like 18 tokens per second. Then once I took two of the sticks out and overclocked to 6000 MHz, I was getting like 40-50 tok/second",
+      "tps": [
+        18.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1520185306643693808",
+      "month": "2026-06",
+      "timestamp": "Friday, June 26, 2026 2:53\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-35b",
+      "hardware": "GPU's/RAM",
+      "quantization": "",
+      "speed": "30 tps \u00b7 30 tok/s",
+      "message": "goddamn MTP is a god send for local inferencing , almost makes me question whether I need more GPU's/RAM . qwen 3.6 35B is running at 30 tps",
+      "tps": [
+        30.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1521384749246185483",
+      "month": "2026-06",
+      "timestamp": "Monday, June 29, 2026 10:19\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-27b",
+      "hardware": "7900xtx",
+      "quantization": "",
+      "speed": "145tps \u00b7 145 tok/s",
+      "message": "wow! 145tps on 27b dense on a 7900xtx\nthe prompt:",
+      "tps": [
+        145.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1519039740039397437",
+      "month": "2026-06",
+      "timestamp": "Tuesday, June 23, 2026 11:01\u202fAM",
+      "tier": "hw_speed_benchmark",
+      "model": "qwen3.6-27b",
+      "hardware": "M2 Max 96GB",
+      "quantization": "q8, gguf",
+      "speed": "30+ tps \u00b7 30 tok/s",
+      "message": "Not for coding. For creative writing etc maybe.\n\nIf you're going to code with serious context sizes, then anything below 8 bit isn't serious.\n\nYou need 400 GB/s bandwidth and 64GB vram minimum to do serious coding.\n\nMy M2 Max 96GB can do Qwen 3.6 27B (GGUF) with MTP at 30+ tps, which is just about a usable alternative for somebody used to big cloud providers.",
+      "tps": [
+        30.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1520223387006271589",
+      "month": "2026-06",
+      "timestamp": "Friday, June 26, 2026 5:24\u202fPM",
+      "tier": "hw_speed_benchmark",
+      "model": "glm-5",
+      "hardware": "mac studio 512GB",
+      "quantization": "",
+      "speed": "18tps \u00b7 18 tok/s",
+      "message": "~$15k (mac studio 512GB, ~18tps I think)\n~$10k if you're lucky and find something special that fell off the back of a truck (GH200)\n https://www.reddit.com/r/homelab/comments/1pjbwt9/i_bought_a_gracehopper_server_for_75k_on_reddit/ \n https://www.reddit.com/r/LocalLLaMA/comments/1uedlas/i_did_some_model_hacks_and_got_glm52_from_about/",
+      "tps": [
+        18.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1515433614349697024",
+      "month": "2026-06",
+      "timestamp": "Saturday, June 13, 2026 12:12\u202fPM",
+      "tier": "inferred_model",
+      "model": "gemma4-31b",
+      "hardware": "rx-7900-xtx",
+      "quantization": "UD-Q4_K_XL",
+      "speed": "66.5t/s \u00b7 66.5 tok/s, 66.5 tok/s, 66.5 tok/s",
+      "message": "Does anyone have Gemma4 30B + MTP + Tensor + Quantized KV working? \nI'm on Dual 7900 xtx, mainline llama.cpp with this patch https://github.com/ggml-org/llama.cpp/pull/24566 .\nunsloth/gemma-4-31b-it-GGUF:UD-Q4_K_XL / MTP / Tensor / f16 kv gives me ~66.5t/s (draft ~58%)\nThat gives me one client and max context, but I'd really like to shrink the kv cache and get some parallelism.",
+      "tps": [
+        66.5,
+        66.5,
+        66.5
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1520763915103895622",
+      "month": "2026-06",
+      "timestamp": "Sunday, June 28, 2026 5:12\u202fAM",
+      "tier": "inferred_model",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "rtx-5070-ti",
+      "quantization": "IQ2",
+      "speed": "202T/S \u00b7 202 tok/s, 202 tok/s, 202 tok/s",
+      "message": "So is Qwen3.6-35B-A3B-GGUF at IQ2 on an RTX 5070TI good at 202T/S",
+      "tps": [
+        202.0,
+        202.0,
+        202.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1500551268228137193",
+      "month": "2026-05",
+      "timestamp": "Sunday, May 3, 2026 10:35\u202fAM",
+      "tier": "full",
+      "model": "functiongemma",
+      "hardware": "Jetson Orin",
+      "quantization": "Q8",
+      "speed": "100ms+",
+      "message": "Hey, could any of you point me to a low latency intent classification model/strategy? i\u2019m trying to classify queries for model routing:\n\u201cwhat is 2+2\u201d -> local\n\u201cwhat is the stock price of asml\u201d -> cloud\n\netc. (around 6 classes)\n\nI\u2019m using fine tuned functiongemma Q8 on Jetson Orin but latency is still 100ms+ (probably due to all the output decode tokens to generate tool call)",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1500612330549936318",
+      "month": "2026-05",
+      "timestamp": "Sunday, May 3, 2026 2:37\u202fPM",
+      "tier": "full",
+      "model": "Minimax m2.7 mxfp4, Qwen-3.6-27b-FP8, Qwen-3.7-27b",
+      "hardware": "RTX Pro 6000",
+      "quantization": "mxfp4",
+      "speed": "18tps for decode, 300tps for prefill \u00b7 18 tok/s, 300 tok/s",
+      "message": "I've been using oMLX which has been a game changer for running local models through claude code on m3 ultra, due to prompt caching, but now that I've got a taste I want to improve my speed. My current best model performance is Minimax m2.7 mxfp4, but after a few back and forths it chugs to around 18tps for decode, 300tps for prefill. The paged prompt caching of oMLX is a game changer, especially the SSD persistence.\n\nI'm thinking of swapping out for Qwen-3.6-27b-FP8, and making an RTX Pro 6000 build (<$15k). Does anyone know how Qwen-3.7-27b is performing (quality wise) compared to Minimax m2.7 for agentic coding?",
+      "tps": [
+        18.0,
+        300.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1500934369462980689",
+      "month": "2026-05",
+      "timestamp": "Monday, May 4, 2026 11:57\u202fAM",
+      "tier": "full",
+      "model": "gemma4-26b",
+      "hardware": "rtx3060 12gb vram 16gb dram",
+      "quantization": "Q5_K_S",
+      "speed": "29.34it/s",
+      "message": "49mins, painfully slow, rtx3060 12gb vram 16gb dram\n Codegen: HumanEval/163 @ gemma-4-26B-it-UD-Q5_K_S\nOpenAIChatDecoder \u2022100% \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501 164/164 \u2022 0:49:03\nComputing expected output...\nExpected outputs computed in 7.67s\nReading samples...\n164it [00:00, 1136.38it/s]\n100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 164/164 [00:05<00:00, 29.34it/s]\nhumaneval (base tests)\npass@1: 0.957\nhumaneval+ (base + extra tests)\npass@1: 0.915",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1501030895996637204",
+      "month": "2026-05",
+      "timestamp": "Monday, May 4, 2026 6:20\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "RTX3090+RTX3060, 2.5G extra VRAM",
+      "quantization": "Q6_K",
+      "speed": "22.97 tok/sec to 42.45 tok/sec \u00b7 22.97 tok/s, 42.45 tok/s",
+      "message": "I am so excited for llama.cpp MTP support: https://github.com/ggml-org/llama.cpp/pull/22673 \nQwen 3.6 27B Q6_K went from 22.97 tok/sec to 42.45 tok/sec on one tester's hardware (RTX3090+RTX3060). That's over double the speed! Only 2.5G extra VRAM usage.",
+      "tps": [
+        22.97,
+        42.45
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1501041021360799986",
+      "month": "2026-05",
+      "timestamp": "Monday, May 4, 2026 7:01\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "AMD, HIP, ROCm, R9700s",
+      "quantization": "MXFP4, Q8, Q4, Q8_0",
+      "speed": "6000 tok/sec PP, 5.7K \u00b7 6000 tok/s",
+      "message": "Ignore NVFP4 \nIt\u2019s not for amd \nMXFP4 MXFP6 and MXFP8 is where CDNA4/RDNA4 is heading. In my local testing, i got above 6000 tok/sec PP using llamacpp + HIP using mxfp4 non gguf model \n\nwith RADV Vulkan, noctrex\u2019s MXFP4_MOE ( Q8 ) variant gives me best Q4 PP around 5.7K \n\n https://huggingface.co/noctrex/Qwen3.6-35B-A3B-MXFP4_MOE-GGUF \n\ni took his model further and compacted lm_head from BF16 to Q8_0 and MXFP4 which ran faster 9-14% token gen \nbut PP remained same\n https://huggingface.co/hugypufy/Qwen3.6-35B-A3B-MXFP4_MOE-GGUF \n\nThere are a couple of Reddit posts on rocm + MXFP4 dual/quad R9700s doing very well on qwen3.6 35B/qwen3.5 122B\nwhich indicates that amd has been finally optimising HIP to use neural accelerators which were probably designed to work well with MXFP but software never arrived on launch \n\nmxfp4 then mxfp8 then mxfp6\nin that order \n\nLike MTP launched but no Vulkan support on llamacpp \nyou can be our saviour",
+      "tps": [
+        6000.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1502508249658691685",
+      "month": "2026-05",
+      "timestamp": "Friday, May 8, 2026 8:11\u202fPM",
+      "tier": "full",
+      "model": "qwen",
+      "hardware": "4090, xeon server",
+      "quantization": "q8 cache quant, full quant",
+      "speed": "4 tok/s \u00b7 4 tok/s",
+      "message": "I did find that q8 cache quant was making qwen noticeably dumber but i can't get nearly enough context on the 4090 without it... tried qwen full quant on the xeon server but it was way too slow (4 tok/s) so i thought I'd give gpt a shot.\n\nFigured smaller context full precision 64 KB might be okay for the coder agent",
+      "tps": [
+        4.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1502605191701336105",
+      "month": "2026-05",
+      "timestamp": "Saturday, May 9, 2026 2:36\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "2x 3080 20Gb",
+      "quantization": "Q6_K_XL",
+      "speed": "50 tok/sec \u00b7 50 tok/s",
+      "message": "2x 3080 20Gb running Qwen 3.6 27B Unsloth Q6_K_XL with MTP - 50 tok/sec",
+      "tps": [
+        50.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1505154479841083422",
+      "month": "2026-05",
+      "timestamp": "Saturday, May 16, 2026 3:26\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "12gb vram, ddr5 6000",
+      "quantization": "q4",
+      "speed": "50t/s \u00b7 50 tok/s, 50 tok/s, 50 tok/s",
+      "message": "35b q4 already runs at 50t/s on 12gb vram + ddr5 6000",
+      "tps": [
+        50.0,
+        50.0,
+        50.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1505155495600717846",
+      "month": "2026-05",
+      "timestamp": "Saturday, May 16, 2026 3:30\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "5090",
+      "quantization": "q4",
+      "speed": "200t/s \u00b7 200 tok/s, 200 tok/s, 200 tok/s",
+      "message": "u can imagine my surprise when i rented a 5090 somewhere, put the 35b q4 on there, and it ran at 200t/s",
+      "tps": [
+        200.0,
+        200.0,
+        200.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1505790321504813248",
+      "month": "2026-05",
+      "timestamp": "Sunday, May 17, 2026 9:33\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "3090, 2xA4500",
+      "quantization": "iq4_nl",
+      "speed": "27tps, 52tps, 72tps \u00b7 27 tok/s, 52 tok/s, 72 tok/s",
+      "message": "on 3090, 2xA4500, qwen3.6 27b iq4_nl, llama.cpp:\nno mtp: 27tps\nmtp: 52tps\ntensor parallelism+mtp: 72tps\n\nimho this are crazy good improvments. \n\nbut i can run tensor parallelism only with 2x cards and not 3x. Would it work with the number of cards divideable by 2?",
+      "tps": [
+        27.0,
+        52.0,
+        72.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1505817093629673492",
+      "month": "2026-05",
+      "timestamp": "Sunday, May 17, 2026 11:19\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "R9700",
+      "quantization": "Q4",
+      "speed": "50 tok/sec \u00b7 50 tok/s",
+      "message": "new llamacpp build giving 27B Q4 50 tok/sec on single R9700 at less than 10% loss in PP\nbig win",
+      "tps": [
+        50.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1505828233344712856",
+      "month": "2026-05",
+      "timestamp": "Monday, May 18, 2026 12:03\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "R9700",
+      "quantization": "q4",
+      "speed": "50 tok/sec \u00b7 50 tok/s",
+      "message": "yea no point struggling for training , just go with nvidia \nbut for inference, idk R9700 50 tok/sec q4 27B is pretty good no ?",
+      "tps": [
+        50.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1506310222577143819",
+      "month": "2026-05",
+      "timestamp": "Tuesday, May 19, 2026 7:59\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-35b",
+      "hardware": "Xeon 1680 v2, 32gb ddr3, 2x RTX 3060",
+      "quantization": "q8_0, q4_0",
+      "speed": "25 t/s \u00b7 25 tok/s, 25 tok/s",
+      "message": "Hey everyone, i'm having a hard time getting a good performance from my setup (Xeon 1680 v2, 32gb ddr3, 2x RTX 3060, CachyOS) on Qwen3.6-35B-A4B-MTP. Its almost impossible to make a good split between the GPUs and the experts on CPU, currently my best config was layer split (tensor-split 11,9 since GPU0 is headless) and n-cpu-moe at 12 with 32k context and kv q8_0, that allows around 25 t/s, using q4_0 kv makes it slower, i really wanted to push the context window up.",
+      "tps": [
+        25.0,
+        25.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1506343719207571547",
+      "month": "2026-05",
+      "timestamp": "Tuesday, May 19, 2026 10:12\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "2x 5060ti",
+      "quantization": "nvfp4",
+      "speed": "33tps \u00b7 33 tok/s",
+      "message": "I get 33tps on 27b 175k context nvfp4 in vllm w/ 2x 5060ti.",
+      "tps": [
+        33.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1506544765976580157",
+      "month": "2026-05",
+      "timestamp": "Tuesday, May 19, 2026 11:31\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "dual R9700",
+      "quantization": "Q8_0",
+      "speed": "nearly 40 tok/sec, 1000 tok/sec prompt processing \u00b7 40 tok/s, 1000 tok/s",
+      "message": "some updates \nhit nearly 40 tok/sec on qwen3.6 27B Q8_0 on dual R9700 but with 1000 tok/sec prompt processing\nllamacpp gfx1201 with bundled rocm from lemonade sdk",
+      "tps": [
+        40.0,
+        1000.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1506930945175978096",
+      "month": "2026-05",
+      "timestamp": "Thursday, May 21, 2026 1:05\u202fAM",
+      "tier": "full",
+      "model": "qwen 3.6",
+      "hardware": "R9700",
+      "quantization": "q4",
+      "speed": "50 tok/sec \u00b7 50 tok/s",
+      "message": "with more tweaks , hit 50 tok/sec on single R9700 q4 qwen 3.6",
+      "tps": [
+        50.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1508216509091283177",
+      "month": "2026-05",
+      "timestamp": "Sunday, May 24, 2026 2:13\u202fPM",
+      "tier": "full",
+      "model": "qwen2.5",
+      "hardware": "Apple Silicon",
+      "quantization": "Q4_K_M",
+      "speed": "226 tok/s, 252 tok/s, 97 tok/s, 44 tok/s \u00b7 213 tok/s, 250 tok/s, 84 tok/s, 51 tok/s",
+      "message": "Conifer local AI runtime. v0 engine matching llama.cpp on Apple Silicon.\n\nI'm building Conifer, an open-source runtime layer between local models and the hardware. Handles model setup, storage, quantization, memory layout, and hardware-aware scheduling, so local inference stops feeling like a fragile cloud fallback.\n\nThe idea: most of the pain of running models locally isn't the model itself, it's everything around it. Conifer is the layer that makes \"point at a model and just run\" actually work.\n\nv0 benchmarks vs llama.cpp on M3 Max (same Q4_K_M GGUFs, 512-token prompt / 128-token decode, batch 1):\n\nTinyLlama-1.1B 226 vs 213 tok/s (+6%)\nQwen2.5-0.5B 252 vs 250 tok/s (+1%)\nGemma-2-2B 97 vs 84 tok/s (+15%)\nLlama-3.1-8B 44 vs 51 tok/s (\u221213%)\nHighlights:\n\nCustom Metal inference engine, every kernel parity-checked against a CPU oracle\nHardware-aware model fit \u2014 probes memory + bandwidth, tells you which models will actually run before you download 4GB\nBrowser playground at conifer.build/chat \u2014 try a model in your browser, no install (WebGPU)\nFree and open source on launch (June 1st)\nmacOS Apple Silicon only right now \u2014 Linux + Windows builds in progress\nSite: https://conifer.build | Benchmarks: https://conifer.build/benchmarks | Waitlist: https://conifer.build/feedback",
+      "tps": [
+        213.0,
+        250.0,
+        84.0,
+        51.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1509233777933549740",
+      "month": "2026-05",
+      "timestamp": "Wednesday, May 27, 2026 9:36\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "32GB DDR5, 2080 Super",
+      "quantization": "Q4_K_S",
+      "speed": "8 to 14t/s \u00b7 14 tok/s, 14 tok/s, 14 tok/s",
+      "message": "o.O\nI get about 8 to 14t/s max generation on 32GB DDR5 and 2080 Super with Qwen3.6-35B-A3B-UD-Q4_K_S.gguf\n50k context 4 layers offload to GPU since 8GB VRAM and I need about 3GB for the system itself",
+      "tps": [
+        14.0,
+        14.0,
+        14.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1509334253190778981",
+      "month": "2026-05",
+      "timestamp": "Wednesday, May 27, 2026 4:15\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "Single GPU, Dual GPU, ROCm backend, Vulkan backend",
+      "quantization": "Q6, q8_0",
+      "speed": "37 tokens/sec, 66 tokens/sec \u00b7 37 tok/s, 66 tok/s",
+      "message": "I'm having some weird issues with trying to run unsloth Qwen3.6 35B A3B at Q6.\n\nWith Mudler's APEX I-Quality Quant I use these parameters and get this speed:\n\nSingle GPU:\n\n262,144 Context\n\nROCm backend\n\nParameters: --split-mode none --tensor-split 0,1 --main-gpu 1 --flash-attn on --reasoning on --temp 0.6 --top-p 0.95 --top-k 20 --min-p 0 --presence-penalty 0 --repeat-penalty 1.0 -b 2048 -ub 2048 -ctk q8_0 -ctv q8_0 --fit off --no-mmap --n-cpu-moe 25 --chat-template-file /var/lib/lemonade/.cache/lemonade/chat_template.jinja -np 1\n\n37 tokens/sec. generation\n\nDual GPU:\n\n262,144 Context\n\nVulkan backend\n\nParameters: --split-mode layer --tensor-split 14,20 --main-gpu 1 --flash-attn on --reasoning on --temp 0.6 --top-p 0.95 --top-k 20 --min-p 0 --presence-penalty 0 --repeat-penalty 1.0 -b 2048 -ub 2048 --fit off --no-mmap --n-cpu-moe 2 --chat-template-file /var/lib/lemonade/.cache/lemonade/chat_template.jinja -np 1 -ctk q8_0 -ctv q8_0\n\n66 tokens/sec. generation",
+      "tps": [
+        37.0,
+        66.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1510459930203652159",
+      "month": "2026-05",
+      "timestamp": "Saturday, May 30, 2026 6:48\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "2x 3080 20G power-limited to 250W",
+      "quantization": "Q4_K_M",
+      "speed": "804 tok/sec pp, 35 tok/sec tg \u00b7 804 tok/s, 35 tok/s",
+      "message": "On 2x 3080 20G power-limited to 250W, I get 804 tok/sec pp and 35 tok/sec tg. That's with unsloth/Qwen3.6-27B-Q4_K_M in llama-bench with --n-prompt 200000 --n-gen 5120 . 2x 3090 should be faster than that.\n # llama-bench --flash-attn 1 --model /models/unsloth/Qwen3.6-27B-GGUF/Qwen3.6-27B-Q4_K_M.gguf --n-prompt 200000 --n-gen 5120\n| model | size | params | backend | ngl | fa | test | t/s |\n| ------------------------------ | ---------: | ---------: | ---------- | --: | -: | --------------: | -------------------: |\n| qwen35 27B Q4_K - Medium | 15.65 GiB | 26.90 B | CUDA | 99 | 1 | pp200000 | 804.31 \u00b1 0.73 |\n| qwen35 27B Q4_K - Medium | 15.65 GiB | 26.90 B | CUDA | 99 | 1 | tg5120 | 35.16 \u00b1 0.00 |",
+      "tps": [
+        804.0,
+        35.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1499700147834323046",
+      "month": "2026-05",
+      "timestamp": "Friday, May 1, 2026 2:12\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "35B MoE",
+      "hardware": "dual p100",
+      "quantization": "",
+      "speed": "~40 tokens per second \u00b7 40 tok/s, 300 tok/s",
+      "message": "I\u2019m currently running dual p100, got them for 70\u20ac each from taobao. Token generation is fine with ~40 tokens per second on the 35B MoE but prompt processing is super slow\u2026 300 tokens per second ON PROMPT PROCESSING",
+      "tps": [
+        40.0,
+        300.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1499887069072199761",
+      "month": "2026-05",
+      "timestamp": "Friday, May 1, 2026 2:35\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-35b",
+      "hardware": "4060 w/16gb",
+      "quantization": "",
+      "speed": "35 t/s \u00b7 35 tok/s, 35 tok/s",
+      "message": "4060 w/16gb, trying to push qwen 3.6 35b to 120k without losing my 35 t/s",
+      "tps": [
+        35.0,
+        35.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1499894057051357305",
+      "month": "2026-05",
+      "timestamp": "Friday, May 1, 2026 3:03\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-27b",
+      "hardware": "6000pro",
+      "quantization": "bf16",
+      "speed": "27t/s \u00b7 27 tok/s, 27 tok/s, 27 tok/s",
+      "message": "only 27t/s on 6000pro with 27b? I guess because you're using bf16, yuck",
+      "tps": [
+        27.0,
+        27.0,
+        27.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1499894091750707241",
+      "month": "2026-05",
+      "timestamp": "Friday, May 1, 2026 3:03\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-27b",
+      "hardware": "macbook",
+      "quantization": "dflash",
+      "speed": "40-50t/s \u00b7 50 tok/s, 50 tok/s, 50 tok/s",
+      "message": "Yeah, my 27B is at about 40-50t/s on my macbook if the prompt is under 8k (I dunno how well DFlash works as context grows though, compared to just the prompt.)",
+      "tps": [
+        50.0,
+        50.0,
+        50.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1499956450850640074",
+      "month": "2026-05",
+      "timestamp": "Friday, May 1, 2026 7:11\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen",
+      "hardware": "3090",
+      "quantization": "",
+      "speed": "1k token/s",
+      "message": "the year is 2028: the qwen swarm has gained sentience and is running at 1k token/s on a 3090",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1500158971099746405",
+      "month": "2026-05",
+      "timestamp": "Saturday, May 2, 2026 8:36\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "llama cpp 35b",
+      "hardware": "5070 with Intel core ultra 9 - 96gb",
+      "quantization": "",
+      "speed": "34t/s \u00b7 34 tok/s, 34 tok/s, 34 tok/s",
+      "message": "I have 5070 with Intel core ultra 9 - 96gb \nI have llama cpp 35b - I\u2019m getting 34t/s",
+      "tps": [
+        34.0,
+        34.0,
+        34.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1500562214015209606",
+      "month": "2026-05",
+      "timestamp": "Sunday, May 3, 2026 11:18\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-35b",
+      "hardware": "4090",
+      "quantization": "",
+      "speed": "25-30 t/ks",
+      "message": "my qwen 3.6 35b is just on another level these days a 4090 @ 262k and getting about 25-30 t/ks.",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1500889876034224209",
+      "month": "2026-05",
+      "timestamp": "Monday, May 4, 2026 9:00\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "5080",
+      "quantization": "",
+      "speed": "2x faster",
+      "message": "yea but is there even a point? checking benchmarks on it for Qwen3.6-35B-A3B and the 5080 swapping to ram is still nearly 2x faster",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1502213630442078268",
+      "month": "2026-05",
+      "timestamp": "Friday, May 8, 2026 12:40\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-122b",
+      "hardware": "3080, 3090, rtx pro 6000",
+      "quantization": "",
+      "speed": "20T/s \u00b7 20 tok/s, 20 tok/s, 20 tok/s, 20 tok/s",
+      "message": "20T/s is fine + I'm gettig 20T/s that much Speed on Qwen 3.5 122B partially on CPU. 3080 or 3090s are still much faster then CPU. And rtx pro 6000s are simply Out of reach (unless I save for Like 10 years)",
+      "tps": [
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1502500203125801131",
+      "month": "2026-05",
+      "timestamp": "Friday, May 8, 2026 7:39\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "rtx 3060, 16gb dram",
+      "quantization": "",
+      "speed": "35 t/s \u00b7 35 tok/s, 35 tok/s",
+      "message": "pretty stable with 35 t/s, running Qwen3.6-35B-A3B-APEX-I-Quality.gguf\non rtx 3060 and 16gb dram, 65k context with vision enabled",
+      "tps": [
+        35.0,
+        35.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1504514157255331961",
+      "month": "2026-05",
+      "timestamp": "Thursday, May 14, 2026 9:02\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "122b iq3xxs",
+      "hardware": "12gb vram 64gb ddr5",
+      "quantization": "",
+      "speed": "~20t/s \u00b7 20 tok/s, 20 tok/s, 20 tok/s",
+      "message": "i run 122b iq3xxs, on 12gb vram 64gb ddr5, and i get like ~20t/s on 128k context. its usable",
+      "tps": [
+        20.0,
+        20.0,
+        20.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1505032571657130004",
+      "month": "2026-05",
+      "timestamp": "Friday, May 15, 2026 7:22\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "GPT-5.5",
+      "hardware": "dual Xeon 6148 server maxing out both CPUs with 40 threads",
+      "quantization": "",
+      "speed": "59% faster token generation",
+      "message": "Not sure if anyone else would be interested in this, but I just had codex with GPT-5.5 on xhigh add a \"--numa mirror\" mode to llama.cpp.\n\nIt mirrors the model weighs in RAM for every NUMA node into NUMA-local memory. Now I'm getting 59% faster token generation on my dual Xeon 6148 server maxing out both CPUs with 40 threads.\n\nBefore this, using both CPUs would actually make it SLOWER than maxing out a single CPU because there was a gigantic performance hit from cross-socket memory transfers.\n\nI haven't even mirrored the kv cache yet, but that's next.\n\nGPT-5.5 xhigh one-shotted it btw. Insane...",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1505034740355567617",
+      "month": "2026-05",
+      "timestamp": "Friday, May 15, 2026 7:30\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "llama-3.1-8b",
+      "hardware": "dual 6148's (20-core each)",
+      "quantization": "",
+      "speed": "30.5 tok/s generation \u00b7 30.5 tok/s",
+      "message": "To give actual numbers, my dual 6148's (20-core each) are getting 30.5 tok/s generation in mirror mode with Llama 3.1 8B Instruct before doing anything with kv mirroring",
+      "tps": [
+        30.5
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1505096212171198585",
+      "month": "2026-05",
+      "timestamp": "Friday, May 15, 2026 11:35\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen36",
+      "hardware": "5090",
+      "quantization": "",
+      "speed": "3000 toks",
+      "message": "https://www.reddit.com/r/LocalLLaMA/comments/1tee5ms/can_a_5090_with_qwen36_achieve_3000_toks_bring/",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1505150462045847572",
+      "month": "2026-05",
+      "timestamp": "Saturday, May 16, 2026 3:10\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "35b, 27b",
+      "hardware": "a3090, a4500",
+      "quantization": "",
+      "speed": "120-145tps \u00b7 145 tok/s, 27 tok/s, 52 tok/s",
+      "message": "my hardware is 2 gens old i.e. a3090 and 2x a4500. 35b is around 120-145tps. 27b w/o mtp is 27tps and with 52tps in q4.",
+      "tps": [
+        145.0,
+        27.0,
+        52.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1505189799580012577",
+      "month": "2026-05",
+      "timestamp": "Saturday, May 16, 2026 5:46\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-27b",
+      "hardware": "R9700",
+      "quantization": "",
+      "speed": "30 to 50 tok/sec \u00b7 50 tok/s",
+      "message": "went from 30 to 50 tok/sec 27B 3.6 with mtp on R9700\nnot bad",
+      "tps": [
+        50.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1505192586439032993",
+      "month": "2026-05",
+      "timestamp": "Saturday, May 16, 2026 5:57\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-27b",
+      "hardware": "R9700",
+      "quantization": "",
+      "speed": "PP 1000\u2192700, TG 30\u219250",
+      "message": "right on R9700 27B , PP goes from 1000 to 700 for TG 30 -> 50",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1507523748310286536",
+      "month": "2026-05",
+      "timestamp": "Friday, May 22, 2026 4:21\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "glm-5.1",
+      "hardware": "256g threadripper, 4x 3090",
+      "quantization": "",
+      "speed": "7t/s \u00b7 7 tok/s, 7 tok/s, 7 tok/s",
+      "message": "yeah I ran glm5.1 2.5bpw? before on just the 256g threadripper, w 4x 3090, it was like 7t/s",
+      "tps": [
+        7.0,
+        7.0,
+        7.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1508264833340932186",
+      "month": "2026-05",
+      "timestamp": "Sunday, May 24, 2026 5:25\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-27b",
+      "hardware": "2 R9700s",
+      "quantization": "q8",
+      "speed": "45-50 tok/sec, 35-45 tok/sec \u00b7 50 tok/s, 45 tok/s",
+      "message": "same i used this for months in a row 3.6 35b Q8 ( 2 R9700s )\n works raelly well but eventually it tapers down to 45-50 tok/sec at 150K context and above\nand tbh rocm-lemonade-llamacpp with mtp and on qwen 3.6 27B Q8 ALSO continues to print 35-45 tok/sec at 150K contexxt",
+      "tps": [
+        50.0,
+        45.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1508265537996587098",
+      "month": "2026-05",
+      "timestamp": "Sunday, May 24, 2026 5:28\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "lemonade llama cpp",
+      "hardware": "single r9700",
+      "quantization": "",
+      "speed": "120 t/s \u00b7 120 tok/s, 120 tok/s",
+      "message": "i have never tried lemonade llama cpp. i\u2019m getting 120 t/s with mtp on my single r9700 with vulkan. i wanna see if i can get faster speeds",
+      "tps": [
+        120.0,
+        120.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1508588094268375100",
+      "month": "2026-05",
+      "timestamp": "Monday, May 25, 2026 2:50\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-27b",
+      "hardware": "v100s",
+      "quantization": "",
+      "speed": "1000 tps",
+      "message": "https://www.reddit.com/r/LocalLLaMA/comments/1tmyln6/1000_tps_generation_on_qwen36_27b_with_v100s/",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1509221283819421867",
+      "month": "2026-05",
+      "timestamp": "Wednesday, May 27, 2026 8:46\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-35b",
+      "hardware": "Ideapad 3, 32GB DDR4",
+      "quantization": "",
+      "speed": "10.5 t/s",
+      "message": "with some extreme optimizations getting 10.5 sustained output t/s on qwen 3.5 35B on an Ideapad 3 ($300 laptop) cpu/ram only, 32gb ddr4 upgrade",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1509713786796245015",
+      "month": "2026-05",
+      "timestamp": "Thursday, May 28, 2026 5:23\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-27b",
+      "hardware": "4090",
+      "quantization": "",
+      "speed": "60tk/s \u00b7 60 tok/s, 60 tok/s, 60 tok/s",
+      "message": "qwen 3.6 27b is running 60tk/s on my 4090 with mtp. wtf",
+      "tps": [
+        60.0,
+        60.0,
+        60.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1510004303316910151",
+      "month": "2026-05",
+      "timestamp": "Friday, May 29, 2026 12:38\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-27b",
+      "hardware": "6000, 5090",
+      "quantization": "",
+      "speed": "80-120 tg",
+      "message": "I\u2019m getting 80-120 tg with Qwen3.6 27B on a 6000, anyone getting faster on a 5090 or 6000 with some other inference?",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1510021043123781723",
+      "month": "2026-05",
+      "timestamp": "Friday, May 29, 2026 1:44\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "Qwopus 3.6 27b v2",
+      "hardware": "3090ti",
+      "quantization": "",
+      "speed": "50-60 tok/sec, 150 tok/sec \u00b7 60 tok/s, 150 tok/s",
+      "message": "MCP is incredible. I usually float around 50-60 tok/sec on Qwopus 3.6 27b v2, but for this one specific task these numbers are crazy\n150 tok/sec on a 3090ti",
+      "tps": [
+        60.0,
+        150.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1510605616748695784",
+      "month": "2026-05",
+      "timestamp": "Sunday, May 31, 2026 4:27\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-27b",
+      "hardware": "5090",
+      "quantization": "",
+      "speed": "50 t/s \u00b7 50 tok/s, 50 tok/s, 50 tok/s, 50 tok/s",
+      "message": "for me, once below 50 t/s, i have a hard to wanting to continue work and paying attention. if it's performing a passive task, i don't care but if i'm actively relying on the model to advance a task and sitting at the desktop, 50 t/s is my baseline (about what 27b runs on my 5090 atm)",
+      "tps": [
+        50.0,
+        50.0,
+        50.0,
+        50.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1505969132217176065",
+      "month": "2026-05",
+      "timestamp": "Monday, May 18, 2026 9:23\u202fAM",
+      "tier": "hw_speed_benchmark",
+      "model": "qwen3.6-27b",
+      "hardware": "24G VRAM, 32G VRAM",
+      "quantization": "Q4",
+      "speed": "~56t/s, 100t/s \u00b7 56 tok/s, 100 tok/s, 56 tok/s, 100 tok/s",
+      "message": "Actually nevermind it's just garbage, it estimates ~56t/s for Qwen 3.6 27B @Q4 on 24G VRAM and 100t/s with 32G VRAM, while keeping everything else the same",
+      "tps": [
+        56.0,
+        100.0,
+        56.0,
+        100.0,
+        56.0,
+        100.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1500200941851508777",
+      "month": "2026-05",
+      "timestamp": "Saturday, May 2, 2026 11:22\u202fAM",
+      "tier": "inferred_model",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "rtx-4070-ti",
+      "quantization": "IQ4_NL_XL",
+      "speed": "40ish t/s \u00b7 41 tok/s",
+      "message": "okay so with my 4070ti and ${latest-llama}\n -m \"A:\\qwen3.6_35b\\Qwen3.6-35B-A3B-UD-IQ4_NL_XL.gguf\"\n --ctx-size 262144\n ${qwen_3_6_coding_params}\n ${common_params_gpu}\n ${threads-http}\n ${default_threads}\n -ngl 41\n -ts 41,0\n -b 4096\n -ub 512\n -ot \"blk\\.[0-9]+\\.ffn_(up|down|gate)_(ch|)exps.*=CPU\"\n --chat-template-kwargs \"{\\\"preserve_thinking\\\":true}\"\n ${engram_params} i get 40ish t/s generation",
+      "tps": [
+        41.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1500886181590601779",
+      "month": "2026-05",
+      "timestamp": "Monday, May 4, 2026 8:45\u202fAM",
+      "tier": "inferred_model",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "rtx-4080",
+      "quantization": "IQ3_XXS",
+      "speed": "30t/s \u00b7 30 tok/s, 30 tok/s, 30 tok/s",
+      "message": "I had to double check the size of the model, lol. 30t/s is pretty good honestly. For what it's worth, here's Qwen's summary of different models running HumanEval+ on my 4080:\n \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n \u2502 Model \u2502 Score \u2502 Notes \u2502\n \u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n \u2502 \ud83c\udfc6 Qwen3.6-27B (no-think) \u2502 88.4% \u2502 Dense 27B \u2502\n \u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n \u2502 Qwen3.6-35B-A3B IQ3_XXS (no-think) \u2502 87.8% \u2502 Smallest A3B quant, surprisingly tied \u2502\n \u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n \u2502 Qwen3.6-35B-A3B IQ4 (no-think) \u2502 87.2% \u2502 Daily driver \u2502\n \u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n \u2502 REAP-40B-A3B Q4_K_XL \u2502 86.6% \u2502 Coder-Next pruned 50% + Q4 \u2502\n \u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n \u2502 Sushi-Coder 9B Q8 \u2502 54.3% \u2502 Verbose-output handicap; could re-bench \u2502\n \u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n \u2502 Qwen3.6 IQ3_XXS (with thinking) \u2502 35.4% \u2502 thinking config penalty \u2502\n \u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n \u2502 Qwen3.6 IQ4 (with thinking) \u2502 44.5% \u2502 thinking config penalty \u2502\n \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518",
+      "tps": [
+        30.0,
+        30.0,
+        30.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1500956926316511363",
+      "month": "2026-05",
+      "timestamp": "Monday, May 4, 2026 1:26\u202fPM",
+      "tier": "inferred_model",
+      "model": "eagle",
+      "hardware": "gb10",
+      "quantization": "",
+      "speed": "10t/s \u00b7 10 tok/s, 10 tok/s, 10 tok/s",
+      "message": "doesn't eagle work out of the box though? I don't think I could deal with getting like 10t/s out of the gb10 ( with eagle mtp)",
+      "tps": [
+        10.0,
+        10.0,
+        10.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1500968961624506561",
+      "month": "2026-05",
+      "timestamp": "Monday, May 4, 2026 2:14\u202fPM",
+      "tier": "inferred_model",
+      "model": "Qwen 3.6 35 A3B",
+      "hardware": "strix-halo",
+      "quantization": "",
+      "speed": "50t/s \u00b7 50 tok/s, 50 tok/s, 50 tok/s",
+      "message": "I really like strix halo and recc it, it's great for a cost to run perspective because it sips power while offering a lot of RAM. MoE's are the only way to go on em tho (but stuff like Qwen 3.6 35 A3B runs at 50t/s and is great)",
+      "tps": [
+        50.0,
+        50.0,
+        50.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1500990432899895486",
+      "month": "2026-05",
+      "timestamp": "Monday, May 4, 2026 3:40\u202fPM",
+      "tier": "inferred_model",
+      "model": "m5 max",
+      "hardware": "m5-max, m5",
+      "quantization": "",
+      "speed": "1500t/s \u00b7 1500 tok/s, 1500 tok/s, 1500 tok/s",
+      "message": "https://omlx.ai/my/fadc2127d384283f5df1fcc2c093a9f95700c6a52594bf9db837a81d3418b5ec I guess m5 max is ok up to 1500t/s",
+      "tps": [
+        1500.0,
+        1500.0,
+        1500.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1508468500329398443",
+      "month": "2026-05",
+      "timestamp": "Monday, May 25, 2026 6:55\u202fAM",
+      "tier": "inferred_model",
+      "model": "qwen3.6-27b",
+      "hardware": "rtx-3080, rtx-2080-ti, v100",
+      "quantization": "",
+      "speed": "40 tok/s",
+      "message": "Which GPU to get for single user Qwen 3.6 27B? \nTarget is 40+ tk/s and I can only spend 450USD or so\nI recently saw a post on Reddit about the V100 having FA2 support in a vLLM fork, but OP had 4 GPUs instead of 2...\n\n V100 PCIE 16G $230\nRTX 2080Ti 22GB $305\nRTX 3080 20G $450 \nMy server also has 16GB free DDR4 3200 dual channel RAM",
+      "tps": [
+        40.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1488873060248584313",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 1, 2026 5:09\u202fAM",
+      "tier": "full",
+      "model": "qwen3.5-35b",
+      "hardware": "113GB",
+      "quantization": "turboquant",
+      "speed": "32 -> 26 tok/s \u00b7 26 tok/s",
+      "message": "hi guys, i used https://github.com/mitkox/vllm-turboquant for serving Qwen3.5-35B from my GB10\nWhen turboquant enabled i can only see decrease in inference speed 32 -> 26 tok/s but memory footprint is still the same. 113GB of unified memory occupied. \n\nNow, I know that inference will be lower due to more compute while transforming and rotating kv_cache but main question is if i should see lesser memory consumed or if allowed model will take all memory available to some extend?",
+      "tps": [
+        26.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1489324754350379200",
+      "month": "2026-04",
+      "timestamp": "Thursday, April 2, 2026 11:04\u202fAM",
+      "tier": "full",
+      "model": "gemma4-26b",
+      "hardware": "128gb vram",
+      "quantization": "Q4_K_M",
+      "speed": "3,825.14 t/s",
+      "message": "Gemma 4 26B MoE Q4_K_M Benchmark (128K Context) \n\n Executed with -c 131072 -ngl 99 -fa 1 (Flash Attention Enabled) \n\n | model | size | params | backend | ngl | test | t/s |\n|--------------|-----------|---------|---------|-----|--------|--------------------|\n| Gemma-4-MoE | 14.82 GiB | 26.11 B | ROCm | 99 | pp512 | 3,825.14 \u00b1 40.2 |\n| Gemma-4-MoE | 14.82 GiB | 26.11 B | ROCm | 99 | pp128k | 1,950.88 \u00b1 65.5 |\n| Gemma-4-MoE | 14.82 GiB | 26.11 B | ROCm | 99 | tg128 | 184.22 \u00b1 2.1 | \nbenched Gemma 4 26B on a Bosgame M5 (ai Max 395+, 128gb vram) using llama-cpp",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1489371229705080945",
+      "month": "2026-04",
+      "timestamp": "Thursday, April 2, 2026 2:09\u202fPM",
+      "tier": "full",
+      "model": "qwen3.5-35b",
+      "hardware": "RX 9070 16GB+32GB RAM",
+      "quantization": "Q4_K_XL",
+      "speed": "47 t/s, 200-300 pp/s, 20-22 t/s, 600-700 pp/s \u00b7 47 tok/s, 22 tok/s, 47 tok/s, 22 tok/s",
+      "message": "hello, how is new gemma 4 26B for you guys? I am running it via llama.cpp's vulkan api and getting some weird performance issues. When I run Qwen 3.5 35B (Q4_K_XL) I get on average 47 t/s and somewhere near 200-300 pp/s. With Gemma 4 is different story. This model creates KV cache first (around 7.5Gb in vram for 65k context size) and then fills GPU with layers. After that I get 20-22 t/s and 600-700 pp/s. Is this expected or some kind of bug? My GPU is RX 9070 16GB+32GB RAM. Here is a screenshot of what starting logs look like in llama-server",
+      "tps": [
+        47.0,
+        22.0,
+        47.0,
+        22.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1490887810524119234",
+      "month": "2026-04",
+      "timestamp": "Monday, April 6, 2026 6:35\u202fPM",
+      "tier": "full",
+      "model": "glm-5",
+      "hardware": "8x blackwell",
+      "quantization": "nvfp4 quant",
+      "speed": "35-40t/s \u00b7 40 tok/s, 40 tok/s, 40 tok/s",
+      "message": "should be able to get 35-40t/s on 8x blackwell w/ an nvfp4 quant of glm-5",
+      "tps": [
+        40.0,
+        40.0,
+        40.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1490971845825003551",
+      "month": "2026-04",
+      "timestamp": "Tuesday, April 7, 2026 12:09\u202fAM",
+      "tier": "full",
+      "model": "gemma4-31b",
+      "hardware": "23gb",
+      "quantization": "nvfp4",
+      "speed": "33 t/s \u00b7 33 tok/s, 33 tok/s",
+      "message": "gemma4 31b nvfp4 the 23gb version runs at 33 t/s on my machine (vllm)",
+      "tps": [
+        33.0,
+        33.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1491096306964496554",
+      "month": "2026-04",
+      "timestamp": "Tuesday, April 7, 2026 8:24\u202fAM",
+      "tier": "full",
+      "model": "gemma4-31b",
+      "hardware": "AI Max 395, 128gb ram",
+      "quantization": "bf16",
+      "speed": "3 tps \u00b7 3 tok/s",
+      "message": "Has anyone tried Gemma 4 31B bf16 on an AI Max 395? I just got it running through llama.cpp on Ubuntu and am getting 3 tps. I\u2019m pretty new to all this so I\u2019m wondering if that\u2019s expected. Running with 128gb ram and on rocm 7.2 Ubuntu 25.10",
+      "tps": [
+        3.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1491231076130099361",
+      "month": "2026-04",
+      "timestamp": "Tuesday, April 7, 2026 5:19\u202fPM",
+      "tier": "full",
+      "model": "glm-5.1",
+      "hardware": "single blackwell",
+      "quantization": "IQ3_S",
+      "speed": "6.12 tps \u00b7 6.12 tok/s",
+      "message": "got 6.12 tps on GLM 5.1 IQ3_S on a single blackwell with ram offload",
+      "tps": [
+        6.12
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1491368875567349781",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 8, 2026 2:27\u202fAM",
+      "tier": "full",
+      "model": "kimi-k2.5",
+      "hardware": "dual EPYC 9655 system, CPU only",
+      "quantization": "q8",
+      "speed": "5t/s \u00b7 5 tok/s, 5 tok/s, 5 tok/s",
+      "message": "running kimi-k2.5-q8 on a dual EPYC 9655 system, CPU only. Getting about 5t/s.",
+      "tps": [
+        5.0,
+        5.0,
+        5.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1491534554287313098",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 8, 2026 1:25\u202fPM",
+      "tier": "full",
+      "model": "qwen3.5-122b",
+      "hardware": "tensor-parallel-size 4",
+      "quantization": "Int4",
+      "speed": "~8.8 tok/s \u00b7 8.8 tok/s",
+      "message": "#!/usr/bin/env bash\nset -euo pipefail\n\nexport CUDA_VISIBLE_DEVICES=0,1,2,3\n\nsource /home/user/vllm_test/nightly/.venv/bin/activate\n\ncd /home/user/vllm_test/nightly\n\nvllm serve /home/user/QWEN123B-gptq \\\n --host 0.0.0.0 \\\n --port 8000 \\\n --enable-auto-tool-choice \\\n --enable-prefix-caching \\\n --enforce-eager \\\n --gpu-memory-utilization 0.95 \\\n --max-model-len 262144 \\\n --reasoning-parser qwen3 \\\n --served-model-name Qwen/Qwen3.5-122B-A10B-GPTQ-Int4 \\\n --tensor-parallel-size 4 \\\n --tool-call-parser qwen3_coder \\\n --trust-remote-code \nStill stuck at ~8.8 tok/s per request.\nlimited gpus to 250W, although i never see them reach that. the more tdp/temp gpu is blower type.\n\nany idea what else I can do to get more t/s ? people here get a lot more: https://www.reddit.com/r/LocalLLaMA/comments/1rf2ulo/qwen35_122b_in_72gb_vram_3x3090_is_the_best_model/",
+      "tps": [
+        8.8
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1491917489460871249",
+      "month": "2026-04",
+      "timestamp": "Thursday, April 9, 2026 2:47\u202fPM",
+      "tier": "full",
+      "model": "glm-5.1",
+      "hardware": "96gb vram, 256 gb ram",
+      "quantization": "IQ3_S",
+      "speed": "6-7 t/s \u00b7 7 tok/s, 7 tok/s",
+      "message": "I think we have similar setups, I'm also 96gb vram + 256 gb ram, best I could do with glm 5.1 was IQ3_S quant at 6-7 t/s",
+      "tps": [
+        7.0,
+        7.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1491971673992466442",
+      "month": "2026-04",
+      "timestamp": "Thursday, April 9, 2026 6:22\u202fPM",
+      "tier": "full",
+      "model": "glm-5.1",
+      "hardware": "4x3090, 192gb ram ddr4",
+      "quantization": "Q2_K_X",
+      "speed": "3.5 t/s \u00b7 3.5 tok/s, 3.5 tok/s",
+      "message": "~3.5 t/s GLM-5.1-UD-Q2_K_X on 4x3090 + 192gb ram ddr4. think I can do better ?",
+      "tps": [
+        3.5,
+        3.5
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1492816343144075284",
+      "month": "2026-04",
+      "timestamp": "Sunday, April 12, 2026 2:19\u202fAM",
+      "tier": "full",
+      "model": "minimax-m2.7",
+      "hardware": "RTX6000 (~250GB)",
+      "quantization": "Q8_K_XL",
+      "speed": "8.64 tokens/second \u00b7 8.64 tok/s",
+      "message": "Had to try it: MiniMax 2.7 Q8_K_XL (~250GB) on a single RTX6000 with RAM offload\ngetting 8.64 tokens/second, which is actually usable",
+      "tps": [
+        8.64
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1493043044067442868",
+      "month": "2026-04",
+      "timestamp": "Sunday, April 12, 2026 5:20\u202fPM",
+      "tier": "full",
+      "model": "Gemopus-4-26B-A4B-it-Preview-Q4_K_M",
+      "hardware": "Mac M4 Max 48GB",
+      "quantization": "Q4_K_M",
+      "speed": "50tok/s \u00b7 50 tok/s, 50 tok/s",
+      "message": "Sorry, I should have expressed myself better. I meant: what you guys are using to actually run models with TurboQuant, I saw a couple of forks of llama.cpp but I am unsure on what to use.\n\nI tested one made by TheTom with turbo3 and turbo4 with Gemopus-4-26B-A4B-it-Preview-Q4_K_M on a Mac M4 Max 48GB, runs pretty bad, like really slow if compared with just -ctk and -ctv Q8_0 which produces like 50tok/s in OpenCode (I consider this very good).\n\nNot sure if I am using TurboQuant wrong or if there isn't any good reliable way to do it, still new to it.",
+      "tps": [
+        50.0,
+        50.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1493050200871272448",
+      "month": "2026-04",
+      "timestamp": "Sunday, April 12, 2026 5:48\u202fPM",
+      "tier": "full",
+      "model": "qwen3.5-27b",
+      "hardware": "duel 4090",
+      "quantization": "8 bit",
+      "speed": "28 t/s \u00b7 28 tok/s, 28 tok/s",
+      "message": "8 bit on a duel 4090 gets 28 t/s on the 27b",
+      "tps": [
+        28.0,
+        28.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1493337593058955264",
+      "month": "2026-04",
+      "timestamp": "Monday, April 13, 2026 12:50\u202fPM",
+      "tier": "full",
+      "model": "26b",
+      "hardware": "low on vram and dram",
+      "quantization": "q4_k_m",
+      "speed": "30 t/s, 22 t/s, 15 t/s \u00b7 30 tok/s, 22 tok/s, 15 tok/s, 30 tok/s",
+      "message": "how do you measure your speed? I'm using 26b q4_k_m and speed sucks, also because i'm low on vram and dram\nllama.cpp web ui: 30 t/s\nopencode: 22 t/s\nclaude: 15 t/s",
+      "tps": [
+        30.0,
+        22.0,
+        15.0,
+        30.0,
+        22.0,
+        15.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1493818871155785768",
+      "month": "2026-04",
+      "timestamp": "Tuesday, April 14, 2026 8:42\u202fPM",
+      "tier": "full",
+      "model": "GLM/kimi",
+      "hardware": "1TB unified ram",
+      "quantization": "Q8",
+      "speed": "5 tokens a second \u00b7 5 tok/s",
+      "message": "maybe m5 ultra mac studio will drop a 1TB unified ram version... probably not but if they do I'd so run the Q8 of GLM/kimi at like 5 tokens a second",
+      "tps": [
+        5.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1493819750940414083",
+      "month": "2026-04",
+      "timestamp": "Tuesday, April 14, 2026 8:46\u202fPM",
+      "tier": "full",
+      "model": "glm-5.1",
+      "hardware": "single blackwell",
+      "quantization": "IQ3_S",
+      "speed": "6-7 t/s \u00b7 7 tok/s, 7 tok/s",
+      "message": "you can run GLM5.1 IQ3_S at 6-7 t/s on a single blackwell with ram offload but Q8 is like 810gb",
+      "tps": [
+        7.0,
+        7.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1494055293968191690",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 15, 2026 12:22\u202fPM",
+      "tier": "full",
+      "model": "qwen3",
+      "hardware": "RTX 3060",
+      "quantization": "INT8",
+      "speed": "113 tok/s \u00b7 113 tok/s",
+      "message": "g023's TurboXInf : 2x faster inference for Qwen3-1.77B on RTX 3060! Custom Triton INT8 GEMV kernels halve memory traffic by fusing dequantization, paired with torch.compile. Hits 113 tok/s (vs 56.4 baseline) with no quality loss. MIT License. https://github.com/g023/xinf",
+      "tps": [
+        113.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1494515829717467188",
+      "month": "2026-04",
+      "timestamp": "Thursday, April 16, 2026 6:52\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "M1 Max",
+      "quantization": "8bit",
+      "speed": "516.6 tok/s, 30.9 tok/s, 63424.8 ms TTFT, 165006.9 ms TTFT \u00b7 516.6 tok/s, 30.9 tok/s, 486.9 tok/s, 397.2 tok/s",
+      "message": "oMLX - LLM inference, optimized for your Mac\nhttps://github.com/jundot/omlx\nBenchmark Model: unsloth/Qwen3.6-35B-A3B-MLX-8bit - via M1 Max\n================================================================================\n\nSingle Request Results\n--------------------------------------------------------------------------------\nTest TTFT(ms) TPOT(ms) pp TPS tg TPS E2E(s) Throughput Peak Mem\npp32768/tg128 63424.8 32.62 516.6 tok/s 30.9 tok/s 67.567 486.9 tok/s 38.48 GB\npp65536/tg128 165006.9 48.00 397.2 tok/s 21.0 tok/s 171.103 383.8 tok/s 41.16 GB\n\nContinuous Batching\npp1024 / tg128\n--------------------------------------------------------------------------------\nBatch tg TPS Speedup pp TPS pp TPS/req TTFT(ms) E2E(s)\n2x 78.8 tok/s - 463.8 tok/s 231.9 tok/s 4233.1 7.665",
+      "tps": [
+        516.6,
+        30.9,
+        486.9,
+        397.2,
+        21.0,
+        383.8,
+        78.8,
+        463.8,
+        231.9,
+        30.9,
+        67.567,
+        38.48,
+        21.0,
+        171.103,
+        41.16,
+        231.9,
+        4233.1
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1494518278326980608",
+      "month": "2026-04",
+      "timestamp": "Thursday, April 16, 2026 7:02\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "M1 Max",
+      "quantization": "8bit",
+      "speed": "524.0 tok/s \u00b7 524 tok/s, 33 tok/s, 495.3 tok/s, 420.5 tok/s",
+      "message": "oMLX - LLM inference, optimized for your Mac\nhttps://github.com/jundot/omlx\nBenchmark Model: mlx-community/Qwen3.6-35B-A3B-8bit via M1 Max\n================================================================================\n\nSingle Request Results\n--------------------------------------------------------------------------------\nTest TTFT(ms) TPOT(ms) pp TPS tg TPS E2E(s) Throughput Peak Mem\npp32768/tg128 62531.2 30.55 524.0 tok/s 33.0 tok/s 66.411 495.3 tok/s 38.48 GB\npp65536/tg128 155835.4 47.69 420.5 tok/s 21.1 tok/s 161.892 405.6 tok/s 41.16 GB\n\nContinuous Batching\npp1024 / tg128\n--------------------------------------------------------------------------------\nBatch tg TPS Speedup pp TPS pp TPS/req TTFT(ms) E2E(s)\n2x 79.0 tok/s - 474.9 tok/s 237.4 tok/s 4117.6 7.552",
+      "tps": [
+        524.0,
+        33.0,
+        495.3,
+        420.5,
+        21.1,
+        405.6,
+        79.0,
+        474.9,
+        237.4,
+        33.0,
+        66.411,
+        38.48,
+        21.1,
+        161.892,
+        41.16,
+        237.4,
+        4117.6
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1494663620741824694",
+      "month": "2026-04",
+      "timestamp": "Friday, April 17, 2026 4:39\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "4090",
+      "quantization": "Q4_K_M",
+      "speed": "54.35 t/s, 922.28 tokens/s, 59.22 t/s \u00b7 522 tok/s, 54.35 tok/s, 922.28 tok/s, 891 tok/s",
+      "message": "for 4090 ppl, how fast do u run qwen 3.6?\n /app/llama-server \\\n --model /models_data/Qwen3.6-35B-A3B-UD-Q4_K_M.gguf \\\n --alias \"llamacpp/unsloth_Qwen3.6-35B-A3B-UD-Q4_K_M-128k\" \\\n --ctx-size 128000 \\\n --temp 0.6 \\\n --top-p 0.95 \\\n --top-k 20 \\\n --min-p 0.00 \\\n -fa 'on' \\\n --chat-template-kwargs '{\"preserve_thinking\": true}' \\\n --host 0.0.0.0 \\\n --port 8089 \ni have 2 chats in llama server\n1 chat few msgs\nprefil almost instant\ngeneration 522 tokens 9.6s 54.35 t/s \n2 chat with 60k tokens in chat \nprefill: 62272 tokens 1min 7s 922.28 tokens/s \ngeneration: 2,891 tokens 48s 59.22 t/s \n\nthe prefill on long context feels very slow, what numbers do you have in situalitons like this?\ni'm playing with\n--batch-size 2048-4096 \\\n--ubatch-size 256-2048 \\\nnothing feels right",
+      "tps": [
+        522.0,
+        54.35,
+        922.28,
+        891.0,
+        59.22,
+        9.6,
+        2.0,
+        1.0,
+        48.0,
+        54.35,
+        59.22
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1495588804357259337",
+      "month": "2026-04",
+      "timestamp": "Sunday, April 19, 2026 5:55\u202fPM",
+      "tier": "full",
+      "model": "bartowski Q6KL, UD-Q5, bart-Q6",
+      "hardware": "three 3060s",
+      "quantization": "Q6KL, UD-Q5, bart-Q6",
+      "speed": "~68 tok/sec \u00b7 68 tok/s",
+      "message": "Well this was good. If I put up with the \"trying again without pipeline parallelism\" malloc failure (which is fine) I can fit bartowski Q6KL across three 3060s. tg speed didn't change, still ~68 tok/sec with UD-Q5 and bart-Q6",
+      "tps": [
+        68.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1495829453593383042",
+      "month": "2026-04",
+      "timestamp": "Monday, April 20, 2026 9:52\u202fAM",
+      "tier": "full",
+      "model": "qwen3.5-27b",
+      "hardware": "pcie4 x8/x1",
+      "quantization": "nvfp4",
+      "speed": "130tok/s \u00b7 130 tok/s, 130 tok/s",
+      "message": "I am literally running pcie4 x8/x1 qwen 27b nvfp4 with dflash hitting 130tok/s",
+      "tps": [
+        130.0,
+        130.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1496092006785744956",
+      "month": "2026-04",
+      "timestamp": "Tuesday, April 21, 2026 3:15\u202fAM",
+      "tier": "full",
+      "model": "gpt-oss-120b",
+      "hardware": "ryzen 7940hs ddr5 5600mhz 128gb, epyc rome ddr4, 64gb vram",
+      "quantization": "q4",
+      "speed": "32-35tps, 19tps \u00b7 35 tok/s, 19 tok/s",
+      "message": "i have also a system with ryzen 7940hs DDR5 5600Mhz 128GB and i measured 90GB/s, but not sure which tool i used. also the tps was kinda good if used with igpu, but still no comparission to epyc rome ddr4 plus 64gb vram e.g. cpu inference:\ngpt-oss-120 some q4 (not sure which one ive used)\n\nepyc 7402 - 32-35tps\n\nryzen 7940hs igpu - 19tps",
+      "tps": [
+        35.0,
+        19.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1496115089009414274",
+      "month": "2026-04",
+      "timestamp": "Tuesday, April 21, 2026 4:47\u202fAM",
+      "tier": "full",
+      "model": "qwen3.5-27b",
+      "hardware": "dual 5060 ti",
+      "quantization": "nvfp4",
+      "speed": "70 tok/sec \u00b7 70 tok/s",
+      "message": "folks getting 70 tok/sec with nvfp4 on dual 5060 ti with 27B models",
+      "tps": [
+        70.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1496115275739959488",
+      "month": "2026-04",
+      "timestamp": "Tuesday, April 21, 2026 4:47\u202fAM",
+      "tier": "full",
+      "model": "qwen3.5-27b",
+      "hardware": "dual 3090",
+      "quantization": "Q4",
+      "speed": "70 tok/sec \u00b7 70 tok/s",
+      "message": "even with dual 3090 , you can't crack more than 70 tok/sec on 27B Q4 >",
+      "tps": [
+        70.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1496547972211544286",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 22, 2026 9:27\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "5090",
+      "quantization": "Q6K",
+      "speed": "48tok/s \u00b7 48 tok/s, 48 tok/s",
+      "message": "Qwen3.6-27b-Q6K - 5090, simple prompt test on llama.cpp 48tok/s",
+      "tps": [
+        48.0,
+        48.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1496548351137546314",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 22, 2026 9:28\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "M5 max",
+      "quantization": "Q8",
+      "speed": "14.73tok/s \u00b7 14.73 tok/s, 14.73 tok/s",
+      "message": "Q8-qwen3.6-27b-8bit-MLX - on the M5 max, 14.73tok/s",
+      "tps": [
+        14.73,
+        14.73
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1496551624997343292",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 22, 2026 9:41\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "m5 max",
+      "quantization": "mlx4bit",
+      "speed": "19.73tok/s \u00b7 19.73 tok/s, 19.73 tok/s",
+      "message": "Qwen3.6-27b-mlx4bit - 19.73tok/s (m5 max)",
+      "tps": [
+        19.73,
+        19.73
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1496630112496648304",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 22, 2026 2:53\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "9070XT 16gb GPU, 9850x3d CPU, 32gb 6000mhz DDR5 RAM",
+      "quantization": "UD-Q4_K_XL",
+      "speed": "~35 t/s \u00b7 35 tok/s, 100 tok/s, 131 tok/s, 35 tok/s",
+      "message": "Is anyone running the Qwen3.5 & 3.6 models on a 9070XT 16gb? I've been trying to optimize my llama.cpp llama-server and Lemonade server parameters to get the best performance I can at 131k context. I started optimizing Qwen3.6 35B UD-Q4_K_XL quant and the best output token speed I've been able to get while keeping my desktop stable is ~35 t/s at 131k context.\n\nI'm using a llama.cpp ROCm build from yesterday as the backend and these parameters to get that speed: --flash-attn on --reasoning on --reasoning-budget -1 --temp 0.6 --top-p 0.95 --top-k 20 --min-p 0 --presence-penalty 0 --repeat-penalty 1.0 --n-cpu-moe 27 -np 1 -b 4096 -ub 2048 --chat-template-kwargs '{\"preserve_thinking\": true}' --mlock \n\nIs there anything that I can change to get better performance? Or is that about what I can expect for this model on a 9070xt with a 9850x3d cpu and 32gb of 6000 mhz ddr5 ram? I saw a thread on the subreddit ( https://www.reddit.com/r/LocalLLaMA/comments/1sor55y/rtx_5070_ti_9800x3d_running_qwen3635ba3b_at_79_ts/) where people were running it at ~100 t/s on a 5070Ti. Is that just the difference between AMD and Nvidia cards, or am I missing something? Also, I tried to use the 3 --fit parameters but it seems that Lemonade server does NOT like that because it fails to load every time if they're in the parameters.\n\nGoing to try to optimize for the Qwen3.5 9B model next, so any advice/suggestions for that would be appreciated too.\nAlso, if I wanted to try to run the new qwen3.6 27b model what quant and context should I try to use? And would it basically be lobotomized, too low context, or too slow to run and use effectively?",
+      "tps": [
+        35.0,
+        100.0,
+        131.0,
+        35.0,
+        100.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1496647227488342107",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 22, 2026 4:01\u202fPM",
+      "tier": "full",
+      "model": "qwen 3.6",
+      "hardware": "4090",
+      "quantization": "Q3_KS",
+      "speed": "130t/s \u00b7 130 tok/s, 130 tok/s, 130 tok/s",
+      "message": "qwen 3.6 gives 130t/s on my 4090 for Q3_KS from unsloth, per slot and 200k context",
+      "tps": [
+        130.0,
+        130.0,
+        130.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1496651792207974491",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 22, 2026 4:19\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "M1 Max",
+      "quantization": "6bit",
+      "speed": "85.1 tok/s \u00b7 85.1 tok/s, 7.7 tok/s, 81.9 tok/s, 7.7 tok/s",
+      "message": "oMLX - LLM inference, optimized for your Mac\nhttps://github.com/jundot/omlx\nBenchmark Model: Qwen3.6-27B-UD-MLX-6bit via M1 Max\n================================================================================\n\nSingle Request Results\n--------------------------------------------------------------------------------\nTest TTFT(ms) TPOT(ms) pp TPS tg TPS E2E(s) Throughput Peak Mem\npp32768/tg128 385235.9 130.88 85.1 tok/s 7.7 tok/s 401.858 81.9 tok/s 35.02 GB",
+      "tps": [
+        85.1,
+        7.7,
+        81.9,
+        7.7,
+        401.858,
+        35.02
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1496652601381486643",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 22, 2026 4:23\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "rtx6k",
+      "quantization": "bf16 q3.6",
+      "speed": "27 tps \u00b7 27 tok/s",
+      "message": "27 tps on bf16 q3.6 27b on rtx6k",
+      "tps": [
+        27.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1496680492534071388",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 22, 2026 6:13\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "2070, 4070ti",
+      "quantization": "iq4xs",
+      "speed": "22t/s \u00b7 22 tok/s, 22 tok/s, 22 tok/s",
+      "message": "my 2070 allows me together with my 4070ti to run 27b at iq4xs (bartowski) and 65k context with 22t/s and decent decode",
+      "tps": [
+        22.0,
+        22.0,
+        22.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1496690584193077349",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 22, 2026 6:54\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "20gb vram",
+      "quantization": "q8",
+      "speed": "35t/s \u00b7 35 tok/s, 35 tok/s, 35 tok/s",
+      "message": "i have 35b q8 running with 35t/s and 260k context and i have 20gb vram max and context takes less than half of it",
+      "tps": [
+        35.0,
+        35.0,
+        35.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1496707845335547966",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 22, 2026 8:02\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "RX 9070 XT, iGPU",
+      "quantization": "IQ3_XXS",
+      "speed": "40 tokens per second \u00b7 40 tok/s",
+      "message": "RX 9070 XT running Qwen3.6 Unsloth 27b IQ3_XXS gets about 100k context and a little under 40 tokens per second with desktop rendering on iGPU.",
+      "tps": [
+        40.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1496725813058474055",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 22, 2026 9:14\u202fPM",
+      "tier": "full",
+      "model": "27B UD-IQ3_XXS",
+      "hardware": "9070XT",
+      "quantization": "UD-IQ3_XXS",
+      "speed": "38 t/s \u00b7 38 tok/s, 38 tok/s",
+      "message": "Wow got the 27B UD-IQ3_XXS model with 32k context running at 38 t/s generation on my 9070XT. Much faster than I expected. How the fuck is it almost as fast as the 35B?",
+      "tps": [
+        38.0,
+        38.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1496928806152437851",
+      "month": "2026-04",
+      "timestamp": "Thursday, April 23, 2026 10:40\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "32G RAM",
+      "quantization": "Q4_K_M",
+      "speed": "10 t/s \u00b7 10 tok/s, 10 tok/s",
+      "message": "Something that has been playing on my mind for a couple of days:\ntake Qwen3.6-35B-A3B-Q4_K_M.gguf, size is 21G. If this is run on consumer hardware today with 32G RAM, no GPU, it would run and produce about 10 t/s but hit OOM after a couple of back and forth interaction\n\nif it's quant was 2b/1.58b (Microsoft BITNET) its size would be roughly around 7G\nlts say OS overhead was 6G\nwhat remains for KVcache at 2b/1.58b is about 18G\nmax content about 40k tokens!\nlets add TurboQuant {google}, 40k jumps to 120K tokens!!\n\nthe technologies exist today, somebody will put this together in a couple of years max. Am I right?",
+      "tps": [
+        10.0,
+        10.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1497197089682100244",
+      "month": "2026-04",
+      "timestamp": "Friday, April 24, 2026 4:26\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "5080 and 3090",
+      "quantization": "Q8",
+      "speed": "23t/s \u00b7 23 tok/s, 23 tok/s, 23 tok/s",
+      "message": "hmm, running qwen3.6-27b Q8 uncensored on 5080 and 3090 and getting 23t/s, any way to get quick wins on the tps?",
+      "tps": [
+        23.0,
+        23.0,
+        23.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1497342072326459473",
+      "month": "2026-04",
+      "timestamp": "Friday, April 24, 2026 2:02\u202fPM",
+      "tier": "full",
+      "model": "q3.6, 27B",
+      "hardware": "rtx6000, 25 GB VRAM",
+      "quantization": "16BF",
+      "speed": "27 tps \u00b7 27 tok/s",
+      "message": "q3.6 27B 16BF + rtx6000 + 256k context = 27 tps + 25 GB VRAM left over",
+      "tps": [
+        27.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1497399124902019223",
+      "month": "2026-04",
+      "timestamp": "Friday, April 24, 2026 5:49\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "2x AI PRO R9700",
+      "quantization": "Q6",
+      "speed": "11.5 tk/s \u00b7 11.5 tok/s, 11.5 tok/s",
+      "message": "they have 2x AI PRO R9700 and are getting 11.5 tk/s with 27b Q6 quant. That's wrong right",
+      "tps": [
+        11.5,
+        11.5
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1497446243369091073",
+      "month": "2026-04",
+      "timestamp": "Friday, April 24, 2026 8:56\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "5060ti 16GB x2",
+      "quantization": "nvfp4",
+      "speed": "85-90tks \u00b7 90 tok/s, 21 tok/s, 21 tok/s",
+      "message": "5060ti 16GB x2\n\nqwen 3.6 35b a3b = 85-90tks\n\nqwen 3.5 27b = 20-21tks\n\nqwen 3.5 27b nvfp4 = 20-21tks",
+      "tps": [
+        90.0,
+        21.0,
+        21.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1497467605647228958",
+      "month": "2026-04",
+      "timestamp": "Friday, April 24, 2026 10:21\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "AMD Radeon RX 7900 XTX",
+      "quantization": "IQ4_XS",
+      "speed": "3194.06 t/s",
+      "message": "\u276f llama-bench -m Qwen3.6-35B-A3B-UD-IQ4_XS.gguf --mmap 0 \nggml_vulkan: Found 1 Vulkan devices:\nggml_vulkan: 0 = AMD Radeon RX 7900 XTX (RADV NAVI31) (radv) | uma: 0 | fp16: 1 | bf16: 0 | warp size: 64 | shared memory: 65536 | int dot: 1 | matrix cores: NV_coopmat2\n| model | size | params | backend | ngl | mmap | test | t/s |\n| ------------------------------ | ---------: | ---------: | ---------- | --: | ---: | --------------: | -------------------: |\n| qwen35moe 35B.A3B IQ4_XS - 4.25 bpw | 16.50 GiB | 34.66 B | Vulkan | 99 | 0 | pp512 | 3194.06 \u00b1 29.99 |\n| qwen35moe 35B.A3B IQ4_XS - 4.25 bpw | 16.50 GiB | 34.66 B | Vulkan | 99 | 0 | tg128 | 143.77 \u00b1 0.13 |",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1497469013133885461",
+      "month": "2026-04",
+      "timestamp": "Friday, April 24, 2026 10:27\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "AMD Radeon RX 7900 XTX",
+      "quantization": "IQ4_XS",
+      "speed": "3128.02 t/s, 102.80 t/s",
+      "message": "\u276f llama-bench -m Qwen3.6-35B-A3B-UD-IQ4_XS.gguf --mmap 0\nggml_cuda_init: found 1 ROCm devices (Total VRAM: 24560 MiB):\n Device 0: AMD Radeon RX 7900 XTX, gfx1100 (0x1100), VMM: no, Wave Size: 32, VRAM: 24560 MiB\n| model | size | params | backend | ngl | mmap | test | t/s |\n| ------------------------------ | ---------: | ---------: | ---------- | --: | ---: | --------------: | -------------------: |\n| qwen35moe 35B.A3B IQ4_XS - 4.25 bpw | 16.50 GiB | 34.66 B | ROCm | 99 | 0 | pp512 | 3128.02 \u00b1 31.88 |\n| qwen35moe 35B.A3B IQ4_XS - 4.25 bpw | 16.50 GiB | 34.66 B | ROCm | 99 | 0 | tg128 | 102.80 \u00b1 0.75 |",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1497720168405794962",
+      "month": "2026-04",
+      "timestamp": "Saturday, April 25, 2026 3:05\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "Radeon AI Pro 9700",
+      "quantization": "Q4",
+      "speed": "60 tokens per sec \u00b7 60 tok/s",
+      "message": "Anyone have an Radeon AI Pro 9700 or similar AMD GPU running Qwen 3.6 35B A3B? I see about 60 tokens per sec with Q4 and not sure if that's low for this card for 3B active param model",
+      "tps": [
+        60.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1497855247513812993",
+      "month": "2026-04",
+      "timestamp": "Sunday, April 26, 2026 12:01\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "3090",
+      "quantization": "q4",
+      "speed": "100 tps \u00b7 100 tok/s",
+      "message": "Damn managing to get Qwen3.6 35b-a3b-q4 running @ 100 tps on 3090.",
+      "tps": [
+        100.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1497917847211348019",
+      "month": "2026-04",
+      "timestamp": "Sunday, April 26, 2026 4:10\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "5080 and 3090",
+      "quantization": "q6",
+      "speed": "29t/s \u00b7 29 tok/s, 29 tok/s, 29 tok/s",
+      "message": "wonder if 29t/s is normal for qwen3.6-27b q6 uncensored with 5080 and 3090",
+      "tps": [
+        29.0,
+        29.0,
+        29.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1497919762473418863",
+      "month": "2026-04",
+      "timestamp": "Sunday, April 26, 2026 4:18\u202fAM",
+      "tier": "full",
+      "model": "27b q6",
+      "hardware": "5090",
+      "quantization": "q6",
+      "speed": "8tps \u00b7 8 tok/s",
+      "message": "8tps? on a 5090? with 27b q6?",
+      "tps": [
+        8.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1498055617716289556",
+      "month": "2026-04",
+      "timestamp": "Sunday, April 26, 2026 1:18\u202fPM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "R9700",
+      "quantization": "dflash",
+      "speed": "~45t/s \u00b7 45 tok/s, 45 tok/s, 45 tok/s",
+      "message": "Oop, I just got dflash kinda working with llama.cpp on my R9700. Getting ~45t/s on Qwen3.6-27B which is almost 2x what I was getting before.",
+      "tps": [
+        45.0,
+        45.0,
+        45.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1498277162598535168",
+      "month": "2026-04",
+      "timestamp": "Monday, April 27, 2026 3:58\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "dual R9700",
+      "quantization": "q8",
+      "speed": "95-100 tg at 130k context",
+      "message": "why not just use 35B \nfor me on dual R9700 \nIt\u2019s 3-4x faster both tg and pp \n\neven q8 does 95-100 tg at 130k context and more",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1498288821438119946",
+      "month": "2026-04",
+      "timestamp": "Monday, April 27, 2026 4:44\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-27b",
+      "hardware": "GPU 1, GPU 2",
+      "quantization": "Q4",
+      "speed": "25token/s \u00b7 25 tok/s",
+      "message": "Realistically you are going to use graph mode layer, which means that you are effectively using only 1 GPU at a time but can pool the memory together.\n\nExplain in simple terms:\n\nGPU 1 processes half of the weights at X GB/s\n->\nGPU 2 processes the other half of the weights at Y GB/s\n\nSo the total T/s is just the time that GPU 1&2 take to process their half + a bit of overhead. I'd guess around 25token/s ( 27B at Q4) for that setup",
+      "tps": [
+        25.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1498688693429469447",
+      "month": "2026-04",
+      "timestamp": "Tuesday, April 28, 2026 7:13\u202fAM",
+      "tier": "full",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "m1",
+      "quantization": "q8",
+      "speed": "60tps, 15-20tps \u00b7 60 tok/s, 20 tok/s",
+      "message": "the m1 gets about 60tps on 35b @ q8 depth 128k, and 15-20tps on the 27b dense",
+      "tps": [
+        60.0,
+        20.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1499069748531560548",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 29, 2026 8:27\u202fAM",
+      "tier": "full",
+      "model": "glm-4.7",
+      "hardware": "1 R9700, 8x32 DDR4-3200",
+      "quantization": "Q3_K_L",
+      "speed": "12 t/s \u00b7 20 tok/s, 12 tok/s, 20 tok/s, 12 tok/s",
+      "message": "If you can negotiate a bit on the 20 t/s it's not impossible, FWIW - I get 12 t/s on GLM-4.7 Q3_K_L (159GB) with 1 R9700 and 8x32 DDR4-3200.",
+      "tps": [
+        20.0,
+        12.0,
+        20.0,
+        12.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1489707554186727515",
+      "month": "2026-04",
+      "timestamp": "Friday, April 3, 2026 12:25\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-9b",
+      "hardware": "6GB VRAM, dual RTX 3060s, 24GB total VRAM",
+      "quantization": "",
+      "speed": "80 to 100+ tokens/second \u00b7 100 tok/s",
+      "message": "Vibe Coding Models for 6GB VRAM Systems \n\n \ufe0f For vibe coding in 6GB VRAM I use VSCodium+Continue and it is quite fast!\n\nThe models that I use with Continue are here:\n\nchat: FieldMouse-AI/qwen3.5:2b-instruct \n\ncode: FieldMouse-AI/qwen3.5:2b-tools \n\nYou might be able to achieve between 80 to 100+ tokens/second performance coding, only using 2.5GB VRAM! \n\nThey key to why these 2b succeeds with speed where another might 9b fail is that the size in parameter count or size in GB of the model is not the only measure of performance. \n\nThink of these 2b models like a child of 10 that is trained in Kung Fu from the age of 5 fighting a teenager that just started to learn Kung Fu last year. That 10 year old is going to hold their own against that teenager if not crush them.\n\nThat is what my 2b models offer. Performance that matches or rivals the other 9b models trained into a 2b model.\n\nThe result: \ufe0fSpeed.\n\nThat's why even that I have dual RTX 3060s giving me 24GB of total VRAM, I continue to these 2b models and leave the rest of my VRAM for other things. \n\nHere, I will prove it to you.\n\nI am using Ollama v0.18.0.\n\nAnd, most importantly, here is my Continue config.yaml file:\n name: Local Config\nversion: 1.0.0\nschema: v1\nmodels:\n - name: VOLT (Chat)\n provider: openai\n model: FieldMouse-AI/qwen3.5:2b-instruct\n apiBase: http://127.0.0.1:11434/v1\n roles:\n - chat\n - edit\n - apply\n - name: VOLT (Coder)\n provider: openai\n model: FieldMouse-AI/qwen3.5:2b-tools\n apiBase: http://127.0.0.1:11434/v1\n roles:\n - autocomplete\n - name: VOLT (Embed)\n provider: openai\n model: nomic-embed-text:latest\n apiBase: http://127.0.0.1:11434/v1\n roles:\n - embed \nAnd I totally don't have to wait 20 seconds or more for a response.\n\n Responses from my VSCodium+Continue environment feel as fast as reflexes. \n\nDo you want to try this, too? \n Links: \n \u00a0 Website: https://FieldMouse-AI.com",
+      "tps": [
+        100.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1490445142790766642",
+      "month": "2026-04",
+      "timestamp": "Sunday, April 5, 2026 1:16\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-35b",
+      "hardware": "5090",
+      "quantization": "",
+      "speed": "290 tok/s, 190 tok/s",
+      "message": "My friend was trying out Qwen3.5 35b on a 5090, and a new vLLM update seems to have upped his tok/s to 290 from 190. I can't find anything in the release notes about this, anyone have a clue?",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1490462529229557945",
+      "month": "2026-04",
+      "timestamp": "Sunday, April 5, 2026 2:25\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "gemma4-31b",
+      "hardware": "Blackwell 6000, 10 GB VRAM, 440W",
+      "quantization": "bf16",
+      "speed": "23 tps \u00b7 23 tok/s",
+      "message": "I'm getting 23 tps on Blackwell 6000 with Gemma 4 31B BF16 with max context, still leaving about 10 GB VRAM to spare. GPU power usage maxes out at 440W (out of 600W).",
+      "tps": [
+        23.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1490660068511715498",
+      "month": "2026-04",
+      "timestamp": "Monday, April 6, 2026 3:30\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "143b",
+      "hardware": "rtx 6000 pros",
+      "quantization": "",
+      "speed": "13tk/s \u00b7 13 tok/s, 13 tok/s, 13 tok/s",
+      "message": "also, not impossible to run. 143b with rtx 6000 pros could get up to 13tk/s",
+      "tps": [
+        13.0,
+        13.0,
+        13.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1490821871372075058",
+      "month": "2026-04",
+      "timestamp": "Monday, April 6, 2026 2:13\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "gemma4-31b",
+      "hardware": "4x 3090",
+      "quantization": "",
+      "speed": "~11 tok/s \u00b7 11 tok/s",
+      "message": "Ok I got gemma4-31b (full model) on vllm, 4x 3090, but only~11 tok/s per request/session. Isn't that a bit low ? I disable the first run compile thing since it was not done after a few hours..",
+      "tps": [
+        11.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1491202634080719000",
+      "month": "2026-04",
+      "timestamp": "Tuesday, April 7, 2026 3:26\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "gpt-oss-120b",
+      "hardware": "9950x3d, 96GB DDR5",
+      "quantization": "",
+      "speed": "9.3 tokens per second \u00b7 9.3 tok/s",
+      "message": "Surprised by this. Ran gpt-oss 120b on my 9950x3d 96GB DDR5. Getting 9.3 tokens per second. Thought it would be slower than that. Actually kinda usable",
+      "tps": [
+        9.3
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1491614379488051350",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 8, 2026 6:43\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "Qwen 3.5",
+      "hardware": "1GB",
+      "quantization": "",
+      "speed": "3x",
+      "message": "it's a 1GB speculative decoding addon to Qwen 3.5 (and other models) that you load in VLLM and it does speculative by diffusion, which allegedly speeds the response up by 3x. However you can't stream it anymore since it doesnt work token-by-token, it diffuses the final answer gradually",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1491861155201683688",
+      "month": "2026-04",
+      "timestamp": "Thursday, April 9, 2026 11:03\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-9b",
+      "hardware": "n_gpu_layers = 43",
+      "quantization": "q8",
+      "speed": "Detokenization: 280\u00d7 faster",
+      "message": "Heyio\n\nBeen building Ion7 ; a full LLM runtime in LuaJIT, on top of llama.cpp. No Python. No HTTP. No subprocess.\n\n local ion7 = require \"ion7.core\"\nion7.init({ log_level = 0 })\nlocal model = ion7.Model.load(\"qwen3.5-9b.gguf\", { n_gpu_layers = 43 })\nlocal ctx = model:context({ n_ctx = 8192 })\nlocal vocab = model:vocab()\nlocal sampler = ion7.Sampler.chain():top_k(40):temp(0.8):dist():build()\nlocal tokens, n = vocab:tokenize(\"Hello from Lua!\", true, false)\nctx:decode(tokens, n, 0, 0)\nprint(vocab:piece(sampler:sample(ctx:ptr(), -1))) \n\n vs llama-cpp-python (Qwen3.5-9B Q8, RTX 3060): Benchmark results \n\nDetokenization: 280\u00d7 faster \n\nGeneration at full context: 1.53\u00d7 \n\nRAM delta: 37% less \n\nKV snapshot: 14ms in-memory \n\n0 malloc per generated token\n\nAlso ships ion7-grammar (token-level constraints, JSON Schema, CRANE/IterGen, DCCD) and ion7-llm (full chat pipeline, prefix cache, sliding window).\n\n All MIT: https://github.com/Ion7-Labs \n\nStill early, would love feedback, opinions, or contributors if any of this resonates with you",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1491919808608993352",
+      "month": "2026-04",
+      "timestamp": "Thursday, April 9, 2026 2:56\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen-3.5-27b",
+      "hardware": "b200 GPUs",
+      "quantization": "",
+      "speed": "1-million-tokens-per-second",
+      "message": "https://medium.com/google-cloud/1-million-tokens-per-second-qwen-3-5-27b-on-gke-with-b200-gpus-161da5c1b592#2422",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1491972637067313394",
+      "month": "2026-04",
+      "timestamp": "Thursday, April 9, 2026 6:26\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-122b",
+      "hardware": "2x RTX PRO 6000 Blackwell",
+      "quantization": "",
+      "speed": "198 tok/s \u00b7 198 tok/s",
+      "message": "Qwen3.5-122B at 198 tok/s on 2x RTX PRO 6000 Blackwell \u2014 Budget build, verified results\n\n\"budget build\" lol",
+      "tps": [
+        198.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1492034623696535622",
+      "month": "2026-04",
+      "timestamp": "Thursday, April 9, 2026 10:32\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "llama 7B",
+      "hardware": "Instinct MI25 16 GB / HBM2 / 2048 bit, Instinct MI50 32 GB / HBM2 / 4096 bit, Instinct MI100 32 GB / HBM2 / 4096 bit",
+      "quantization": "",
+      "speed": "409.83 \u00b1 0.23, 63.94 \u00b1 0.06, 1057.24 \u00b1 0.53, 98.95 \u00b1 0.25, 1129.43 \u00b1 0.15, 105.82 \u00b1 0.07, 2732.83 \u00b1 1.98, 110.48 \u00b1 0.14, 2755.00 \u00b1 3.68, 104.71 \u00b1 0.10",
+      "message": "llama.cpp ROCm performance tracking: https://github.com/ggml-org/llama.cpp/discussions/15021 \n pp512 tg128\nInstinct MI25 16 GB / HBM2 / 2048 bit 409.83 \u00b1 0.23 63.94 \u00b1 0.06 (no FA)\n\nInstinct MI50 32 GB / HBM2 / 4096 bit 1057.24 \u00b1 0.53 98.95 \u00b1 0.25 (no FA)\nInstinct MI50 32 GB / HBM2 / 4096 bit 1129.43 \u00b1 0.15 105.82 \u00b1 0.07 (yes FA)\n\nInstinct MI100 32 GB / HBM2 / 4096 bit 2732.83 \u00b1 1.98 110.48 \u00b1 0.14 (no FA)\nInstinct MI100 32 GB / HBM2 / 4096 bit 2755.00 \u00b1 3.68 104.71 \u00b1 0.10 (yes FA) \nadmittedly that is with llama 7B. maybe useful to spend a few dollars renting each card and submit the three standard https://www.localscore.ai/ results which are more recent models?",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1492090926967951421",
+      "month": "2026-04",
+      "timestamp": "Friday, April 10, 2026 2:16\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "80B model (MoE A3B)",
+      "hardware": "GTX 1050 4G VRAM, 20G RAM, i7 8th",
+      "quantization": "",
+      "speed": "5-15 tokens per sec \u00b7 15 tok/s",
+      "message": "hello guys!\ni wanted to share my experience\ni have 4G vram (GTX 1050)\nand 20G ram\nand i7 8th cpu\n\nrunning models on this specs might be not the good idea\nbut i was able to make about 200G PageFile (Swap Ram) on windows\nand used Cpu offload, \nand successfully ran 80B model (MoE A3B)\nwith KV Cache Quant, evaluation batch 1024, and 10 experts, getting around 5-15 tokens per sec\n\nwould like to hear yall opinions",
+      "tps": [
+        15.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1492854146041249823",
+      "month": "2026-04",
+      "timestamp": "Sunday, April 12, 2026 4:49\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-9b",
+      "hardware": "8GB VRAM",
+      "quantization": "",
+      "speed": "30 token/s; 1 token/s \u00b7 30 tok/s, 1 tok/s",
+      "message": "Going from Qwen3.5 9B to Qwen3.5 27B drops from 30 token/s to 1 token/s. My GPU only has 8GB VRAM. Is this performance to due being too big for VRAM?",
+      "tps": [
+        30.0,
+        1.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1492874665738371225",
+      "month": "2026-04",
+      "timestamp": "Sunday, April 12, 2026 6:10\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "q3.5 27b; g4 31b",
+      "hardware": "p40",
+      "quantization": "",
+      "speed": "q3.5 27b; g4 31b; p40",
+      "message": "what are the speeds for q3.5 27b/g4 31b on a p40",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1493424692428542083",
+      "month": "2026-04",
+      "timestamp": "Monday, April 13, 2026 6:36\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "gpt-oss-120b",
+      "hardware": "Pro 6000",
+      "quantization": "",
+      "speed": "10k+ t/s",
+      "message": "gpt-oss-120b is still my go-to for batch processing. Able to get 10k+ t/s on a Pro 6000",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1493427657163935866",
+      "month": "2026-04",
+      "timestamp": "Monday, April 13, 2026 6:48\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "gemma4-e2b",
+      "hardware": "ss a26 5g, Vivo yo5",
+      "quantization": "",
+      "speed": "4 t/s \u00b7 4 tok/s, 4 tok/s",
+      "message": "E2B 4 t/s on ss a26 5g but E2B crashed on Vivo yo5",
+      "tps": [
+        4.0,
+        4.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1493503990695071855",
+      "month": "2026-04",
+      "timestamp": "Monday, April 13, 2026 11:51\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "deepseek-r1-0528",
+      "hardware": "ddr4 ram only machines",
+      "quantization": "q2-k",
+      "speed": "3t/s \u00b7 3 tok/s, 3 tok/s, 3 tok/s",
+      "message": "just to give context, ppl built ddr4 ram only machines to run deepseek r1 q2 at 3t/s",
+      "tps": [
+        3.0,
+        3.0,
+        3.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1493590815350587473",
+      "month": "2026-04",
+      "timestamp": "Tuesday, April 14, 2026 5:36\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-27b",
+      "hardware": "dual 5090, RTX 6000, R9700",
+      "quantization": "",
+      "speed": "30 tk/sec",
+      "message": "nobody is getting great numbers on 27B tbh unless its a dual 5090 or RTX 6000 \nyou aren't that far off from m5 max or R9700 with 30 tk/sec",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1493611004293025915",
+      "month": "2026-04",
+      "timestamp": "Tuesday, April 14, 2026 6:56\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "Gemma 4 31B",
+      "hardware": "2x 3090s",
+      "quantization": "",
+      "speed": "50 t/s \u00b7 50 tok/s, 50 tok/s",
+      "message": "I like the output/feel of Gemma 4 31B. With the spec decoding I can easily get up to 50 t/s on 2x 3090s on certain tasks with like 1200 pp.\n\nI just used it last night to brainstorm and rebuild my personal website just through my nanobot agent. It was a good partner and did a good job, all while being 2x as fast as 3.5 27B since I am using llama.cpp w/ spec decoding, which I think isn't ready yet for Qwen (or the MTP thing they do).",
+      "tps": [
+        50.0,
+        50.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1493613654929703144",
+      "month": "2026-04",
+      "timestamp": "Tuesday, April 14, 2026 7:07\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "MoE",
+      "hardware": "cpu/ram on a $300 laptop",
+      "quantization": "",
+      "speed": "6-8t/s \u00b7 8 tok/s, 8 tok/s, 8 tok/s",
+      "message": "i am running cpu/ram on a $300 laptop. even with heavy optimizations, I get like 6-8t/s reliably on the MoE",
+      "tps": [
+        8.0,
+        8.0,
+        8.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1493781689195823290",
+      "month": "2026-04",
+      "timestamp": "Tuesday, April 14, 2026 6:15\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-122b",
+      "hardware": "gpu and cpu",
+      "quantization": "",
+      "speed": "22t/s \u00b7 22 tok/s, 22 tok/s, 22 tok/s",
+      "message": "22t/s on qwen3.5-122b-a10b-reap-40, was kinda a pain to configure the server between gpu and cpu. i wonder how the reap compares to the baseline or 27b",
+      "tps": [
+        22.0,
+        22.0,
+        22.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1494014292092125277",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 15, 2026 9:39\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "llamacpp",
+      "hardware": "mi300a have hbm3",
+      "quantization": "",
+      "speed": "100 tokens/s \u00b7 100 tok/s",
+      "message": "it's kinda the same for strix halo in principle the apu is nice but in practice hard to fully use the 128GB properly. i tried running llamacpp with cpu for some layers but the performance is attrocious idk. the mi300a have hbm3 i thought i would get 100 tokens/s +",
+      "tps": [
+        100.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1494395990835335278",
+      "month": "2026-04",
+      "timestamp": "Thursday, April 16, 2026 10:56\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "vllm",
+      "hardware": "amd R9700",
+      "quantization": "",
+      "speed": "156 tok/sec, 100 tok/sec \u00b7 156 tok/s, 100 tok/s",
+      "message": "vllm cannot run vulkan mesa for amd R9700\nrocm runs 210w even when idle\n\nvulkan mesa on llamacpp with optimisations does 156 tok/sec on qwen 3.5 \nvllm with rocm cant do 100 tok/sec",
+      "tps": [
+        156.0,
+        100.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1494559153044066314",
+      "month": "2026-04",
+      "timestamp": "Thursday, April 16, 2026 9:44\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-27b",
+      "hardware": "dual rtx5060ti",
+      "quantization": "",
+      "speed": "62t/s \u00b7 62 tok/s, 100 tok/s, 62 tok/s, 100 tok/s",
+      "message": "dual rtx5060ti (~$1k) can run qwen3.5-27b at 62t/s tg with mtp using 3 speculative tokens ime. qwen3.5-27b (and soon 3.6-27b) are about the best you can get without needing a looot more vram or ram (preferably unified memory) which requires a lot more spending. additionally 60-100t/s tg is around the same speed as an actual inference provider so it feels speedy",
+      "tps": [
+        62.0,
+        100.0,
+        62.0,
+        100.0,
+        62.0,
+        100.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1494634834855989448",
+      "month": "2026-04",
+      "timestamp": "Friday, April 17, 2026 2:45\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3-235b",
+      "hardware": "170gb ram, 64gb vram, A10B",
+      "quantization": "",
+      "speed": "5-7tps \u00b7 7 tok/s",
+      "message": "i mean the ram at 170gb is nice, but i do mostly inference on 64gb vram, and almost not offloading to cpu, just sometimes to test some bigger model like qwen3-235b (moe), but max is A10B, after that speed falls under 5-7tps",
+      "tps": [
+        7.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1494766164302106705",
+      "month": "2026-04",
+      "timestamp": "Friday, April 17, 2026 11:27\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "gemma4-e4b, qwen",
+      "hardware": "cpu",
+      "quantization": "",
+      "speed": "14t/s \u00b7 14 tok/s, 14 tok/s, 14 tok/s",
+      "message": "any of yall try running a model on cpu? tryna run a summarizer model but i get 14t/s no matter the model size, i tried gemma4-e4b and qwen moe models",
+      "tps": [
+        14.0,
+        14.0,
+        14.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1494769363901878425",
+      "month": "2026-04",
+      "timestamp": "Friday, April 17, 2026 11:39\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "bonsai",
+      "hardware": "CPU",
+      "quantization": "",
+      "speed": "<1t/s tg \u00b7 1 tok/s, 1 tok/s, 1 tok/s",
+      "message": "<1t/s tg with bonsai on CPU",
+      "tps": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1494812103775752233",
+      "month": "2026-04",
+      "timestamp": "Friday, April 17, 2026 2:29\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "4b",
+      "hardware": "60gb/s",
+      "quantization": "",
+      "speed": "15tk/s \u00b7 15 tok/s, 15 tok/s, 15 tok/s",
+      "message": "Nah, even at like 60gb/s, you'll get 15tk/s with a 4b active model",
+      "tps": [
+        15.0,
+        15.0,
+        15.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1495777244671512749",
+      "month": "2026-04",
+      "timestamp": "Monday, April 20, 2026 6:24\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-35b",
+      "hardware": "server mobo+CPU, x16 pcie lanes, more GPU's, fast VRAM",
+      "quantization": "",
+      "speed": "single digits ... 100t/s \u00b7 100 tok/s, 100 tok/s, 100 tok/s",
+      "message": "What kind of t/s are you getting on a spark with qwen3.6 35b? I see people hitting single digits with >100b models but still reporting close to 100t/s on double digit models like Q3.6. It's a hard to swallow pill that buying a whole server mobo+CPU just to get more x16 pcie lanes for more GPU's is the only option to get more fast VRAM.",
+      "tps": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1495960107052437605",
+      "month": "2026-04",
+      "timestamp": "Monday, April 20, 2026 6:31\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "k2.5",
+      "hardware": "4 512gb mac studios",
+      "quantization": "",
+      "speed": "30 tps \u00b7 30 tok/s",
+      "message": "4 512gb mac studios ran k2.5 at like 30 tps I think",
+      "tps": [
+        30.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1496112509097218109",
+      "month": "2026-04",
+      "timestamp": "Tuesday, April 21, 2026 4:36\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-27b",
+      "hardware": "2x 5060 ti's, 600gb/s, 448gb/s",
+      "quantization": "",
+      "speed": "22tk/s, 16tk/s, 12tk/s \u00b7 22 tok/s, 16 tok/s, 12 tok/s, 22 tok/s",
+      "message": "2x 5060 ti's don't make alot of sense, even if we are generous and calculate with 600gb/s, qwen 27b would only get 22tk/s. Real max theoritical bandwidth is actually 448gb/s, which is 16tk/s with the same model. Real world performance is about 80% of that so that leaves us to 12tk/s.",
+      "tps": [
+        22.0,
+        16.0,
+        12.0,
+        22.0,
+        16.0,
+        12.0,
+        22.0,
+        16.0,
+        12.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1496663127239164106",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 22, 2026 5:04\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "k2.5, k2.6",
+      "hardware": "cheap ebay xeons",
+      "quantization": "",
+      "speed": "1.7 tok/s, 5 tok/s \u00b7 1.7 tok/s, 5 tok/s",
+      "message": "Overall iIm most surprised at how well k2.6 runs on this thing compared to when i first started tuning things for this system. iirc originally i had k2.5 running at only 1.7 tok/s..... now with k2.6 getting 5 tok/s gen, Maybe useful for some more mundane chat situations at least.\n\nThough that \"tuning\" did involve upgrading the cpus 1 generation newer with some cheap ebay xeons for like $150",
+      "tps": [
+        1.7,
+        5.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1496708847396454410",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 22, 2026 8:06\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-35b",
+      "hardware": "9070XT",
+      "quantization": "q4",
+      "speed": "~45 t/s \u00b7 45 tok/s, 45 tok/s",
+      "message": "I'm getting ~45 t/s at q4 with a 9070XT on Qwen3.6 35B",
+      "tps": [
+        45.0,
+        45.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1496955151607533638",
+      "month": "2026-04",
+      "timestamp": "Thursday, April 23, 2026 12:25\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-27b",
+      "hardware": "3090",
+      "quantization": "",
+      "speed": "3x+, 10x+",
+      "message": "Been testing Qwen3.6-27B for a few hours now. Preliminary analysis is it\u2019s great for tasks if you are willing to let it sit there and cook on moderate hardware like a 3090 etc. Qwen3-Coder-Next so far is about 95% as accurate and on average 3x+ the speed (some tests it was 10x+ faster while generating the same result). All worth noting of course these are two different sized models. Nobody is running coder-next on a 3090. But it\u2019s been a very interesting couple of hours running them side by side.",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1497182412810092635",
+      "month": "2026-04",
+      "timestamp": "Friday, April 24, 2026 3:28\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3-coder-0.8",
+      "hardware": "nvidia",
+      "quantization": "",
+      "speed": "100tps \u00b7 100 tok/s",
+      "message": "interesting, i keep seeing tweets about people getting like 100tps with a draft model for qwen3.6 but using qwen3.5 0.8b the logs tell me the tokens arent compatible and will be translated \ntheyre also running on nvidia not amd",
+      "tps": [
+        100.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1497320152298164277",
+      "month": "2026-04",
+      "timestamp": "Friday, April 24, 2026 12:35\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-27b",
+      "hardware": "DGX Spark, 128 gibs, RTX 6000",
+      "quantization": "dflash",
+      "speed": "35 tok/sec \u00b7 35 tok/s",
+      "message": "dgx spark hitting 35 tok/sec with dflash + ddtree on 27b \n128 gibs for $3K, stack 3 and you got a 768 384 gibs for the price of one 1 RTX 6000 \nand speed would increase",
+      "tps": [
+        35.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1497463261736603698",
+      "month": "2026-04",
+      "timestamp": "Friday, April 24, 2026 10:04\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-35b-a3b",
+      "hardware": "16gb",
+      "quantization": "",
+      "speed": "80t/s \u00b7 80 tok/s, 80 tok/s, 80 tok/s",
+      "message": "I mean I can run 35b on a 16gb card with 128k context at 80t/s",
+      "tps": [
+        80.0,
+        80.0,
+        80.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1497468826839945359",
+      "month": "2026-04",
+      "timestamp": "Friday, April 24, 2026 10:26\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-35b",
+      "hardware": "dual 5060s",
+      "quantization": "dflash",
+      "speed": "~170tok/s \u00b7 170 tok/s, 170 tok/s",
+      "message": "qwen 3.6 35b + dflash hitting ~170tok/s peak with dual 5060s @ 125k",
+      "tps": [
+        170.0,
+        170.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1498408374503473322",
+      "month": "2026-04",
+      "timestamp": "Monday, April 27, 2026 12:39\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-27b",
+      "hardware": "two 5060ti",
+      "quantization": "",
+      "speed": "50tps \u00b7 50 tok/s",
+      "message": "i got qwen3.6 27b running on two 5060ti @ 50tps, that's a decently cheap setup already",
+      "tps": [
+        50.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1498447305890730127",
+      "month": "2026-04",
+      "timestamp": "Monday, April 27, 2026 3:14\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-27b",
+      "hardware": "5090",
+      "quantization": "",
+      "speed": "70-100t/s, low 60s t/s, 70s \u00b7 100 tok/s, 100 tok/s, 100 tok/s",
+      "message": "I've wasted so much time today in vllm seeking out these 70-100t/s optimizations on a 5090 with qwen27b only to end up right back where I started barely getting it to launch without OOMing and only low 60s t/s and 70s for a max of 4 concurrencies.",
+      "tps": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1498876874065969232",
+      "month": "2026-04",
+      "timestamp": "Tuesday, April 28, 2026 7:41\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.6-27b",
+      "hardware": "rtx 6000",
+      "quantization": "dflash",
+      "speed": "1m output tokens an hr",
+      "message": "depends on the size but you can get about 1m output tokens an hr on a rtx 6000 when batched. on the 27b. it'll be more when dflash behaves better",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1499463360876511386",
+      "month": "2026-04",
+      "timestamp": "Thursday, April 30, 2026 10:32\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "deepseek-v4",
+      "hardware": "Ampere GPU's",
+      "quantization": "",
+      "speed": "2tok/s \u00b7 2 tok/s, 2 tok/s",
+      "message": "I got DeepSeek v4 support for vllm working on Ampere GPU's @ 2tok/s",
+      "tps": [
+        2.0,
+        2.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1499465418232828056",
+      "month": "2026-04",
+      "timestamp": "Thursday, April 30, 2026 10:40\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "DSv4 Flash",
+      "hardware": "Ampere",
+      "quantization": "",
+      "speed": "5-10tok/s \u00b7 10 tok/s, 10 tok/s",
+      "message": "I'm still working on getting DSv4 Flash up to around 5-10tok/s on Ampere via vllm",
+      "tps": [
+        10.0,
+        10.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1492790640667525372",
+      "month": "2026-04",
+      "timestamp": "Sunday, April 12, 2026 12:37\u202fAM",
+      "tier": "hw_speed_benchmark",
+      "model": "minimax-m2.7",
+      "hardware": "rtx6000",
+      "quantization": "IQ3_XXS",
+      "speed": "110 tps \u00b7 110 tok/s",
+      "message": "110 tps on IQ3_XXS M2.7 (rtx6000)",
+      "tps": [
+        110.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1494394287134347377",
+      "month": "2026-04",
+      "timestamp": "Thursday, April 16, 2026 10:49\u202fAM",
+      "tier": "hw_speed_benchmark",
+      "model": "claude",
+      "hardware": "3090, R9700",
+      "quantization": "",
+      "speed": "100+ tok/sec \u00b7 100 tok/s",
+      "message": "basically 100+ tok/sec on local 3090 , R9700 \nfuck claude and chatgpt",
+      "tps": [
+        100.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1496333656883724428",
+      "month": "2026-04",
+      "timestamp": "Tuesday, April 21, 2026 7:15\u202fPM",
+      "tier": "hw_speed_benchmark",
+      "model": "glm-4.7",
+      "hardware": "EPYC 7532 + 8x32 DDR4-3200 + 2x R9700s",
+      "quantization": "Q3_K_L",
+      "speed": "12 t/s \u00b7 12 tok/s, 12 tok/s",
+      "message": "Without any offloading ( -ngl 0 ) or without offloading of the experts ( -ncmoe 0 )?\nI'm running on an EPYC 7532 + 8x32 DDR4-3200 + 2x R9700s, and I got 12 t/s on GLM-4.7 at Q3_K_L (which is like ~180GB, with 16GB of active weights) with -ncmoe 0 (so just the attention layers were on 1 R9700, all experts in RAM).\nYou should probably get better speeds than that on 122B with only 4.7GB of active weights.",
+      "tps": [
+        12.0,
+        12.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1497046123909746689",
+      "month": "2026-04",
+      "timestamp": "Thursday, April 23, 2026 6:26\u202fPM",
+      "tier": "hw_speed_benchmark",
+      "model": "kimi-k2.6",
+      "hardware": "M5 ultra studio",
+      "quantization": "",
+      "speed": "1000t/s \u00b7 1000 tok/s, 1000 tok/s, 1000 tok/s",
+      "message": "M5 ultra studio running k2.6 at 1000t/s tg next month",
+      "tps": [
+        1000.0,
+        1000.0,
+        1000.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1499068828104134799",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 29, 2026 8:24\u202fAM",
+      "tier": "hw_speed_benchmark",
+      "model": "deepseek-v4-flash",
+      "hardware": "2+ Blackwells; strong GPU + EPYC/Threadripper Pro/Xeon Scalable system with 8 channels of DDR4-2933/3200 or DDR5",
+      "quantization": "",
+      "speed": "20 tokens/sec \u00b7 20 tok/s",
+      "message": "DS V4 Flash is around 140GB at Q4. 13B/284B=6.4GB of active weights. To get 20 tokens/sec, you need 6.4*20=128GB/s of RAM bandwidth.\nThe only ways to get that are:\n\n2+ Blackwells\n\nsome strong GPU + EPYC/Threadripper Pro/Xeon Scalable system with 8 channels of DDR4-2933/3200 or DDR5",
+      "tps": [
+        20.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1493131274263462028",
+      "month": "2026-04",
+      "timestamp": "Sunday, April 12, 2026 11:10\u202fPM",
+      "tier": "hw_speed",
+      "model": "gemma4",
+      "hardware": "vram allocation across my gpus",
+      "quantization": "",
+      "speed": "5% boost in t/s",
+      "message": "i ended up getting split mode tensor working after rebooting, but it was giving me only like a 5% boost in t/s with gemma 4 and less control on my vram allocation across my gpus",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1493745370780668046",
+      "month": "2026-04",
+      "timestamp": "Tuesday, April 14, 2026 3:50\u202fPM",
+      "tier": "hw_speed",
+      "model": "wan-2.2",
+      "hardware": "h100",
+      "quantization": "",
+      "speed": "15-20mins for 15 sec vid",
+      "message": "ii just checked\u2026 still 15-20mins for 15 sec vid t2v with wan2.2 on h100",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1493817967400456192",
+      "month": "2026-04",
+      "timestamp": "Tuesday, April 14, 2026 8:39\u202fPM",
+      "tier": "hw_speed",
+      "model": "glm-4.7-flash",
+      "hardware": "3050",
+      "quantization": "",
+      "speed": "7",
+      "message": "Pretty good, I'm only getting around 7 on glm4.7 flash, but that's on lmstudio non llamacpp, this 3050 really sucks, hence why I'm looking to get a new card",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1498651767624171602",
+      "month": "2026-04",
+      "timestamp": "Tuesday, April 28, 2026 4:47\u202fAM",
+      "tier": "hw_speed",
+      "model": "kimi-k2.6",
+      "hardware": "server cpus",
+      "quantization": "2bit",
+      "speed": "5 tok /s; 40 pp/s",
+      "message": "My server cpus can do a 2bit k2.6 want @ 5 tok /s and 40 pp/s lmao",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1489713840932261919",
+      "month": "2026-04",
+      "timestamp": "Friday, April 3, 2026 12:50\u202fPM",
+      "tier": "inferred_model",
+      "model": "gemma4",
+      "hardware": "mac-studio",
+      "quantization": "",
+      "speed": "8 tokens a second, 90 tokens a second \u00b7 8 tok/s, 90 tok/s",
+      "message": "Hi all, new here.\n\nI was only getting ~8 tokens a second on gemma 4 with llama.cpp, turns out that brew had installed the intel version wrapped via rosetta, so I also installed the arm64 version and it jumped to ~90 tokens a second. I have no idea how the intel version was on a new mac studio but this caused a lot of problems.",
+      "tps": [
+        8.0,
+        90.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1490016547698118676",
+      "month": "2026-04",
+      "timestamp": "Saturday, April 4, 2026 8:53\u202fAM",
+      "tier": "inferred_model",
+      "model": "qwen3.5-35b",
+      "hardware": "gb10",
+      "quantization": "Q4_K_M",
+      "speed": "70+T/s \u00b7 70 tok/s",
+      "message": "finally getting pretty happy with my gb10 (dgx spark-ish) setup, I've got kokoto TTS, parakeet ASR, qwen3.5 35b (Q4_K_M, 70+T/s, full context), z-image-turbo (~4s/1024x1024) and qwen-image-edit (~14s/1024x1024) all running happily together",
+      "tps": [
+        70.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1494512279042130031",
+      "month": "2026-04",
+      "timestamp": "Thursday, April 16, 2026 6:38\u202fPM",
+      "tier": "inferred_model",
+      "model": "qwen3.6-35b",
+      "hardware": "m1, m1-max",
+      "quantization": "q8",
+      "speed": "39 t/s decode, 35.6 t/s decode \u00b7 39 tok/s, 35.6 tok/s, 39 tok/s, 35.6 tok/s",
+      "message": "The old Qwen 3.5 35B q8 was hitting 39 t/s decode on M1 Max\nThe new Qwen 3.6 35B q8 is hitting 35.6 t/s decode on M1 Max",
+      "tps": [
+        39.0,
+        35.6,
+        39.0,
+        35.6
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1496519219687456889",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 22, 2026 7:33\u202fAM",
+      "tier": "inferred_model",
+      "model": "qwen3.5",
+      "hardware": "rtx-3080",
+      "quantization": "q5-k",
+      "speed": "17 tok/s, 100 tok/s, 17 tok/s, 100 tok/s",
+      "message": "I mean I'm fine ish with the 17 T/s I get out of Qwen 3.5 122B at IQ5_K using --n-cpu-moe to put half of it or more on cpu.\n\nConsidering that even a 3080 memory bandwidth still quite a lot more then going to system ram do I really need that much more speed, I don't need 100 T/s, I care more about running bigger stuff at decent speed.",
+      "tps": [
+        17.0,
+        100.0,
+        17.0,
+        100.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1496550178063384758",
+      "month": "2026-04",
+      "timestamp": "Wednesday, April 22, 2026 9:36\u202fAM",
+      "tier": "inferred_model",
+      "model": "qwen3.6-27b",
+      "hardware": "rtx-3090",
+      "quantization": "Q4",
+      "speed": "30-35 t/s \u00b7 35 tok/s, 35 tok/s",
+      "message": "Qwen3.6-27b_Q4_M on 3090 running @ 30-35 t/s out of the box on llama.cpp.",
+      "tps": [
+        35.0,
+        35.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1478049697091424368",
+      "month": "2026-03",
+      "timestamp": "Monday, March 2, 2026 7:21\u202fAM",
+      "tier": "full",
+      "model": "qwen3.5-2b",
+      "hardware": "Radeon 6650 xt",
+      "quantization": "q8",
+      "speed": "20 tokens a second \u00b7 20 tok/s",
+      "message": "Anyone know why when I run qwen 3.5 2b, 4, and 9b I get 20 tokens a second generation across all three models? I'm using the same 131072 context size, KV cache quantization to q8, and full GPU offload. Radeon 6650 xt is the GPU. 2 and 4b are Q4_K_XL and 9b is Q3_K_XL. I'm using Vulkan in LM Studio on Linux",
+      "tps": [
+        20.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1478112319484592220",
+      "month": "2026-03",
+      "timestamp": "Monday, March 2, 2026 11:30\u202fAM",
+      "tier": "full",
+      "model": "qwen3-coder-0.8",
+      "hardware": "i5-1145g7 cpu only",
+      "quantization": "q8_0",
+      "speed": "12t/s \u00b7 12 tok/s, 12 tok/s, 12 tok/s",
+      "message": "qwen3.5-0.8b q8_0 ran 12t/s on i5-1145g7 cpu only, lm studio",
+      "tps": [
+        12.0,
+        12.0,
+        12.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1478255201516261578",
+      "month": "2026-03",
+      "timestamp": "Monday, March 2, 2026 8:58\u202fPM",
+      "tier": "full",
+      "model": "qwen3.5-9b",
+      "hardware": "M1 Max 64GB",
+      "quantization": "8bit",
+      "speed": "38.54tok/sec \u00b7 38.54 tok/s, 17.3 tok/s, 26.5 tok/s",
+      "message": "New tests with an M1 Max 64GB:\n qwen3.5-35b-a3b@8bit - 38.54tok/sec (43k of the context window filled)\nqwen3.5-9b-mlx@bf-16 - 17.3tok/sec (40k of the context window filled) \nqwen3.5-9b-mlx@9bit - 26.5tok/sec (44k of the context window filled)",
+      "tps": [
+        38.54,
+        17.3,
+        26.5
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1478441851362213928",
+      "month": "2026-03",
+      "timestamp": "Tuesday, March 3, 2026 9:20\u202fAM",
+      "tier": "full",
+      "model": "qwen3.5-27b",
+      "hardware": "5090",
+      "quantization": "Q5_K_L",
+      "speed": "52 tok/s \u00b7 52 tok/s",
+      "message": "On my 5090 I was getting 52 tok/s generation with Qwen 3.5 27B Q5_K_L, for a comparison point.",
+      "tps": [
+        52.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1478455512868585682",
+      "month": "2026-03",
+      "timestamp": "Tuesday, March 3, 2026 10:14\u202fAM",
+      "tier": "full",
+      "model": "glm-4.7",
+      "hardware": "9950x, 256GB ddr5, 6000mt machine, 6000 blackwell",
+      "quantization": "Q4",
+      "speed": "5.8 tps \u00b7 5.8 tok/s",
+      "message": "Not Qwen but on a 9950x 256GB ddr5 6000mt machine with 6000 blackwell I'm getting about 5.8 tps on a Q4 of a GLM 4.7 (about 202 gb model) just for reference.",
+      "tps": [
+        5.8
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1479198528273383516",
+      "month": "2026-03",
+      "timestamp": "Thursday, March 5, 2026 11:26\u202fAM",
+      "tier": "full",
+      "model": "qwen3.5-35b-a3b",
+      "hardware": "Macbook Pro M1 Max 64GB",
+      "quantization": "5.5bit",
+      "speed": "Token Gen: 45 tok/s, 39 tok/s, 23 tok/s \u00b7 45 tok/s, 39 tok/s, 23 tok/s, 10 tok/s",
+      "message": "inferencerlabs/Qwen3.5-35B-A3B-MLX-5.5bit - Token Gen: 45 tok/s (KV Cache 8bit LMStudio)\ninferencerlabs/Qwen3.5-35B-A3B-MLX-9bit - Token Gen: 39 tok/s (KV Cache 8bit LMStudio)\nmlx-community/Qwen3.5-35B-A3B-6bit - Token Gen: 23 tok/s (KV Cache not supported in LMStudio)\n\nunsloth/Qwen3.5-35B-A3B-GGUF:MXFP4_MOE - Token Gen 10 tok/s - PP 344 tok/s - KV Cache 8bit\nunsloth/Qwen3.5-35B-A3B-GGUF:UD-Q4_K_XL - Token Gen 20 tok/s - PP 330 tok/s - KV Cache 8bit\n\nAll tests done with 40-44k context window fill parsing a 70 page PDF and summarizing it.\n\nHardware: Macbook Pro M1 Max 64GB",
+      "tps": [
+        45.0,
+        39.0,
+        23.0,
+        10.0,
+        344.0,
+        20.0,
+        330.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1481349100120182854",
+      "month": "2026-03",
+      "timestamp": "Wednesday, March 11, 2026 10:52\u202fAM",
+      "tier": "full",
+      "model": "qwen3.5-35b-a3b",
+      "hardware": "dual 4090",
+      "quantization": "Q8",
+      "speed": "1462.37 tokens/s, 23.45 t/s, 3218.70 tokens/s, 99.33 t/s \u00b7 1462.37 tok/s, 23.45 tok/s, 3218.7 tok/s, 99.33 tok/s",
+      "message": "Running some new tests with the dual 4090 setup with a 40k token prompt. KV Cache is Q8, Context set to 128k\n unsloth/Qwen3.5-27B-GGUF Q8 1462.37 tokens/s PP 23.45 t/s TG\nunsloth/Qwen3.5-35B-A3B-GGUF Q8 3218.70 tokens/s 99.33 t/s TG",
+      "tps": [
+        1462.37,
+        23.45,
+        3218.7,
+        99.33,
+        99.33,
+        23.45,
+        99.33
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1481466465910521917",
+      "month": "2026-03",
+      "timestamp": "Wednesday, March 11, 2026 6:38\u202fPM",
+      "tier": "full",
+      "model": "qwen3.5-35b-a3b",
+      "hardware": "Double RTX 4090",
+      "quantization": "Q8",
+      "speed": "4505.38 tokens/s PP - 94 t/s TG; 1462.37 tokens/s PP - 23.45 t/s TG \u00b7 4505.38 tok/s, 94 tok/s, 1462.37 tok/s, 23.45 tok/s",
+      "message": "Double RTX 4090 - KV Cache Q8\n\nunsloth/Qwen3.5-35B-A3B-Q8_0.gguf\n4505.38 tokens/s PP - 94 t/s TG\n\nunsloth/Qwen3.5-27B-Q8_0.gguf\n1462.37 tokens/s PP - 23.45 t/s TG",
+      "tps": [
+        4505.38,
+        94.0,
+        1462.37,
+        23.45,
+        94.0,
+        23.45
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1481473520528785511",
+      "month": "2026-03",
+      "timestamp": "Wednesday, March 11, 2026 7:06\u202fPM",
+      "tier": "full",
+      "model": "unsloth/3.5 35b q8",
+      "hardware": "dual 5060ti",
+      "quantization": "q8",
+      "speed": "prompt eval time = 2849.51 ms / 2354 tokens (1.21 ms per token, 826.11 tokens per second); eval time = 24183.67 ms / 1404 tokens (17.22 ms per token, 58.06 tokens per second); total time = 27033.18 ms / 3758 tokens \u00b7 2354 tok/s, 826.11 tok/s, 1404 tok/s, 58.06 tok/s",
+      "message": "prompt eval time = 2849.51 ms / 2354 tokens ( 1.21 ms per token, 826.11 tokens per second)\n eval time = 24183.67 ms / 1404 tokens ( 17.22 ms per token, 58.06 tokens per second)\n total time = 27033.18 ms / 3758 tokens \n\nme with unsloth/3.5 35b q8 dual 5060ti. PP gimped by x1 pcie4",
+      "tps": [
+        2354.0,
+        826.11,
+        1404.0,
+        58.06,
+        3758.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1481473892936581210",
+      "month": "2026-03",
+      "timestamp": "Wednesday, March 11, 2026 7:08\u202fPM",
+      "tier": "full",
+      "model": "qwen3-coder-next",
+      "hardware": "DGX spark",
+      "quantization": "NVFP4",
+      "speed": "45000 t/s PP 2048, 95t/s tg512 \u00b7 45000 tok/s, 95 tok/s, 45000 tok/s, 95 tok/s",
+      "message": "Just benchmarked Nvidia's Qwen Coder Next 80B A3B NVFP4 on my DGX spark.\n45000 t/s PP 2048, 95t/s tg512",
+      "tps": [
+        45000.0,
+        95.0,
+        45000.0,
+        95.0,
+        95.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1483131779400339668",
+      "month": "2026-03",
+      "timestamp": "Monday, March 16, 2026 8:56\u202fAM",
+      "tier": "full",
+      "model": "Qwen-3.5-9B",
+      "hardware": "GTX 1650, 4gb vram",
+      "quantization": "Q_K_M",
+      "speed": "5 tokens per second \u00b7 5 tok/s",
+      "message": "Wait, if the model is too large, how am I able to run Qwen-3.5-9B Q_K_M on my GTX 1650 with 4gb vram? It works, although I only get about 5 tokens per second",
+      "tps": [
+        5.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1483170334025978119",
+      "month": "2026-03",
+      "timestamp": "Monday, March 16, 2026 11:29\u202fAM",
+      "tier": "full",
+      "model": "qwen3.5-122b",
+      "hardware": "Apple M3 Ultra, 512.0GB RAM, 32 CPU cores, 80 GPU cores",
+      "quantization": "4bit",
+      "speed": "54 t/s \u00b7 54 tok/s, 54 tok/s, 54 tok/s, 53 tok/s",
+      "message": "Qwen3.5-122B-A10-4bit \n Apple M3 Ultra, 512.0GB RAM, 32 CPU cores, 80 GPU cores\n0.5k pp 605 tg 54 t/s 69.7GB\n1k pp 861 tg 54 t/s 70.2GB\n2k pp 909 tg 54 t/s 71.5GB\n4k pp 822 tg 53 t/s 71.9GB\n8k pp 772 tg 52 t/s 72.6GB\n16k pp 709 tg 50 t/s 73.8GB\n32k pp 613 tg 47 t/s 76.2GB\n64k pp 468 tg 39 t/s 81.3GB\n128k pp 311 tg 32 t/s 91.7GB \n Apple M5 Max, 128.0GB RAM, 18 CPU cores, 40 GPU cores\n0.5k pp 762 tg 65 t/s 69.7GB\n1k pp 1076 tg 66 t/s 70.2GB\n2k pp 1239 tg 66 t/s 71.5GB\n4k pp 1338 tg 64 t/s 71.9GB\n8k pp 1286 tg 63 t/s 72.6GB\n16k pp 1240 tg 60 t/s 73.8GB\n32k pp 1092 tg 54 t/s 76.2GB\n64k pp 852 tg 46 t/s 81.3GB\n128k pp 574 tg 35 t/s 91.7GB",
+      "tps": [
+        54.0,
+        54.0,
+        54.0,
+        53.0,
+        52.0,
+        50.0,
+        47.0,
+        39.0,
+        32.0,
+        65.0,
+        66.0,
+        66.0,
+        64.0,
+        63.0,
+        60.0,
+        54.0,
+        46.0,
+        35.0,
+        69.7,
+        70.2,
+        71.5,
+        71.9,
+        72.6,
+        73.8,
+        76.2,
+        81.3,
+        91.7,
+        69.7,
+        70.2,
+        71.5,
+        71.9,
+        72.6,
+        73.8,
+        76.2,
+        81.3,
+        91.7,
+        54.0,
+        54.0,
+        54.0,
+        53.0,
+        52.0,
+        50.0,
+        47.0,
+        39.0,
+        32.0,
+        65.0,
+        66.0,
+        66.0,
+        64.0,
+        63.0,
+        60.0,
+        54.0,
+        46.0,
+        35.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1483510845135917158",
+      "month": "2026-03",
+      "timestamp": "Tuesday, March 17, 2026 10:02\u202fAM",
+      "tier": "full",
+      "model": "Mistral-Small-4-119B-2603-GGUF-IQ4_XS",
+      "hardware": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition, VRAM: 97247 MiB",
+      "quantization": "IQ4_XS",
+      "speed": "pp512 3494.09 t/s, tg128 189.68 t/s",
+      "message": "$ ./llama-bench -m ~/docker/data/llama.cpp/Mistral-Small-4-119B-2603-GGUF-IQ4_XS/Mistral-Small-4-119B-2603-UD-IQ4_XS-00001-of-00003.gguf\nggml_cuda_init: found 1 CUDA devices (Total VRAM: 97247 MiB):\n Device 0: NVIDIA RTX PRO 6000 Blackwell Workstation Edition, compute capability 12.0, VMM: yes, VRAM: 97247 MiB\n| model | size | params | backend | ngl | test | t/s |\n| ------------------------------ | ---------: | ---------: | ---------- | --: | --------------: | -------------------: |\n| mistral4 ?B IQ4_XS - 4.25 bpw | 60.28 GiB | 118.97 B | CUDA | 99 | pp512 | 3494.09 \u00b1 105.79 |\n| mistral4 ?B IQ4_XS - 4.25 bpw | 60.28 GiB | 118.97 B | CUDA | 99 | tg128 | 189.68 \u00b1 0.86 |\nbuild: b6c83aad5 (8390) \nnone is getting offloaded to ram",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1484048434666410084",
+      "month": "2026-03",
+      "timestamp": "Wednesday, March 18, 2026 9:38\u202fPM",
+      "tier": "full",
+      "model": "llama",
+      "hardware": "2 3090s",
+      "quantization": "q8",
+      "speed": "27 tps \u00b7 27 tok/s",
+      "message": "I was getting 27 tps q8 in llama on 2 3090s last weekend and I still haven\u2019t learned all of the flags",
+      "tps": [
+        27.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1484242147019460670",
+      "month": "2026-03",
+      "timestamp": "Thursday, March 19, 2026 10:28\u202fAM",
+      "tier": "full",
+      "model": "qwen3-coder-next",
+      "hardware": "5060 and 96GB",
+      "quantization": "unquantized",
+      "speed": "170t/s \u00b7 170 tok/s, 170 tok/s, 170 tok/s",
+      "message": "\"unquantized qwen3-coder-next\" on 5060 and 96GB does not at all sound like it'd hit 170t/s",
+      "tps": [
+        170.0,
+        170.0,
+        170.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1484242365484109928",
+      "month": "2026-03",
+      "timestamp": "Thursday, March 19, 2026 10:29\u202fAM",
+      "tier": "full",
+      "model": "q4km",
+      "hardware": "cpu",
+      "quantization": "q4km",
+      "speed": "8tok/s \u00b7 8 tok/s, 8 tok/s",
+      "message": "I had to load quantized q4km to do this, and was getting 8tok/s on cpu (previously)",
+      "tps": [
+        8.0,
+        8.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1484547555886108884",
+      "month": "2026-03",
+      "timestamp": "Friday, March 20, 2026 6:41\u202fAM",
+      "tier": "full",
+      "model": "qwen3-coder-next",
+      "hardware": "nvidia 5060 ti (16GB), 96GB DDR5",
+      "quantization": "q4-k-m",
+      "speed": "14.75tok/s, 8tok/s, 26.5 tok/s \u00b7 14.75 tok/s, 8 tok/s, 26.5 tok/s, 14.75 tok/s",
+      "message": "So... I ended up getting ik_llama.\nhw: nvidia 5060 ti (16GB), 96GB DDR5\nmodel: qwen3-coder-next-q4-k-m\n\nik_llama avg speed: 14.75tok/s\nllama: 8tok/s\nkrasis: 26.5 tok/s\n\nThere's a problem, and in not sure if its me or vibecoding. But krais says it offers OpenAI compatible API. When I try to use it with openclaw, get some weird errors when submitting prompts.",
+      "tps": [
+        14.75,
+        8.0,
+        26.5,
+        14.75,
+        8.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1485015727889977384",
+      "month": "2026-03",
+      "timestamp": "Saturday, March 21, 2026 1:42\u202fPM",
+      "tier": "full",
+      "model": "qwen3.5-122b",
+      "hardware": "5060ti, 3070",
+      "quantization": "q3-k-m, q4-k-m",
+      "speed": "140t/s pp @ 2.7k, 14.4t/s tg @ 2k, 57t/s pp @ 2.7k, 15.6t/s tg @ 2k, 979t/s pp @ 2.7k, 20.5t/s tg @ 2k, 969t/s pp @ 55k, ~17.2t/s tg @ 55k \u00b7 140 tok/s, 14.4 tok/s, 57 tok/s, 15.6 tok/s",
+      "message": "qwen3.5-122b-q3-k-m w/ tools on llama cpp\nsingle 5060ti:\n140t/s pp @ 2.7k\n14.4t/s tg @ 2k\n5060ti + 3070:\n57t/s pp @ 2.7k\n15.6t/s tg @ 2k\n\nqwen3.5-27b-q4-k-m w/ tools on llama cpp\n5060ti + 3070:\n979t/s pp @ 2.7k\n20.5t/s tg @ 2k\n969t/s pp @ 55k\n~17.2t/s tg @ 55k",
+      "tps": [
+        140.0,
+        14.4,
+        57.0,
+        15.6,
+        979.0,
+        20.5,
+        969.0,
+        17.2,
+        140.0,
+        14.4,
+        57.0,
+        15.6,
+        979.0,
+        20.5,
+        969.0,
+        17.2,
+        140.0,
+        14.4,
+        57.0,
+        15.6,
+        979.0,
+        20.5,
+        969.0,
+        17.2
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1485739232235622664",
+      "month": "2026-03",
+      "timestamp": "Monday, March 23, 2026 1:37\u202fPM",
+      "tier": "full",
+      "model": "qwen3.5-27b",
+      "hardware": "5090",
+      "quantization": "4ish-bpw quant",
+      "speed": "50t/s \u00b7 50 tok/s, 50 tok/s, 50 tok/s",
+      "message": "you can get the 27B in 4ish-bpw quant, it'll run about 50t/s on the 5090",
+      "tps": [
+        50.0,
+        50.0,
+        50.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1486072230352785649",
+      "month": "2026-03",
+      "timestamp": "Tuesday, March 24, 2026 11:40\u202fAM",
+      "tier": "full",
+      "model": "qwen3-30b-a3b",
+      "hardware": "Pi 5 8GB",
+      "quantization": "3-bit quant",
+      "speed": "6-8 tok/s \u00b7 8 tok/s, 2 tok/s",
+      "message": "Potato OS is a Raspberry Pi operating system with baked in local inference, no cloud APIs. Runs Qwen3 30B-A3B (3-bit quant) at 6-8 tok/s on a Pi 5 8GB with NVMe SSD . \nJust shipped two things: Pi 4 support (tested on the 8GB variant, does up to 2 tok/s on the same 30B 3-bit quant) and OTA updates so you don't have to reflash the SD card every time.\nStill early, context is 16k for now, working on getting that to 32-64k. If you've got a Pi sitting around doing nothing, give it a go. \n GitHub: https://github.com/slomin/potato-os \n Flash guide: https://github.com/slomin/potato-os/blob/main/docs/flashing.md",
+      "tps": [
+        8.0,
+        2.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1486150987852025966",
+      "month": "2026-03",
+      "timestamp": "Tuesday, March 24, 2026 4:53\u202fPM",
+      "tier": "full",
+      "model": "qwen3.5-35b",
+      "hardware": "16 GB RX 9070 XT",
+      "quantization": "unsloth quant",
+      "speed": "111 t/s \u00b7 111 tok/s, 111 tok/s",
+      "message": "I just tried Qwen 35b a3b ud q2_k_xl (unsloth quant) with 64k context window and it is pure 111 t/s bliss on my 16 GB RX 9070 XT with no offloading.",
+      "tps": [
+        111.0,
+        111.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1486374178062995535",
+      "month": "2026-03",
+      "timestamp": "Wednesday, March 25, 2026 7:40\u202fAM",
+      "tier": "full",
+      "model": "qwen3.5-35b-a3b",
+      "hardware": "Macbook M1 Max 64gb",
+      "quantization": "8bit",
+      "speed": "Prefill speed : 483.3 tok/s \u00b7 484.39 tok/s, 483.3 tok/s, 41 tok/s, 409.89 tok/s",
+      "message": "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nmlx-community/Qwen3.5-35B-A3B-8bit - Macbook M1 Max 64gb\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n Baseline (no KV quant)\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nPrefill: 36370/36371 [01:15<00:00, 484.39tok/s]\n Prompt tokens : 36,371\n Generated tokens: 200\n Prefill speed : 483.3 tok/s\n Decode speed : 41.0 tok/s\n Wall time : 80.2s\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n TurboQuant 3.5bit\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nPrefill: 36370/36371 [01:28<00:00, 409.89tok/s]\n Prompt tokens : 36,371\n Generated tokens: 200\n Prefill speed : 407.1 tok/s\n Decode speed : 6.6 tok/s\n Wall time : 119.8s\n\n============================================================\n SUMMARY\n============================================================\n\n Baseline (no KV quant)\n Prefill : 483.3 tok/s\n Decode : 41.0 tok/s\n\n TurboQuant 3.5bit\n Prefill : 407.1 tok/s\n Decode : 6.6 tok/s",
+      "tps": [
+        484.39,
+        483.3,
+        41.0,
+        409.89,
+        407.1,
+        6.6,
+        483.3,
+        41.0,
+        407.1,
+        6.6,
+        484.39,
+        409.89
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1486723280911073362",
+      "month": "2026-03",
+      "timestamp": "Thursday, March 26, 2026 6:47\u202fAM",
+      "tier": "full",
+      "model": "qwen3.5-397b",
+      "hardware": "RTX PRO 6000 Max-Q 96GB, RTX A6000 48GB, 128GB DDR4",
+      "quantization": "Q4, Q8 KV cache",
+      "speed": "~13-14 tok/s \u00b7 14 tok/s",
+      "message": "it's alive!!\n\nsqueezing qwen3.5-397b Q4 with 128K Q8 KV cache onto this ultra-jank system is getting ~13-14 tok/s:\n\n1x RTX PRO 6000 Max-Q 96GB\n1x RTX A6000 48GB\n128GB DDR4\nPCIe Gen 3 ( )",
+      "tps": [
+        14.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1487657441268334693",
+      "month": "2026-03",
+      "timestamp": "Saturday, March 28, 2026 8:39\u202fPM",
+      "tier": "full",
+      "model": "qwen3.5-27b",
+      "hardware": "vram",
+      "quantization": "q8",
+      "speed": "25-28, 8, 10",
+      "message": "with a 200k context which is that max i cant fix in vram q8 i maintain about 25-28. With the 27b it was much lower like 8 or 10?",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1487854710869327882",
+      "month": "2026-03",
+      "timestamp": "Sunday, March 29, 2026 9:43\u202fAM",
+      "tier": "full",
+      "model": "122b",
+      "hardware": "system ram",
+      "quantization": "q4_k_m",
+      "speed": "20t/s \u00b7 20 tok/s, 20 tok/s, 20 tok/s",
+      "message": "122b q4_k_m is about 20t/s but because it's offloading to my system ram",
+      "tps": [
+        20.0,
+        20.0,
+        20.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1487930668338905250",
+      "month": "2026-03",
+      "timestamp": "Sunday, March 29, 2026 2:45\u202fPM",
+      "tier": "full",
+      "model": "27b, 35b",
+      "hardware": "16gb card",
+      "quantization": "Q3, Q6",
+      "speed": "100 t/s \u00b7 100 tok/s, 100 tok/s",
+      "message": "Theyre not. If you have a 16gb card, the only way youre fitting something like 27b on it is Q3 quant and below. With 35b you can have any quant you can goto like Q6 if you want and still get 100 t/s",
+      "tps": [
+        100.0,
+        100.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1488247054277939232",
+      "month": "2026-03",
+      "timestamp": "Monday, March 30, 2026 11:42\u202fAM",
+      "tier": "full",
+      "model": "qwen3.5-397b",
+      "hardware": "rtx6000prox4",
+      "quantization": "nvfp4",
+      "speed": "~15k pp",
+      "message": "I only get ~15k pp with rtx6000prox4 on qwen 3.5 397b nvfp4",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1488517196559679619",
+      "month": "2026-03",
+      "timestamp": "Tuesday, March 31, 2026 5:35\u202fAM",
+      "tier": "full",
+      "model": "qwen3.5-27b",
+      "hardware": "9070xt, 32gb ram",
+      "quantization": "q6_0, q4_K_XL",
+      "speed": "2-3 minutes",
+      "message": "I wanted to try out qwen3.5-27b on my 9070xt + 32gb ram.\nHF told me that i could run q6_0 version of the unsloth one, since im using llamacpp server.\nHowever, when i tried it, or even q4_K_XL, same thing happens, no output for 2-3 minutes already, and I just said Hello",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1478130151047958630",
+      "month": "2026-03",
+      "timestamp": "Monday, March 2, 2026 12:41\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-35b-a3b",
+      "hardware": "i5-1145g7",
+      "quantization": "",
+      "speed": "8t/s \u00b7 8 tok/s, 8 tok/s, 8 tok/s",
+      "message": "I have an i5-1145g7 in my Homelab and I can run 35B A3B on it at 8t/s",
+      "tps": [
+        8.0,
+        8.0,
+        8.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1478340131596271707",
+      "month": "2026-03",
+      "timestamp": "Tuesday, March 3, 2026 2:35\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-35b-a3b",
+      "hardware": "Ryzen 7940hs 128gb + egpu 5060ti 16gb",
+      "quantization": "",
+      "speed": "422,55 t/s \u00b7 55 tok/s, 82 tok/s, 1 tok/s, 3 tok/s",
+      "message": "i guess ik-llamap.cpp ist just different, as the logs are simliar to llama.cpp --verbose but less verbose. Basically prompt processing can also be viewed in real time. But just run a anaylsis on a 2k java lines of code on Ryzen 7940hs 128gb + egpu 5060ti 16gb, and result shocked me:\n\n./bin/llama-cli -m ../../models/qwen3.5/Qwen3.5-35B-A3B-MXFP4_MOE.gguf -p \"Create a list of classes and methods, that should be extracted from VermietungService into these classes. At the current point of time this class is containing functionality from different domain areas. Don't generate code. Don't write code. Use classname and class methods to show the resulting classes. Don't explain anything. $(cat test.java)\" -t 8 -ngl 999 -fa on --no-mmap --n-cpu-moe 22\n\nik-llama.cpp\n[ Prompt: 422,55 t/s | Generation: 39,82 t/s ]\ntotal time: 1m30,384s \nllama.cpp\n[ Prompt: 123,1 t/s | Generation: 36,3 t/s ]\ntotal time: 6m8,379s",
+      "tps": [
+        55.0,
+        82.0,
+        1.0,
+        3.0,
+        55.0,
+        82.0,
+        1.0,
+        3.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1480268084429193378",
+      "month": "2026-03",
+      "timestamp": "Sunday, March 8, 2026 11:16\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-35b",
+      "hardware": "mi50",
+      "quantization": "",
+      "speed": "35tps \u00b7 35 tok/s",
+      "message": "ive just use the new version to test qwen 35b on mi50, i always had 35tps.",
+      "tps": [
+        35.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1480320394966859796",
+      "month": "2026-03",
+      "timestamp": "Sunday, March 8, 2026 2:44\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "minimax-m2.5",
+      "hardware": "single 6000, 5090",
+      "quantization": "q3-k",
+      "speed": "20 tk/s generation, 200 for prompt processing \u00b7 20 tok/s, 20 tok/s",
+      "message": "running MiniMax 2.5 Q3 on my single 6000 and goddamn is it slow lol. Getting 20 tk/s generation and 200 for prompt processing. When ever I get my electrical sorted, going to try adding my 5090 and offloading layers to that to see if it helps.",
+      "tps": [
+        20.0,
+        20.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1480477150921621596",
+      "month": "2026-03",
+      "timestamp": "Monday, March 9, 2026 1:07\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-9b",
+      "hardware": "radeon 7800 XT with 16 gb, 32 gb ram, Ryzen 7 5800x3d",
+      "quantization": "",
+      "speed": "50 t/s \u00b7 50 tok/s, 50 tok/s",
+      "message": "Sup everyone.\nI would like to have a quick reality check.\nI have my gaming setup (Linux, radeon 7800 XT with 16 gb, 32 gb ram, Ryzen 7 5800x3d) and I tried to run some models on it to use with Opencode for coding tasks for work.\nI tried qwen 3 14B, oss-gpt-20b and currently qwen 3.5 9B with llama switch\nWhile it works surprisingly good (50 t/s, 120k context) it is sometimes taking really long just to read files and tool calls sometimes end up in an infinite loop.\nAm I chasing a dream with this setup, am I doing something terribly wrong, or can it actually be used for something?",
+      "tps": [
+        50.0,
+        50.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1480678144024248531",
+      "month": "2026-03",
+      "timestamp": "Monday, March 9, 2026 2:26\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-9b",
+      "hardware": "16gb mac mini",
+      "quantization": "",
+      "speed": "15 tps \u00b7 15 tok/s",
+      "message": "Anyone here run 9b qwen 3.5 with a 16gb mac mini ? curious what your tokens/second are. I'm getting about 15 tps",
+      "tps": [
+        15.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1480978952813150280",
+      "month": "2026-03",
+      "timestamp": "Tuesday, March 10, 2026 10:21\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "gpt-oss-20b",
+      "hardware": "amd igpu",
+      "quantization": "",
+      "speed": "30tps, 20tps, 22tps, 13tps \u00b7 30 tok/s, 20 tok/s, 22 tok/s, 13 tok/s",
+      "message": "ive run yesterday gpt-oss 20B and 120B on llama vulkan. Like 2 weeks ago i was getting on amd igpu 30tps for 20B and 20tps for 120B and yesterday 22tps for 20B and 13tps for 120B.",
+      "tps": [
+        30.0,
+        20.0,
+        22.0,
+        13.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1481477273684279368",
+      "month": "2026-03",
+      "timestamp": "Wednesday, March 11, 2026 7:21\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen-image-edit",
+      "hardware": "Spark, 5060",
+      "quantization": "",
+      "speed": "2 mins per image",
+      "message": "I tried the Qwen Image Edit from December, I think it was my 1st model when I got the spark. It was way too slow to use. Around 2 mins per image. Remember the Spark is a 5060 compute-wise, just has more VRAM.",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1481738210492026930",
+      "month": "2026-03",
+      "timestamp": "Thursday, March 12, 2026 12:38\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "gemma3-12b",
+      "hardware": "64-96gb",
+      "quantization": "",
+      "speed": "3 tok/sec \u00b7 3 tok/s",
+      "message": "Yeah so I think Gemma3 12B sucks and even 27B is barely there, like I need multiple generations to get a result I consider good currently. I can run Mistral 123B or whatever but it is like 3 tok/sec. Like you said the current tech seems really skewed to \n64-96gb which is bad for 32gb plebes.",
+      "tps": [
+        3.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1482132771244867777",
+      "month": "2026-03",
+      "timestamp": "Friday, March 13, 2026 2:46\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-4b",
+      "hardware": "phone",
+      "quantization": "",
+      "speed": "12t/s \u00b7 12 tok/s, 12 tok/s, 12 tok/s",
+      "message": "whoop. flashattention got qwen3.5 4b going at 12t/s on my phone's llama-server",
+      "tps": [
+        12.0,
+        12.0,
+        12.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1482870187618468035",
+      "month": "2026-03",
+      "timestamp": "Sunday, March 15, 2026 3:36\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "27b, 35b",
+      "hardware": "3070 & 5060ti",
+      "quantization": "",
+      "speed": "17tg/s, 60tg/s",
+      "message": "ive got a 3070 & 5060ti, in practice i get 17tg/s with 27b and 60tg/s with 35b at mid range contexts",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1483131473182855241",
+      "month": "2026-03",
+      "timestamp": "Monday, March 16, 2026 8:54\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-9b",
+      "hardware": "5GB in VRAM",
+      "quantization": "q4-k-m, q4-0",
+      "speed": "33 tok/sec \u00b7 33 tok/s",
+      "message": "Qwen3.5-9B-Q4_K_M.gguf -c 32768 --cache-type-k q4_0 --cache-type-v q4_0 -ngl 99 \n\nI am running this (5GB in VRAM ig) and it gives a decent 33 tok/sec",
+      "tps": [
+        33.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1483523619706376447",
+      "month": "2026-03",
+      "timestamp": "Tuesday, March 17, 2026 10:53\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-122b",
+      "hardware": "partially offloaded to cpu",
+      "quantization": "",
+      "speed": ">65t/s \u00b7 65 tok/s, 65 tok/s, 65 tok/s",
+      "message": "I'm running qwen 122b hybrid, partially offloaded to cpu, and it still gets >65t/s",
+      "tps": [
+        65.0,
+        65.0,
+        65.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1483628682156314686",
+      "month": "2026-03",
+      "timestamp": "Tuesday, March 17, 2026 5:50\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "Ollama, LM Studio, MLX, llama.cpp, vLLM, oMLX, LocalAI",
+      "hardware": "Apple Silicon, GPU, VRAM",
+      "quantization": "",
+      "speed": "2.4x speed difference",
+      "message": "asiai \u2014 benchmark & monitor your local LLM engines on Apple Silicon \n\nSame model, same Mac: 2.4x speed difference between engines. I needed to know which one was actually faster. So I built this.\n\n\u2022 7 engines side-by-side (Ollama, LM Studio, MLX, llama.cpp, vLLM, oMLX, LocalAI)\n\u2022 Real-time GPU monitoring (utilization, VRAM, thermal)\n\u2022 Web dashboard, 90-day history\n\u2022 MCP server \u2014 your AI agents can benchmark autonomously\n\n pip install asiai or brew install druide67/tap/asiai \n\n https://github.com/druide67/asiai \n https://asiai.dev",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1484422862038110348",
+      "month": "2026-03",
+      "timestamp": "Thursday, March 19, 2026 10:26\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "32b",
+      "hardware": "CPU: Intel Xeon Platinum 8488C (x2) ... GPU: Nvidia Geforce RTX 4090D 24GB ... RAM: Unknown 64GB DDR5 ECC",
+      "quantization": "",
+      "speed": "4tok/sec \u00b7 4 tok/s",
+      "message": "Hey can anybody see what model I can run that is smart?\n\n32b I feel is a bit underpowered for my setup lmao\nllama 3.1 70b is too slow for me (like 4tok/sec)\n\nSpecs:\n\nCPU: Intel Xeon Platinum 8488C (x2) *Totaling 192 cores\nGPU: Nvidia Geforce RTX 4090D 24GB GDDR6X (x1) \nRAM: Unknown 64GB DDR5 ECC (probably kingston)\nMotherboard: SuperMicro X13DEI\nSSD: M.2 Kingston KC3000 4TB",
+      "tps": [
+        4.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1484825681312485397",
+      "month": "2026-03",
+      "timestamp": "Saturday, March 21, 2026 1:07\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3-vl",
+      "hardware": "ESP32-S3; Raspberry Pi",
+      "quantization": "",
+      "speed": "~2-4s",
+      "message": "Hey! Wanted to share a project I've been working on. Eva is a companion that runs entirely on local hardware no cloud, no API keys. \nFull pipeline: \n\nWhisper STT for voice recognition \n\nQwen3-VL for language + vision \n\nF5-TTS with voice cloning for responses \n\nESP32-S3 for hardware (mic, speaker, camera, OLED) \n\nShe listens, responds in a cloned voice (you can youse your own ref audio), shows emotions on an OLED display, and can describe what she sees through the camera on request. \n\nBiggest challenge was getting the full pipeline running with acceptable latency (~2-4s) on consumer hardware. \n\n https://github.com/Ksirailway-base/EVA-Robot?tab=readme-ov-file \n\nHappy to see your questions and ideas for the project.\nThanks!\n\n*I'd like to test, for example, the lightweight version of LFM2 and use only a Raspberry Pi with Vision, but I don't currently have access to the hardware for a fully local setup",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1486182531119321120",
+      "month": "2026-03",
+      "timestamp": "Tuesday, March 24, 2026 6:58\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "VLLM",
+      "hardware": "Asus Ascent GX10",
+      "quantization": "",
+      "speed": "5 minutes to launch",
+      "message": "i also thought they were all identical....it ran on my Asus Ascent GX10, but i didnt benchmark compare with base VLLM tbh, model takes like 5 minutes to launch and I'm too lazy, plus the Docker commands are not the same",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1486192079162839211",
+      "month": "2026-03",
+      "timestamp": "Tuesday, March 24, 2026 7:36\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-27b",
+      "hardware": "DDR5, VRAM",
+      "quantization": "",
+      "speed": "100GB/s, 1000GB/s",
+      "message": "Nope. Way slower. You underestimate VRAM. 27B vs 10B active = 3x dense. But I only get 100GB/s on DDR5 and I get 1000GB/s on VRAM.",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1486200731701608508",
+      "month": "2026-03",
+      "timestamp": "Tuesday, March 24, 2026 8:11\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-122b",
+      "hardware": "A10B",
+      "quantization": "",
+      "speed": "67 tok/s \u00b7 67 tok/s",
+      "message": "\"Qwen3.5 122B (A10B 4it) running locally at 67 tok/s via mlx\"",
+      "tps": [
+        67.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1486584753741107412",
+      "month": "2026-03",
+      "timestamp": "Wednesday, March 25, 2026 9:37\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-27b",
+      "hardware": "memory bandwidth",
+      "quantization": "",
+      "speed": "18t/s \u00b7 18 tok/s, 18 tok/s, 18 tok/s",
+      "message": "that's roughly the expected speed anyway, theoretical max is something like 18t/s for 27B on this memory bandwidth",
+      "tps": [
+        18.0,
+        18.0,
+        18.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1486923518171152496",
+      "month": "2026-03",
+      "timestamp": "Thursday, March 26, 2026 8:03\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen-3-5-27b",
+      "hardware": "b200 GPUs",
+      "quantization": "",
+      "speed": "1 million tokens per second",
+      "message": "https://medium.com/google-cloud/1-million-tokens-per-second-qwen-3-5-27b-on-gke-with-b200-gpus-161da5c1b592",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1487889933854310571",
+      "month": "2026-03",
+      "timestamp": "Sunday, March 29, 2026 12:03\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "gpt-oss-120b",
+      "hardware": "Pro 6000",
+      "quantization": "",
+      "speed": "10,000 token/s",
+      "message": "You can rent a Pro 6000 for half that price and you need massive parallelism to take full advantage of it. For batch task processing I use vllm with gpt-oss-120b and 1024 parallel requests to generate over 10,000 token/s out of a Pro 6000 which is like 20x cheaper than API.",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1488069404984868896",
+      "month": "2026-03",
+      "timestamp": "Sunday, March 29, 2026 11:56\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "gpt-oss-120b",
+      "hardware": "96gb, 5600 mt/s, 4060, 2060",
+      "quantization": "",
+      "speed": "10 TP/s",
+      "message": "Im pretty happy with what ive set up. 96gb 5600 mt/s + 4060 + 2060\n\n10 TP/s on gpt oss 120b (lower quant).",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1488286115105345708",
+      "month": "2026-03",
+      "timestamp": "Monday, March 30, 2026 2:17\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-27b",
+      "hardware": "vram and ram",
+      "quantization": "",
+      "speed": "35 t/s \u00b7 35 tok/s, 35 tok/s",
+      "message": "im testing now unsloth/Qwen3.5-27B-GGUF\nbut it only go up to 35 t/s generating ,, while i still have much vram and ram\nwhy it can't go more ,, i have tried all the arguments for optimizations and it's the same",
+      "tps": [
+        35.0,
+        35.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1488761814174138418",
+      "month": "2026-03",
+      "timestamp": "Tuesday, March 31, 2026 9:47\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "VideoVAE",
+      "hardware": "12gb vram",
+      "quantization": "",
+      "speed": "00:15:35",
+      "message": "Model VideoVAE prepared for dynamic VRAM loading. 1384MB Staged. 0 patches attached.\nPrompt executed in 00:15:35 \n5-sec clip 1440p, on a blackwell 12gb vram",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1485442748554285177",
+      "month": "2026-03",
+      "timestamp": "Sunday, March 22, 2026 5:59\u202fPM",
+      "tier": "hw_speed_benchmark",
+      "model": "qwen3.5",
+      "hardware": "m3 Max Macbook pro",
+      "quantization": "gguf",
+      "speed": "230 tokens per second \u00b7 230 tok/s",
+      "message": "run GGUF without any conversion in Swift\n\n https://github.com/christopherkarani/EdgeRunner \n\nbuilt using Swift/Metal Gets 230 tokens per second with Qwen 3.5 0.6B on a m3 Max Macbook pro",
+      "tps": [
+        230.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1487812374823178441",
+      "month": "2026-03",
+      "timestamp": "Sunday, March 29, 2026 6:55\u202fAM",
+      "tier": "hw_speed_benchmark",
+      "model": "qwen3.5",
+      "hardware": "Ryzen 5900X, 64GB DDR4, 9070XT 16GB",
+      "quantization": "IQ4_XS",
+      "speed": "200 t/s PP, 15 t/s TG \u00b7 200 tok/s, 15 tok/s, 200 tok/s, 15 tok/s",
+      "message": "Anyone experienced tuning/compiling llama.cpp for vulkan or rocm with mixed CPU + GPU offload? Trying to figure out if theres any more performance I can squeeze out of my system or whether I'm at a dead end. System is a Ryzen 5900X 64GB DDR4 @ 3866 + 9070XT 16GB. Using the default vulkan build of llama.cpp and spending a lot of time tuning batch sizes, I can now run Qwen 3.5 122B IQ4_XS @ 200 t/s PP and 15 t/s TG. Great for one-shotting and simple prompts, but that kind PP speed is still painful to use in agentic frameworks with a lot of tools. I tried the lemonade rocm build and got better PP but MUCH worse TG.\n\nAre there any other llama.cpp tunings that will make a meaningful difference to PP speeds? Is it worth compiling with a BLAS backend? Is there a different version of rocm I should try building with?",
+      "tps": [
+        200.0,
+        15.0,
+        200.0,
+        15.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1478523359531634768",
+      "month": "2026-03",
+      "timestamp": "Tuesday, March 3, 2026 2:43\u202fPM",
+      "tier": "inferred_model",
+      "model": "qwen3.5-27b",
+      "hardware": "rtx-2080-ti",
+      "quantization": "",
+      "speed": "15T/s \u00b7 15 tok/s, 15 tok/s, 15 tok/s",
+      "message": "I get a whopping 15T/s for the 27B Qwen3.5 spanned across 4 RTX 2080 Ti, or across 2, or just on one. I knew something was weird with vllm",
+      "tps": [
+        15.0,
+        15.0,
+        15.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1478982383477723206",
+      "month": "2026-03",
+      "timestamp": "Wednesday, March 4, 2026 9:07\u202fPM",
+      "tier": "inferred_model",
+      "model": "llama 3 7b",
+      "hardware": "m3-ultra, m5, m4, m3",
+      "quantization": "",
+      "speed": "~185tps, ~220tps, ~600tps, ~1700tps, ~4500tps \u00b7 185 tok/s, 220 tok/s, 600 tok/s, 1700 tok/s",
+      "message": "If the M4 base vs M5 base is any example, Im expecting to see a big prompt processing improvement. The numbers from that were wild. Someone had posted the llama.cpp automated test benchmarks before, but for llama 3 7b (I think that was the model), the M3 base had around ~185tps prompt processing, M4 base had around ~220tps prompt processing, and M5 base had around ~600tps prompt processing.\n\nSo given that jump, if we saw the same for the M3 Ultra which was around 1700tps prompt processing on that model, the the M5 Ultra could conceivably be... around 4500tps or so?",
+      "tps": [
+        185.0,
+        220.0,
+        600.0,
+        1700.0,
+        4500.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1479185095771426886",
+      "month": "2026-03",
+      "timestamp": "Thursday, March 5, 2026 10:33\u202fAM",
+      "tier": "inferred_model",
+      "model": "qwen3.5-35b-a3b",
+      "hardware": "m1, m1-max",
+      "quantization": "MXFP4_MOE",
+      "speed": "PP 344 tok/s, Token Gen 10 tok/s \u00b7 344 tok/s, 10 tok/s, 330 tok/s, 20 tok/s",
+      "message": "M1 Max results from the latest unsloth:\n unsloth/Qwen3.5-35B-A3B-GGUF:MXFP4_MOE - PP 344 tok/s & Token Gen 10 tok/s\nunsloth/Qwen3.5-35B-A3B-GGUF:UD-Q4_K_XL - PP 330 tok/s & Token Gen 20 tok/s",
+      "tps": [
+        344.0,
+        10.0,
+        330.0,
+        20.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1481455666018390048",
+      "month": "2026-03",
+      "timestamp": "Wednesday, March 11, 2026 5:55\u202fPM",
+      "tier": "inferred_model",
+      "model": "qwen3.5-35b-a3b",
+      "hardware": "rtx-4090, m1, m1-max",
+      "quantization": "Q8_0",
+      "speed": "339.15 tokens/s PP, 9.42 t/s TG, 4505.38 tokens/s PP, 94 t/s TG \u00b7 339.15 tok/s, 9.42 tok/s, 4505.38 tok/s, 94 tok/s",
+      "message": "No difference with the llama.cpp GDN stuff, the numbers are still really bad. This is for the same model unsloth/Qwen3.5-35B-A3B-Q8_0.gguf with KV at Q8\nM1 Max: 339.15 tokens/s PP and 9.42 t/s TG \n4090: 4505.38 tokens/s PP and 94 t/s TG",
+      "tps": [
+        339.15,
+        9.42,
+        4505.38,
+        94.0,
+        9.42,
+        94.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1483223124156616704",
+      "month": "2026-03",
+      "timestamp": "Monday, March 16, 2026 2:59\u202fPM",
+      "tier": "inferred_model",
+      "model": "qwen3.5-27b",
+      "hardware": "rtx-3090",
+      "quantization": "q4",
+      "speed": "20tok/s \u00b7 20 tok/s, 20 tok/s",
+      "message": "27b at q4 gets me around 20tok/s, which is much slower than what people with 3090 have been reporting",
+      "tps": [
+        20.0,
+        20.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1468212407473016842",
+      "month": "2026-02",
+      "timestamp": "Tuesday, February 3, 2026 3:51\u202fAM",
+      "tier": "full",
+      "model": "glm-4.7-flash",
+      "hardware": "p40s",
+      "quantization": "Q4_K_M",
+      "speed": "40 t / s",
+      "message": "that's very odd, i get 40 t / s on p40s with this quant: GLM-4.7-Flash-Q4_K_M.gguf",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1468227570716901612",
+      "month": "2026-02",
+      "timestamp": "Tuesday, February 3, 2026 4:52\u202fAM",
+      "tier": "full",
+      "model": "glm-4.7-flash",
+      "hardware": "mi50, vulkan, ROCm",
+      "quantization": "Q4_K_XL",
+      "speed": "38tps, 13tps \u00b7 38 tok/s, 13 tok/s",
+      "message": "yes it slow, on mi50 on vulkan i am getting GLM-4.7-Flash-REAP-23B-A3B-UD-Q4_K_XL.gguf, 38tps. But can you try using vulkan, as the same model e.g. on ROCM gives me 13tps",
+      "tps": [
+        38.0,
+        13.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1468256183717462274",
+      "month": "2026-02",
+      "timestamp": "Tuesday, February 3, 2026 6:45\u202fAM",
+      "tier": "full",
+      "model": "qwen3-coder-30b",
+      "hardware": "MI50",
+      "quantization": "Q4_K_M",
+      "speed": "54tps \u00b7 14 tok/s, 13 tok/s, 29 tok/s, 24 tok/s",
+      "message": "MI50 - ROCM (7.x) (--batch-size 512 --ubatch-size 512)\nDeepSeek-R1-Distill-Qwen-32B-Q4_K_M.gguf, kvcache q8_0, fa - 14tps\n + DeepSeek-R1-DRAFT-0.6B-v3.0.i1-Q4_K_M.gguf - 13tps\nDeepSeek-R1-Distill-Qwen-14B-Q4_K_M.gguf, kvcache q8_0, fa - 29tps\n + DeepSeek-R1-DRAFT-0.6B-v3.0.i1-Q4_K_M.gguf - 24tps\nDeepSeek-R1-Distill-Qwen-7B-Q4_K_M.gguf, kvcache q8_0, fa - 54tps\nDeepSeek-R1-Distill-Llama-8B-Q4_K_M.gguf, kvcache q8_0, fa - 52tps\ngpt-oss-20b-Q6_K.gguf, kvcache q8_0, fa - 75tps\nGLM-4.7-Flash-REAP-23B-A3B-UD-Q4_K_XL.gguf, kvcache q8_0, fa - 13tps\nQwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf, kvcache q8_0, fa - 54tps\nQwen3-Coder-30B-A3B-Instruct-UD-Q4_K_XL.gguf, kvcache q8_0, fa - 54tps\ndeepseek-coder-6.7b-instruct.i1-Q6_K.gguf, kvcache q8_0, fa - 54tps\n + qwen2.5-0.5b-instruct-q4_k_m.gguf - 44tps\n + DeepSeek-R1-DRAFT-Qwen2.5-Coder-0.5B-Q4_K_M.gguf - 37tps\n + DeepSeek-R1-DRAFT-Qwen2.5-Coder-0.5B-Q8_0.gguf - 40tps\nDevstral-Small-2-24B-Instruct-2512-UD-Q4_K_XL.gguf, kvcache q8_0, fa - 20tps\n + Mistral-Small-3.1-DRAFT-0.5B-Q8_0.gguf - 20tps\nqwen2.5-coder-32b-instruct-q4_k_m.gguf, kvcache q8_0, fa - 14tps\n + qwen2.5-0.5b-instruct-q4_k_m.gguf - 18tps\n + qwen2.5-0.5b-instruct-q8_0.gguf - 18tps\n + Qwen2.5-Coder-0.5B-QwQ-draft.i1-Q4_K_M.gguf - 17tps\n + DeepSeek-R1-DRAFT-0.5B-v1.0.Q8_0.gguf 9,6tps\nQwen2.5-Coder-14B-Instruct-Q4_K_L.gguf, kvcache q8_0, fa - 29tps\nqwen2.5-coder-7b-instruct-q4_k_m.gguf, kvcache q8_0, fa - 54tps\n + DeepSeek-R1-DRAFT-0.5B-v1.0.Q8_0.gguf - 25tps\n + Qwen_Qwen3-0.6B-Q8_0.gguf - 41tps\n + Qwen3-Coder-Instruct-DRAFT-0.75B-32k-Q4_0.gguf - 48tps\nqwen2.5-coder-3b-instruct-q4_k_m.gguf, kvcache q8_0, fa - 85tps\n\nMI50 - Vulkan (--batch-size 512 --ubatch-size 512)\nDeepSeek-Coder-V2-Lite-Instruct.i1-Q4_0.gguf, kvcache q8_0, fa - 93tps\n+ Qwen_Qwen3-0.6B-Q4_K_M.gguf - 25tps\nGLM-4.7-Flash-REAP-23B-A3B-UD-Q4_K_XL.gguf, kvcache q8_0, fa - 38tps\ngpt-oss-20b-Q6_K.gguf - 71tps\nQwen3-Coder-30B-A3B-Instruct-UD-Q4_K_XL.gguf - 15tps",
+      "tps": [
+        14.0,
+        13.0,
+        29.0,
+        24.0,
+        54.0,
+        52.0,
+        75.0,
+        13.0,
+        54.0,
+        54.0,
+        54.0,
+        44.0,
+        37.0,
+        40.0,
+        20.0,
+        20.0,
+        14.0,
+        18.0,
+        18.0,
+        17.0,
+        6.0,
+        29.0,
+        54.0,
+        25.0,
+        41.0,
+        48.0,
+        85.0,
+        93.0,
+        25.0,
+        38.0,
+        71.0,
+        15.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1468725965420236801",
+      "month": "2026-02",
+      "timestamp": "Wednesday, February 4, 2026 1:52\u202fPM",
+      "tier": "full",
+      "model": "qwen3-coder-next",
+      "hardware": "4070 12gb + 64gb ddr5 6000mhz + 7950x",
+      "quantization": "q4_0",
+      "speed": "476.17 tokens per second \u00b7 29883 tok/s, 307.05 tok/s, 1672 tok/s, 25.54 tok/s",
+      "message": "with (4070 12gb + 64gb ddr5 6000mhz + 7950x)\n\nllama-server -m \"C:\\Users\\maxkr.lmstudio\\models\\unsloth\\Qwen3-Coder-Next-GGUF\\Qwen3-Coder-Next-Q4_K_M.gguf\" --ctx-size $(1024*40) --batch-size 512 --parallel 1 --threads 12 --flash-attn on -ctvd q4_0 -ctkd q4_0 --fit on --temp 1.0 --top-p 0.95 --min-p 0.01 --top-k 40 --jinja\n\nand \n\nllama_params_fit_impl: projected to use 47426 MiB of device memory vs. 11014 MiB of free device memory\nllama_params_fit_impl: cannot meet free memory target of 1024 MiB, need to reduce device memory by 37436 MiB\nllama_params_fit_impl: context size set by user to 40960 -> no change\nllama_params_fit_impl: with only dense weights in device memory there is a total surplus of 6947 MiB\nllama_params_fit_impl: filling dense-only layers back-to-front:\nllama_params_fit_impl: - CUDA0 (NVIDIA GeForce RTX 4070): 49 layers, 4038 MiB used, 6975 MiB free\nllama_params_fit_impl: converting dense-only layers to full layers and filling them front-to-back with overflow to next device/system memory:\nllama_params_fit_impl: - CUDA0 (NVIDIA GeForce RTX 4070): 49 layers (42 overflowing), 9891 MiB used, 1122 MiB free\n\nand a random 30k token input prompt (some log), i get\n\nslot init_sampler: id 0 | task 3 | init sampler, took 2.34 ms, tokens: text = 29883, total = 29883\nslot update_slots: id 0 | task 3 | created context checkpoint 1 of 8 (pos_min = 29818, pos_max = 29818, size = 75.376 MiB)\nslot print_timing: id 0 | task 3 |\nprompt eval time = 97323.22 ms / 29883 tokens ( 3.26 ms per token, 307.05 tokens per second)\n eval time = 65468.14 ms / 1672 tokens ( 39.16 ms per token, 25.54 tokens per second)\n total time = 162791.36 ms / 31555 tokens\nslot release: id 0 | task 3 | stop processing: n_tokens = 31554, truncated = 0",
+      "tps": [
+        29883.0,
+        307.05,
+        1672.0,
+        25.54,
+        31555.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1468961993380593877",
+      "month": "2026-02",
+      "timestamp": "Thursday, February 5, 2026 5:30\u202fAM",
+      "tier": "full",
+      "model": "qwen3-30b-a3b",
+      "hardware": "DGX Spark",
+      "quantization": "NVFP4 = 4-bit floating point quantization, Q4_K_M (GGUF) ~4.5 bits",
+      "speed": "~1,285 tok/s at 96 concurrent, 67 tok/s single, 665 tok/s 32 conc, 1,018 tok/s 64 conc \u00b7 285 tok/s, 67 tok/s, 665 tok/s, 18 tok/s",
+      "message": "DGX Spark - Peak performance at 96 concurrent: ~1,285 tok/s\n\nThe throughput dips around 112-128 (likely KV cache pressure) then recovers.\n\nFinal Benchmark Summary\nBackend Model Single 32 Conc 64 Conc 96 Conc\nvLLM NVFP4 Qwen3-30B-A3B 67 tok/s 665 tok/s 1,018 tok/s 1,285 tok/s\nvLLM BF16 Qwen3-30B-A3B 30 tok/s 241 tok/s 385 tok/s \u2014\nOllama Q4_K_M Nemotron-3-Nano 74 tok/s 83 tok/s \u2014 \u2014\nKey takeaways:\n\nNVFP4 + vLLM = 15x better concurrent throughput than Ollama\nSweet spot: 80-96 concurrent requests\nYour setup now matches your friend's performance\nThe Docker command for future reference:\n\ndocker run -d --name vllm-qwen3-fp4 --gpus all \\\n -p 8355:8000 \\\n -v ~/.cache/huggingface:/root/.cache/huggingface \\\n --ipc=host --entrypoint python3 \\\n scitrera/dgx-spark-vllm:0.14.0-t5 \\\n -m vllm.entrypoints.openai.api_server \\\n --model nvidia/Qwen3-30B-A3B-NVFP4 \\\n --host 0.0.0.0 --port 8000 \\\n --gpu-memory-utilization 0.80 \\\n --trust-remote-code \\\n --enable-prefix-caching \\\n --enable-chunked-prefill\nHow quantized is this\nNVFP4 = 4-bit floating point quantization\n\nPrecision Bits/Weight Model Size Memory\nBF16 16 bits ~60 GB Full precision\nFP8 8 bits ~30 GB 2x compression\nNVFP4 4 bits ~15 GB 4x compression\nQ4_K_M (GGUF) ~4.5 bits ~17 GB Similar to FP4\nNVFP4 is NVIDIA's proprietary 4-bit floating-point format optimized for their GPUs. It uses:\n\n4-bit weights with per-block scaling factors\nFP8 KV cache (as seen in the logs: kv_cache_dtype=fp8_e4m3)\nHardware-accelerated GEMM via flashinfer-cutlass\nThe quality trade-off is minimal for most tasks - you lose maybe 1-2% on benchmarks vs BF16, but gain:\n\n4x less memory \u2192 more KV cache headroom\nFaster inference (memory bandwidth is the bottleneck)\nHigher concurrent throughput",
+      "tps": [
+        285.0,
+        67.0,
+        665.0,
+        18.0,
+        285.0,
+        30.0,
+        241.0,
+        385.0,
+        74.0,
+        83.0,
+        665.0,
+        1.0,
+        1.0,
+        241.0,
+        385.0,
+        83.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1471202135554392178",
+      "month": "2026-02",
+      "timestamp": "Wednesday, February 11, 2026 9:52\u202fAM",
+      "tier": "full",
+      "model": "GLM-5",
+      "hardware": "4\u00d7 RTX Pro 6000 Blackwell Max-Q",
+      "quantization": "FP4",
+      "speed": "50-60 tokens/second \u00b7 60 tok/s",
+      "message": "GLM-5 Size Summary: \n\n Current (HuggingFace): \n\nFP16: 1.51 TB (1,490 GiB)\n\n FP4 Quantized + Q8 KV Cache: \n\nModel: 347 GiB \n\nKV cache ( 128K tokens , Q8): 4.2 GiB \n\n Total: ~351 GiB \n\n Your 4\u00d7 RTX Pro 6000 Blackwell Max-Q: \n\n384 GiB VRAM total\n\n Fits with ~33 GiB headroom \n\nContext: 128K tokens \n\nEstimated speed: 50-60 tokens/second\n\nThat's sonnets estimate",
+      "tps": [
+        60.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1471627025436381246",
+      "month": "2026-02",
+      "timestamp": "Thursday, February 12, 2026 2:00\u202fPM",
+      "tier": "full",
+      "model": "qwen3-235b",
+      "hardware": "3090s, 4070",
+      "quantization": "Q8, Q2, q4",
+      "speed": "52 T/s \u00b7 52 tok/s, 52 tok/s",
+      "message": "Did some experimenting with GPT-OSS, don't like it, currently playing with Q8 4.7-Flash, its pretty good, not as clever as Q2 big GLM 4.7, but its a shitload faster getting 52 T/s probably be even faster if I limited the cards it used to just the 3090s and the 4070. \n\nGonna give Qwen3 235b q4 a go see how it cooks in a min",
+      "tps": [
+        52.0,
+        52.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1472667153324048455",
+      "month": "2026-02",
+      "timestamp": "Sunday, February 15, 2026 10:53\u202fAM",
+      "tier": "full",
+      "model": "glm-4.7-flash",
+      "hardware": "5070Ti, 9800X3D, 32GB of RAM",
+      "quantization": "Q4_K_XL",
+      "speed": "~40-50t/s \u00b7 50 tok/s, 50 tok/s, 50 tok/s",
+      "message": "If I am running llama-server and getting ~40-50t/s with a 5070Ti & 9800X3D w/ 32GB of RAM using GLM-4.7-Flash-UD-Q4_K_XL.gguf , does that sound like good performance?",
+      "tps": [
+        50.0,
+        50.0,
+        50.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1472694357248180328",
+      "month": "2026-02",
+      "timestamp": "Sunday, February 15, 2026 12:41\u202fPM",
+      "tier": "full",
+      "model": "qwen3-vl",
+      "hardware": "4060",
+      "quantization": "4 bit, q8_0",
+      "speed": "1-2 minutes",
+      "message": "So im running my 2nd pc with Qwen 3 vl 4b (4 bit)\n\nIm using openweb ui and i have plenty of vram for it. Ollama as the backend ofc. Anyone know why the vision recognition is so slow? It takes 1-2 minutes while fully loaded into my 4060.\n\nIve tried setting ollama flash attention to 1, kv cache type to q8_0, and even shortening context lenght",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1473239439005454386",
+      "month": "2026-02",
+      "timestamp": "Tuesday, February 17, 2026 12:47\u202fAM",
+      "tier": "full",
+      "model": "qwen3-coder-30b",
+      "hardware": "5060 ti 16GB",
+      "quantization": "fp4, MXFP4",
+      "speed": "1,5-2x faster",
+      "message": "I am having a 5060 ti 16GB here, and just got it to check the advantanges for fp4. Until now i ran with MOE_MXFP4 using llama.cpp, some models are smaller like Qwen3-Coder-REAP-25B-A3B-i1-MXFP4_MOE.gguf which is great 'cos they can fit into vram memory. But i read that the usage of fp4 should run like 1,5-2x faster, but can't see any advantages on the 5060 ti. Any hints?",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1474734107777957978",
+      "month": "2026-02",
+      "timestamp": "Saturday, February 21, 2026 3:46\u202fAM",
+      "tier": "full",
+      "model": "qwen3-coder-next",
+      "hardware": "128GB MBP",
+      "quantization": "8bit",
+      "speed": "2 minutes (~30k context)",
+      "message": "Mac's are crazy slow at prompt processing. I still use a 128GB MBP as my primary compute. I loaded up Qwen 3 Coder Next 8bit and did some Cline with local LLM and found it took like 2 minutes for \"hello cline\" to prompt process (~30k context)",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1475295874379943957",
+      "month": "2026-02",
+      "timestamp": "Sunday, February 22, 2026 4:59\u202fPM",
+      "tier": "full",
+      "model": "minimax-m2.5",
+      "hardware": "Mac Studio",
+      "quantization": "q8_0",
+      "speed": "294.31 tokens per second \u00b7 37079 tok/s, 294.31 tok/s, 1354 tok/s, 22.62 tok/s",
+      "message": "Ok, Minimax 2.5 q8_0 on the Mac Studio is amazing. Quality + speed has been a very pleasant surprise\n\n [57323] prompt eval time = 125984.38 ms / 37079 tokens ( 3.40 ms per token, 294.31 tokens per second)\n[57323] eval time = 59863.24 ms / 1354 tokens ( 44.21 ms per token, 22.62 tokens per second)\n[57323] total time = 185847.61 ms / 38433 tokens \n\nThis is a 40k context prompt. Total time to respond: about 3 minutes.\n\nI know that seems like a long time for most folks, but on a mac when sending a prompt that big? It's really fast comparatively",
+      "tps": [
+        37079.0,
+        294.31,
+        1354.0,
+        22.62,
+        38433.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1475981644996415539",
+      "month": "2026-02",
+      "timestamp": "Tuesday, February 24, 2026 2:24\u202fPM",
+      "tier": "full",
+      "model": "qwen3.5-35b-a3b",
+      "hardware": "8GB VRAM GPU / DDR4 8c CPU",
+      "quantization": "without kv quantization",
+      "speed": "30t/s \u00b7 30 tok/s, 30 tok/s, 30 tok/s",
+      "message": "I'll try that, thanks. I'm really happy with it right now, I can run the 35b model at full context without kv quantization on a 8GB VRAM GPU / DDR4 8c CPU and have it run at 30t/s even on 60k context. I think this might be the perfect model for my hardware",
+      "tps": [
+        30.0,
+        30.0,
+        30.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1476023831369089046",
+      "month": "2026-02",
+      "timestamp": "Tuesday, February 24, 2026 5:11\u202fPM",
+      "tier": "full",
+      "model": "qwen3.5-35b-a3b",
+      "hardware": "5070ti/5060ti",
+      "quantization": "MXFP4",
+      "speed": "70 tok/s \u00b7 70 tok/s",
+      "message": "woah Qwen3.5-35B-A3B-MXFP4_MOE.gguf is really fast, and its workflow and output from some of my personal tests are looking very promising! 70 tok/s on my 5070ti/5060ti with 131k context is nuts!\n\ndecided to test it after seeing this post https://www.reddit.com/r/LocalLLaMA/comments/1rdxfdu/qwen3535ba3b_is_a_gamechanger_for_agentic_coding/",
+      "tps": [
+        70.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1476132566993207350",
+      "month": "2026-02",
+      "timestamp": "Wednesday, February 25, 2026 12:23\u202fAM",
+      "tier": "full",
+      "model": "35b q8_0",
+      "hardware": "12gb vram",
+      "quantization": "q8_0",
+      "speed": "30t/s \u00b7 30 tok/s, 30 tok/s, 30 tok/s",
+      "message": "for what its worth, the 35b q8_0 on 12gb vram also runs at 30t/s",
+      "tps": [
+        30.0,
+        30.0,
+        30.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1476719169121550358",
+      "month": "2026-02",
+      "timestamp": "Thursday, February 26, 2026 3:14\u202fPM",
+      "tier": "full",
+      "model": "qwen3.5-27b",
+      "hardware": "RTX 4090, Mac Studio M3 Ultra",
+      "quantization": "Q4_K_M",
+      "speed": "337.35 tokens per second; 20.17 tokens per second; 1528.55 tokens per second; 34.19 tokens per second \u00b7 337.35 tok/s, 20.17 tok/s, 1528.55 tok/s, 16.7 tok/s",
+      "message": "In case anyone was curious, I did a quick speed check\n\n Qwen3.5 27b Q4_K_M on RTX 4090 and on Mac Studio M3 Ultra\n\nM3 Ultra Mac Studio 512GB RAM:\n\nPrompt Eval: 337.35 tokens per second ; it took 46 seconds to process 15.6k tokens\n\nPrompt Generation: 20.17 tokens per second \n\nRTX 4090 on Windows 10:\n\nPrompt Eval: 1528.55 tokens per second ; it took 10 seconds to process 16.7 tokens\n\nPrompt Generation: 34.19 tokens per second",
+      "tps": [
+        337.35,
+        20.17,
+        1528.55,
+        16.7,
+        34.19
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1476911807481249946",
+      "month": "2026-02",
+      "timestamp": "Friday, February 27, 2026 4:00\u202fAM",
+      "tier": "full",
+      "model": "coder next q8",
+      "hardware": "pcie limits",
+      "quantization": "q8",
+      "speed": "25-30 t/s \u00b7 30 tok/s, 30 tok/s",
+      "message": "I get same 25-30 t/s on coder next q8, hitting some pcie limits i think. Not rly getting better speeds for lower Q. And q8 gets better job done in coding.",
+      "tps": [
+        30.0,
+        30.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1477391009196282041",
+      "month": "2026-02",
+      "timestamp": "Saturday, February 28, 2026 11:44\u202fAM",
+      "tier": "full",
+      "model": "qwen3.5-27b",
+      "hardware": "A100 (*80G)",
+      "quantization": "FP8",
+      "speed": "~80T/s \u00b7 80 tok/s, 80 tok/s, 80 tok/s",
+      "message": "I don't know if you're still looking for this, but I'm running qwen3.5-27B-FP8 with vllm (w/ FLASHINFER) on A100 (*80G) and get good performance (~80T/s)",
+      "tps": [
+        80.0,
+        80.0,
+        80.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1477575742736039986",
+      "month": "2026-02",
+      "timestamp": "Saturday, February 28, 2026 11:58\u202fPM",
+      "tier": "full",
+      "model": "qwen3.5-35b-a3b",
+      "hardware": "23.562Gi, 23.988Gi of vram",
+      "quantization": "MXFP4_MOE-GGUF",
+      "speed": "53.90 tokens/second \u00b7 1013 tok/s, 53.9 tok/s",
+      "message": "about to try out https://huggingface.co/noctrex/Qwen3.5-35B-A3B-MXFP4_MOE-GGUF \n\nEDIT -- 1013 tokens context window, 1 concurrent slot, 39 layers on GPU yielding 53.90 tokens/second \nthis is using 23.562Gi/23.988Gi of vram",
+      "tps": [
+        1013.0,
+        53.9
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1468121090269122611",
+      "month": "2026-02",
+      "timestamp": "Monday, February 2, 2026 9:49\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "gpt-oss-120b",
+      "hardware": "radeon 780u",
+      "quantization": "",
+      "speed": "20tps \u00b7 20 tok/s, 3 tok/s",
+      "message": "just as a reference, gpt-oss-120 runs 20tps on 7940hs igpu i.e. radeon 780u. I use 128gb ddr5 5600 and assign 118gb aa gtt to the igpu. It os not blazing fast, but also better than 1-3 tps.",
+      "tps": [
+        20.0,
+        3.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1468210808407326943",
+      "month": "2026-02",
+      "timestamp": "Tuesday, February 3, 2026 3:45\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "glm-4.7-flash",
+      "hardware": "96gb vram, 4x3090",
+      "quantization": "",
+      "speed": "40t/s \u00b7 40 tok/s, 40 tok/s, 40 tok/s",
+      "message": "hello any suggestion to what model is good and fast for 96gb vram ? glm 4.7 flash is slow.. only getting 40t/s (4x3090)",
+      "tps": [
+        40.0,
+        40.0,
+        40.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1468618446391476309",
+      "month": "2026-02",
+      "timestamp": "Wednesday, February 4, 2026 6:45\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3",
+      "hardware": "single A100",
+      "quantization": "",
+      "speed": "> 10,000 T/s PP",
+      "message": "prompt processing in vllm for qwen3-next is very fast (I see > 10,000 T/s PP - practically speaking, it can process the whole 262k context in ~1.6 min on a single A100), it's not an arch problem, it's an optimization problem for llama.cpp. If the model is popular, I'm sure it will improve though, as you say",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1468720481782992948",
+      "month": "2026-02",
+      "timestamp": "Wednesday, February 4, 2026 1:30\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3-coder-next",
+      "hardware": "4x RTX 2080 Ti (88GB VRAM), wx2990 w/ 128GB RAM",
+      "quantization": "gguf",
+      "speed": "450T/s and 550T/s \u00b7 450 tok/s, 550 tok/s, 476.17 tok/s, 277 tok/s",
+      "message": "If anyone has tried it, what's your prompt processing speed look like for the GGUF version of Qwen3-Coder-Next?\n\nI am seeing between 450T/s and 550T/s depending on the context size. I have 4x RTX 2080 Ti (88GB VRAM) and a wx2990 w/ 128GB RAM\n\n[38041] prompt eval time = 145091.96 ms / 69089 tokens ( 2.10 ms per token, 476.17 tokens per second)\n[38041] eval time = 6081.94 ms / 277 tokens ( 21.96 ms per token, 45.54 tokens per second)\n[38041] total time = 151173.91 ms / 69366 tokens\n[38041] slot release: id 3 | task 0 | stop processing: n_tokens = 69365, truncated = 0\n\nAlso, has anyone had any luck with self-speculative decoding for this model? I always get \"the tokens of sequence 3 in the input batch have inconsistent sequence positions\" and it errors out for this one.",
+      "tps": [
+        450.0,
+        550.0,
+        476.17,
+        277.0,
+        45.54,
+        450.0,
+        550.0,
+        450.0,
+        550.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1473571410692673677",
+      "month": "2026-02",
+      "timestamp": "Tuesday, February 17, 2026 10:46\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwencode",
+      "hardware": "12gb vram, 64gb ram",
+      "quantization": "",
+      "speed": "33t/s \u00b7 33 tok/s, 33 tok/s, 33 tok/s",
+      "message": "12gb vram, 64gb ram, heavily offloaded, runs at 33t/s with 64k context so its usable enough. currently with qwencode, heard good things with cline and kilo though",
+      "tps": [
+        33.0,
+        33.0,
+        33.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1475946386678878339",
+      "month": "2026-02",
+      "timestamp": "Tuesday, February 24, 2026 12:04\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3-coder-30b",
+      "hardware": "8GB VRAM RTX 3070 Laptop",
+      "quantization": "",
+      "speed": "30t/s at 64k context \u00b7 30 tok/s, 15 tok/s, 30 tok/s, 15 tok/s",
+      "message": "This is fantastic on my 8GB VRAM RTX 3070 Laptop, 30t/s at 64k context. Compared to 15t/s with qwen3 coder",
+      "tps": [
+        30.0,
+        15.0,
+        30.0,
+        15.0,
+        30.0,
+        15.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1476044817489199277",
+      "month": "2026-02",
+      "timestamp": "Tuesday, February 24, 2026 6:35\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "0.6B model",
+      "hardware": "google colab t4",
+      "quantization": "",
+      "speed": "1000 t/s \u00b7 1000 tok/s, 1000 tok/s",
+      "message": "i can get 1000 t/s throughput for a 0.6B model on a google colab t4 using some special arguments for Transformers, can only imagine what an A100 could do.",
+      "tps": [
+        1000.0,
+        1000.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1476708296046940374",
+      "month": "2026-02",
+      "timestamp": "Thursday, February 26, 2026 2:31\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-35b-a3b",
+      "hardware": "5070ti/5060ti 16gb setup",
+      "quantization": "",
+      "speed": "72tps \u00b7 72 tok/s",
+      "message": "whew, couldnt get any of the Qwen3.5-35B-A3Bs to work nicely in opencode, i think its a command parsing issue on the edit command it couldnt edit anything, i readded the --jinja flag and it fixed it, its sooooooo good and fast holy shit, 72tps on 5070ti/5060ti 16gb setup with opencode, will use that flag until things are ironed out more",
+      "tps": [
+        72.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1477189280110743655",
+      "month": "2026-02",
+      "timestamp": "Friday, February 27, 2026 10:22\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3.5-27b",
+      "hardware": "3070 with 8gb vram",
+      "quantization": "",
+      "speed": "<1t/s \u00b7 1 tok/s, 1 tok/s, 1 tok/s",
+      "message": "I'm running a 3070 with 8gb vram, I'd like to try out a model that supports toolcalling that fits inside that GPU for speed\nI know I might be asking for a unicorn here, but is there anything like that that exists?\nI'm trying out the smallest qwen 3.5 I can find (27b) but that's like <1t/s",
+      "tps": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1468981447678234825",
+      "month": "2026-02",
+      "timestamp": "Thursday, February 5, 2026 6:47\u202fAM",
+      "tier": "inferred_model",
+      "model": "qwen3-30b-a3b",
+      "hardware": "dgx-spark",
+      "quantization": "NVFP4",
+      "speed": "67 tok/s single, 665 tok/s 32 conc, 1,018 tok/s 64 conc \u00b7 67 tok/s, 665 tok/s, 18 tok/s, 30 tok/s",
+      "message": "Nemotron-3-Nano vLLM Results\nModel Quantization Single 32 Conc 64 Conc\nQwen3-30B-A3B NVFP4 67 tok/s 665 tok/s 1,018 tok/s\nQwen3-30B-A3B BF16 30 tok/s 241 tok/s 385 tok/s\nNemotron-3-Nano BF16 28 tok/s 181 tok/s 285 tok/s\nNemotron-3-Nano NVFP4 (Not supported)\nKey findings:\n\nNemotron NVFP4 on vLLM fails with \"No NvFp4 MoE backend supports the deployment configuration\" - the hybrid Mamba-2 + MoE architecture isn't fully supported with NVFP4 quantization yet\n\nNemotron BF16 works but is slower than Qwen NVFP4 because:\n\nBF16 uses ~60GB vs ~15GB for NVFP4\nLess KV cache headroom = less batching efficiency\nFor best vLLM performance on DGX Spark: Use Qwen3-30B-A3B-NVFP4 (~1,000+ tok/s at high concurrency)\n\nFor Nemotron: Ollama (Q4_K_M) remains the best option at ~74 tok/s single-request",
+      "tps": [
+        67.0,
+        665.0,
+        18.0,
+        30.0,
+        241.0,
+        385.0,
+        28.0,
+        181.0,
+        285.0,
+        74.0,
+        665.0,
+        1.0,
+        241.0,
+        385.0,
+        181.0,
+        285.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1474844825571430551",
+      "month": "2026-02",
+      "timestamp": "Saturday, February 21, 2026 11:06\u202fAM",
+      "tier": "inferred_model",
+      "model": "qwen3-235b",
+      "hardware": "m3-ultra, m2-ultra",
+      "quantization": "Q4_K_XL",
+      "speed": "107.41 tokens per second \u00b7 4186 tok/s, 107.41 tok/s, 4000 tok/s, 13.3 tok/s",
+      "message": "Here is GLM 5 UD-Q4_K_XL \n\nAt 5,000 tokens\n [55269] prompt eval time = 38973.27 ms / 4186 tokens ( 9.31 ms per token, 107.41 tokens per second)\n[55269] eval time = 300647.12 ms / 4000 tokens ( 75.16 ms per token, 13.30 tokens per second)\n[55269] total time = 339620.39 ms / 8186 tokens \n\nAt 14,000 tokens\n\n [55269] prompt eval time = 152092.60 ms / 12795 tokens ( 11.89 ms per token, 84.13 tokens per second)\n[55269] eval time = 59703.18 ms / 658 tokens ( 90.73 ms per token, 11.02 tokens per second)\n[55269] total time = 211795.78 ms / 13453 tokens \n\nHere are other benchmarks for models of various sizes and types (dense or MoE || gguf or mlx)\n\n https://www.someoddcodeguy.dev/here-are-some-real-world-speeds-for-the-mac-m2-ultra-in-case-you-were-curious/ \n\n https://www.someoddcodeguy.dev/real-world-speeds-on-the-mac-koboldcpp-context-shift-edition/ \n\n https://www.someoddcodeguy.dev/running-llama-3-1-405b-q6-and-command-a-111b-q8-on-m3-ultra-mac-studio/ \n\n https://www.someoddcodeguy.dev/m3-ultra-mac-studio-512gb-prompt-and-write-speeds-for-deepseek-v3-0-671b-gguf-q4_k_m-for-those-curious/ \n\n https://www.someoddcodeguy.dev/running-deepseek-r1-0528-q4_k_m-and-mlx-4-bit-on-a-mac-studio-m3/ \n\n https://www.someoddcodeguy.dev/mac-studio-m3-ultra-speeds-for-qwen3-235b-gpt-oss-120b-glm-4-5-and-deepseek-v3-1/ \n\n https://www.someoddcodeguy.dev/glm-4-6-mxfp4-vs-q8_0-gguf-speeds-on-mac-m3-ultra/",
+      "tps": [
+        4186.0,
+        107.41,
+        4000.0,
+        13.3,
+        8186.0,
+        12795.0,
+        84.13,
+        658.0,
+        11.02,
+        13453.0,
+        14.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1477370184045035704",
+      "month": "2026-02",
+      "timestamp": "Saturday, February 28, 2026 10:21\u202fAM",
+      "tier": "inferred_model",
+      "model": "qwen",
+      "hardware": "strix-halo",
+      "quantization": "",
+      "speed": "30 tok/s, 30 tok/s",
+      "message": "With these new Qwen models, Strix halo isn't as exciting any more if you use the 35B A3B/27B model because it does like <30 t/s which is much slower than just getting a GPU with VRAM",
+      "tps": [
+        30.0,
+        30.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1456689665636831368",
+      "month": "2026-01",
+      "timestamp": "Friday, January 2, 2026 8:44\u202fAM",
+      "tier": "full",
+      "model": "qwen3-30b-a3b",
+      "hardware": "Strix Halo, Strix Point",
+      "quantization": "Q5",
+      "speed": "~30tps, ~10tps \u00b7 30 tok/s, 10 tok/s",
+      "message": "Anyone here have a feel for how Strix Halo performs compared to Strix Point? I have a Strix point box running llama.cpp and I can get ~30tps on Qwen3-30b-a3b Q5. It drops to like 10tps at higher contexts.\n\nIm trying to decide if Strix Halo would be much of an improvement or if I\u2019d be able to run larger models at similar speeds. I haven\u2019t seen any head to head benchmarks or anything",
+      "tps": [
+        30.0,
+        10.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1457089987446177833",
+      "month": "2026-01",
+      "timestamp": "Saturday, January 3, 2026 11:15\u202fAM",
+      "tier": "full",
+      "model": "qwen3-235b",
+      "hardware": "~100G",
+      "quantization": "XS quant, Q3",
+      "speed": "5x faster",
+      "message": "I'm at right around this level of vram also (~100G) and no, qwen3 235B is just a hair too big to be good. The XS quant is slightly better, but it's not usable for other reasons (I run of of any useful context and need to quant the kv cache too much). Honestly though, it's way too chatty of a thinker for me, everything takes forever. gpt-oss-120b (full precision weights, kv cache, full context, 5x faster and 2-3x fewer tokens wasted thinking) is practically speaking 10x better than qwen3 235B Q3.",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1462003140063789110",
+      "month": "2026-01",
+      "timestamp": "Saturday, January 17, 2026 12:38\u202fAM",
+      "tier": "full",
+      "model": "8B models",
+      "hardware": "Ryzen 6800H 16gb DDR5 1stick and 680M iGPU",
+      "quantization": "Q4_K_M",
+      "speed": "6.5t/s \u00b7 6.5 tok/s, 6.5 tok/s, 6.5 tok/s",
+      "message": "My hardware is minipc with Ryzen 6800H 16gb DDR5 1stick and 680M iGPU. So i wouldnt run model like gpt5 at all(even fully on swap), while 8B models have around 6.5t/s with Q4_K_M quant. So it would take 76 hours for 1 answer. \n\nSo model is usefull for GPU clasters and datacenters, but not for me.\n\n(also it is loosing to gpt5 in other benchmarks)",
+      "tps": [
+        6.5,
+        6.5,
+        6.5
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1462870860967837718",
+      "month": "2026-01",
+      "timestamp": "Monday, January 19, 2026 10:06\u202fAM",
+      "tier": "full",
+      "model": "gpt-oss-20b",
+      "hardware": "14GB between 2 seperate gpus",
+      "quantization": "FP4",
+      "speed": "8-9 TPS \u00b7 9 tok/s",
+      "message": "Id say general use, maybe tailored towards coding. \n\nI dont have my new gpu yet, so im stuck with 14GB between 2 seperate gpus. I run my small models on my 2nd gpu and image gen (z image) on my main gpu. With everything open and gpt oss 20b (FP4) i get like 8-9 TPS/",
+      "tps": [
+        9.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1462940423747272899",
+      "month": "2026-01",
+      "timestamp": "Monday, January 19, 2026 2:42\u202fPM",
+      "tier": "full",
+      "model": "PersonaPlex model (7B at Q8)",
+      "hardware": "1x5090 and 1x3090",
+      "quantization": "Q8",
+      "speed": "sub 250ms latency \u00b7 250ms TTFT",
+      "message": "So, for you here, too. I set up some really, really impressive full-duplex-end-2-end audio demo with nv PersonaPlex model (7B at Q8) running on 1x5090 and 1x3090. Two instances talking to each other and you via mic/speaker, you can e.g. pose as showmaster having a trialogue with sub 250ms latency, barge-in and all that, IMHO indiscernible from real talk show. Link: https://jens-david-consulting.com Screenshot attached. Looking for feedback.",
+      "tps": [],
+      "ttft_ms": [
+        250.0
+      ]
+    },
+    {
+      "id": "1462949086092066973",
+      "month": "2026-01",
+      "timestamp": "Monday, January 19, 2026 3:17\u202fPM",
+      "tier": "full",
+      "model": "glm-4.7-flash",
+      "hardware": "2x RTX 3090, AMD Ryzen 9 9950X",
+      "quantization": "AWQ 4-bit",
+      "speed": "95 tokens/s, 80 tokens/s, 20\u201330 tokens/s \u00b7 95 tok/s, 80 tok/s, 30 tok/s",
+      "message": "Just got GLM-4.7-Flash (AWQ 4-bit) running via vLLM for use with Roo-Code, and the performance/intelligence ratio is impressive. Here\u2019s the breakdown for anyone looking to replicate this on a dual-GPU setup.\n\n Hardware: \n\n GPU: 2x RTX 3090\n\n CPU: AMD Ryzen 9 9950X\n\n Performance: \n\n Short Prompts: Hits ~95 tokens/s initially, settling into 80 tokens/s .\n\n Long Context (~15K): Maintains a very usable 20\u201330 tokens/s .\n\n Max Context: Set to 26,624 in this config.\n\n The \"MTP\" Gotcha: \nI tried using Multi-Token Prediction (MTP), but it was a disaster for coding. Accuracy dropped significantly (around 1% success on complex logic). Turning MTP off fixed the logic issues and saved about 5GB of VRAM , which is a huge win.\n\n Deployment (Podman/Docker): \nUsed a custom Dockerfile with the latest transformers to ensure support. \n\n podman run -it --rm \\\n --name glm-4.7-flash \\\n --device nvidia.com/gpu=all \\\n --ipc=host \\\n --network host \\\n -v ~/.cache/huggingface:/root/.cache/huggingface:z \\\n --entrypoint vllm \\\n glm-4.7-custom \\\n serve cyankiwi/GLM-4.7-Flash-AWQ-4bit \\\n --tensor-parallel-size 2 \\\n --tool-call-parser glm47 \\\n --reasoning-parser glm45 \\\n --enable-auto-tool-choice \\\n --served-model-name glm-4.7-flash \\\n --trust-remote-code \\\n --max-model-len 26624 \\\n --gpu-memory-utilization 0.94 \n\n Intelligence: \nEven Gemini agrees this model is punching above its weight. It handled complex high-performance Python requests (like multiprocessing.shared_memory without copying) flawlessly.\n\nModel link: cyankiwi/GLM-4.7-Flash-AWQ-4bit",
+      "tps": [
+        95.0,
+        80.0,
+        30.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1463169811411505255",
+      "month": "2026-01",
+      "timestamp": "Tuesday, January 20, 2026 5:54\u202fAM",
+      "tier": "full",
+      "model": "glm-4.7-flash",
+      "hardware": "Pixel 10 pro",
+      "quantization": "q2 K XL",
+      "speed": "2.4 t/s, 2.1 t/s, under 1 tok/s \u00b7 2.4 tok/s, 2.1 tok/s, 2.4 tok/s, 2.1 tok/s",
+      "message": "[ Prompt: 2.4 t/s | Generation: 2.1 t/s ] \nPixel 10 pro fresh restart\nLlama.cpp b7779 in termux\nGLM 4.7 flash UD q2 K XL\n1000 context (maximum before the whole phone crashes LOL)",
+      "tps": [
+        2.4,
+        2.1,
+        2.4,
+        2.1
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1463174818286272554",
+      "month": "2026-01",
+      "timestamp": "Tuesday, January 20, 2026 6:14\u202fAM",
+      "tier": "full",
+      "model": "glm-4.7-flash",
+      "hardware": "2 * 7900xtx",
+      "quantization": "Q4_K_XL, f16 KV cache",
+      "speed": "under 1 tok/s \u00b7 1 tok/s, 2 tok/s",
+      "message": "Anybody else getting terrible performance from GLM-4.7-Flash on llama.cpp?\n\nUsing unsloth/GLM-4.7-Flash-GGUF:Q4_K_XL with f16 KV cache, I'm getting under 1 tok/s\n\n2 * 7900xtx. All layers are on GPU\n\nSomething is clearly broken",
+      "tps": [
+        1.0,
+        2.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1461813912121905284",
+      "month": "2026-01",
+      "timestamp": "Friday, January 16, 2026 12:06\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "10B",
+      "hardware": "iGpu",
+      "quantization": "",
+      "speed": "73hours",
+      "message": "I like when its like\n\n\"Technicly this 10B model is better than GPT5 in 1 benchmark\"\n\nWhile it requars 1796 000 tokens of thinking before answer. Which will take aproximatly 73hours on my iGpu",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1463009861360025651",
+      "month": "2026-01",
+      "timestamp": "Monday, January 19, 2026 7:18\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3-coder-30b",
+      "hardware": "gfx1031, 32gb of ram",
+      "quantization": "",
+      "speed": "15-26tok/sec, 2tok/sec \u00b7 26 tok/s, 2 tok/s",
+      "message": "I'm currently using a 4.5 sonnet and qwen3 coder hybrid (from teichai, one of the only good hybrid makers I've seen), getting about 15-26tok/sec on LM studio (gfx1031 and 32gb of ram)\nWondering if there's a better model I can use without sacrificing speed\nWas recommended devstral but max I can get is 2tok/sec, which I can't really use\nTrying nemotron 14b hybrid now, but asking for a couple opinions",
+      "tps": [
+        26.0,
+        2.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1464932403750633583",
+      "month": "2026-01",
+      "timestamp": "Sunday, January 25, 2026 2:38\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3-coder-30b",
+      "hardware": "RTX 3070, 32GB RAM",
+      "quantization": "",
+      "speed": "33t/s, 20t/s \u00b7 33 tok/s, 20 tok/s, 33 tok/s, 20 tok/s",
+      "message": "I would use Qwen3-coder-30b-a3b. It's what I use for a similar system (RTX 3070, 32GB RAM) and it gives me 33t/s and 20t/s in long contexts",
+      "tps": [
+        33.0,
+        20.0,
+        33.0,
+        20.0,
+        33.0,
+        20.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1465393241296998543",
+      "month": "2026-01",
+      "timestamp": "Monday, January 26, 2026 9:09\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen-image-edit",
+      "hardware": "21351.55 MB usable",
+      "quantization": "",
+      "speed": "2.53s/it",
+      "message": "Requested to load QwenImageTEModel \nloaded completely; 21351.55 MB usable, 7910.28 MB loaded, full load: True\nRequested to load QwenImage\nloaded completely; 20401.28 MB usable, 19581.95 MB loaded, full load: True\n100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 4/4 [00:10<00:00, 2.53s/it]\nRequested to load WanVAE\nUnloaded partially: 4832.44 MB freed, 14749.55 MB remains loaded, 324.11 MB buffer reserved, lowvram patches: 480\nloaded completely; 821.26 MB usable, 242.03 MB loaded, full load: True\nPrompt executed in 79.56 seconds\ngot prompt\nRequested to load QwenImageTEModel \nloaded completely; 21351.55 MB usable, 7910.28 MB loaded, full load: True\nRequested to load QwenImage\nloaded completely; 20401.28 MB usable, 19581.95 MB loaded, full load: True\n100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 4/4 [00:08<00:00, 2.08s/it]\nRequested to load WanVAE\nUnloaded partially: 4778.41 MB freed, 14803.59 MB remains loaded, 324.11 MB buffer reserved, lowvram patches: 480\nloaded completely; 767.22 MB usable, 242.03 MB loaded, full load: True\nPrompt executed in 62.53 seconds\n\nWhy is my qwen image edit workflow keeps unloading modem after execution is done?",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1466541247043866666",
+      "month": "2026-01",
+      "timestamp": "Thursday, January 29, 2026 1:11\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "glm-4.7-flash",
+      "hardware": "100% CPU",
+      "quantization": "",
+      "speed": "100 tokens a seconds \u00b7 100 tok/s",
+      "message": "I am totally perplexed by GLM Flash, it goes from 100 tokens a seconds and 2000PP, to running like poop with llama.cpp consuming 100% CPU",
+      "tps": [
+        100.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1464622090408825053",
+      "month": "2026-01",
+      "timestamp": "Saturday, January 24, 2026 6:05\u202fAM",
+      "tier": "hw_speed_benchmark",
+      "model": "gpt-oss-120b",
+      "hardware": "DDR5",
+      "quantization": "",
+      "speed": "12-15 t/s \u00b7 15 tok/s, 15 tok/s",
+      "message": "Yeah you can get between 12-15 t/s on DDR5 alone with OSS120B",
+      "tps": [
+        15.0,
+        15.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1464412206413381788",
+      "month": "2026-01",
+      "timestamp": "Friday, January 23, 2026 4:11\u202fPM",
+      "tier": "inferred_model",
+      "model": "gpt-oss-120b",
+      "hardware": "strix-halo",
+      "quantization": "",
+      "speed": "30 tok/s \u00b7 30 tok/s",
+      "message": "but if the goal is truly \"GPT-120B at 30 tok/s\", 1 strix halo suffices",
+      "tps": [
+        30.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1447640534050013419",
+      "month": "2025-12",
+      "timestamp": "Monday, December 8, 2025 9:26\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "glm-4.5-air",
+      "hardware": "13900k, 2 x 48GB 6000MHz DDR5 RAM with RTX 4090",
+      "quantization": "",
+      "speed": "6-7 tokens a second \u00b7 7 tok/s",
+      "message": "Okay GLM 4.5 Air is kinda cracked with the desrestricted model. 13900k, 2 x 48GB 6000MHz DDR5 RAM with RTX 4090 on LM Studio Windows 11 getting 6-7 tokens a second but the quality is extremely good. looking forward to 4.6 Air",
+      "tps": [
+        7.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1454181758840082574",
+      "month": "2025-12",
+      "timestamp": "Friday, December 26, 2025 10:39\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "glm-4.7",
+      "hardware": "4x RTX 6000 PRO",
+      "quantization": "",
+      "speed": "decoding speed 80-95 tokens / sec \u00b7 95 tok/s, 70 tok/s",
+      "message": "so I have tested minimax m2.1 on my rig (4x RTX 6000 PRO ) - decoding speed 80-95 tokens / sec with 80 000 input tokens compared to minimax m2.1 - 70tokens (glm wins) - prefill is unfortunatelly 2x slower with glm 4.7 due to denser / higher / larger MOE. But the output for RAG and the hybrid leaves minimax in dust by miles.\nm2.1 is probably good for coding / agentic only - but the overall inteligence of GLM 4.7 is in another leage.",
+      "tps": [
+        95.0,
+        70.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1451109634181173483",
+      "month": "2025-12",
+      "timestamp": "Wednesday, December 17, 2025 11:11\u202fPM",
+      "tier": "inferred_model",
+      "model": "INTELLECT-3-MXFP4_MOE",
+      "hardware": "strix-halo",
+      "quantization": "MXFP4",
+      "speed": "Prompt: 134.2 t/s | Generation: 5.0 t/s \u00b7 134.2 tok/s, 5 tok/s, 134.2 tok/s, 5 tok/s",
+      "message": "15 minutes - [ Prompt: 134.2 t/s | Generation: 5.0 t/s ] on Strix Halo using INTELLECT-3-MXFP4_MOE. all correct answers. ran only once.",
+      "tps": [
+        134.2,
+        5.0,
+        134.2,
+        5.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1435655240740241500",
+      "month": "2025-11",
+      "timestamp": "Wednesday, November 5, 2025 7:41\u202fAM",
+      "tier": "full",
+      "model": "Llama variant",
+      "hardware": "4090",
+      "quantization": "24B-Q5_K_M",
+      "speed": "50tok/sec \u00b7 50 tok/s",
+      "message": "CMAKE_ARGS=\"-DGGML_CUDA=on\" \\\npip install --no-binary=:all: --no-cache-dir llama-cpp-python==0.3.16\n\ni use this flag and compile llama-cpp on debian with a 4090 with a Llama variant using the quant 24B-Q5_K_M and get 50tok/sec.",
+      "tps": [
+        50.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1442361120928174272",
+      "month": "2025-11",
+      "timestamp": "Sunday, November 23, 2025 7:48\u202fPM",
+      "tier": "full",
+      "model": "glm-4.5-air",
+      "hardware": "48GB VRAM and 192GB of ram",
+      "quantization": "Q4_K_M",
+      "speed": "~5 tok/s \u00b7 5 tok/s",
+      "message": "on GLM-4.5-Air Q4_K_M I only get ~5 tok/s with 48GB VRAM and 192GB of ram",
+      "tps": [
+        5.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1437648397275496570",
+      "month": "2025-11",
+      "timestamp": "Monday, November 10, 2025 7:41\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "8B models",
+      "hardware": "6000s",
+      "quantization": "",
+      "speed": "40tps per node \u00b7 40 tok/s",
+      "message": "yea I am switching them out for 6000s, it's surprisingly not too bad if it just runs 8B models though, about 40tps per node so I just spun 4 containers for each",
+      "tps": [
+        40.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1437973576547438612",
+      "month": "2025-11",
+      "timestamp": "Tuesday, November 11, 2025 5:13\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3-32b",
+      "hardware": "4090",
+      "quantization": "",
+      "speed": "5-10 tokens/sec \u00b7 10 tok/s",
+      "message": "I got a 4090 and running qwen3-32b in lmstudio I get like 5-10 tokens/sec",
+      "tps": [
+        10.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1442254338469789827",
+      "month": "2025-11",
+      "timestamp": "Sunday, November 23, 2025 12:43\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3-coder-30b",
+      "hardware": "RTX 2060 6Gb VRAM",
+      "quantization": "",
+      "speed": "14 tk/s \u00b7 14 tok/s, 14 tok/s",
+      "message": "wow, I'm impressed. Managed to get 14 tk/s with qwen3-coder 25b a3b on my very modest system. (laptop with RTX 2060 6Gb VRAM)",
+      "tps": [
+        14.0,
+        14.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1442350119990067360",
+      "month": "2025-11",
+      "timestamp": "Sunday, November 23, 2025 7:04\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "glm-4.5-air",
+      "hardware": "16GB VRAM and 128GB ram",
+      "quantization": "",
+      "speed": "10tok/s \u00b7 10 tok/s, 10 tok/s",
+      "message": "So is GLM 4.5 air still the best for 16GB VRAM and 128GB ram? Not complaing. Good quality for 10tok/s",
+      "tps": [
+        10.0,
+        10.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1444064755210780757",
+      "month": "2025-11",
+      "timestamp": "Friday, November 28, 2025 12:37\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen-next 80B",
+      "hardware": "Pixel 10 pro 512GB",
+      "quantization": "",
+      "speed": "0.7 t/s \u00b7 0.7 tok/s, 0.7 tok/s",
+      "message": "i am testing qwen-next 80B iQ-3xs on a Pixel 10 pro 512GB (supposedly faster storage). it's slow, but it's walking a few tokens out EDIT: 0.7 t/s lol which considering the power envelope/wattage in use, may not be that bad",
+      "tps": [
+        0.7,
+        0.7
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1423041768860946503",
+      "month": "2025-10",
+      "timestamp": "Wednesday, October 1, 2025 1:19\u202fPM",
+      "tier": "full",
+      "model": "glm-4.6",
+      "hardware": "4x blackwells",
+      "quantization": "8 bit",
+      "speed": "60tok/sec \u00b7 60 tok/s",
+      "message": "Guy in here earlier said he gets 60tok/sec out of 4x blackwells running GLM 4.6 8 bit.",
+      "tps": [
+        60.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1431775223413346496",
+      "month": "2025-10",
+      "timestamp": "Saturday, October 25, 2025 3:43\u202fPM",
+      "tier": "full",
+      "model": "Qwen_Image-Q6_K.gguf",
+      "hardware": "3090",
+      "quantization": "Q6_K",
+      "speed": "71.3s",
+      "message": "stable-diffusion.cpp now supports Qwen_Image. This picture done using Qwen_Image-Q6_K.gguf on one 3090 and got 71.3s with nothing offloaded to cpu.",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1433246560434524180",
+      "month": "2025-10",
+      "timestamp": "Wednesday, October 29, 2025 5:10\u202fPM",
+      "tier": "full",
+      "model": "glm-4.6",
+      "hardware": "4 or 2 rtx pro",
+      "quantization": "nvfp4",
+      "speed": "58tokens/sec \u00b7 58 tok/s",
+      "message": "I would like to see glm-4.6 nvfp4 variant having at least 58tokens/sec on 4 or 2 rtx pro",
+      "tps": [
+        58.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1433976447944364072",
+      "month": "2025-10",
+      "timestamp": "Friday, October 31, 2025 5:30\u202fPM",
+      "tier": "full",
+      "model": "phi-4",
+      "hardware": "gtx 2060",
+      "quantization": "q5",
+      "speed": "20+t/s \u00b7 20 tok/s",
+      "message": "I don't know what conditions you're testing in, but for me I was getting like 20+t/s running Phi 4 3.6b q5 on a damn gtx 2060 !!",
+      "tps": [
+        20.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1423078941916135424",
+      "month": "2025-10",
+      "timestamp": "Wednesday, October 1, 2025 3:47\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "gpt-oss-120b",
+      "hardware": "2x 6000 PRO",
+      "quantization": "",
+      "speed": ">200 tokens \u00b7 200 tok/s",
+      "message": "I'm getting >200 tokens for gpt-oss-120b on 2x 6000 PRO",
+      "tps": [
+        200.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1423087947741401159",
+      "month": "2025-10",
+      "timestamp": "Wednesday, October 1, 2025 4:23\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "glm-4.6",
+      "hardware": "M3 Ultra 512GB Mac Studio",
+      "quantization": "",
+      "speed": "176.13 tokens per second; 13.59 tokens per second \u00b7 2671 tok/s, 176.13 tok/s, 184 tok/s, 13.59 tok/s",
+      "message": "M3 Ultra 512GB Mac Studio on GLM 4.6:\n prompt eval time = 15164.53 ms / 2671 tokens ( 5.68 ms per token, 176.13 tokens per second)\n eval time = 13536.74 ms / 184 tokens ( 73.57 ms per token, 13.59 tokens per second)\n total time = 28701.26 ms / 2855 tokens \n\nFair bit slower than the RTX 6000s, but usable",
+      "tps": [
+        2671.0,
+        176.13,
+        184.0,
+        13.59,
+        2855.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1423299977341571243",
+      "month": "2025-10",
+      "timestamp": "Thursday, October 2, 2025 6:25\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "llama-3.1-8b",
+      "hardware": "CUDA_VISIBLE_DEVICES=0,1, TR Pro 7965WX, dual 5090s",
+      "quantization": "bf16",
+      "speed": "Output token throughput (tok/s): 3021.08, Request throughput (req/s): 48.55 \u00b7 30.42ms TTFT, 29.76ms TTFT",
+      "message": "Results:\n Traffic request rate: 50.0\nBurstiness factor: 1.0 (Poisson process)\nMaximum request concurrency: None\n100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1000/1000 [00:20<00:00, 48.55it/s]\n============ Serving Benchmark Result ============\nSuccessful requests: 1000\nRequest rate configured (RPS): 50.00\nBenchmark duration (s): 20.60\nTotal input tokens: 62970\nTotal generated tokens: 62223\nRequest throughput (req/s): 48.55\nOutput token throughput (tok/s): 3021.08\nTotal Token throughput (tok/s): 6078.43\n---------------Time to First Token----------------\nMean TTFT (ms): 30.42\nMedian TTFT (ms): 29.76\nP99 TTFT (ms): 48.20\n-----Time per Output Token (excl. 1st token)------\nMean TPOT (ms): 13.28\nMedian TPOT (ms): 13.47\nP99 TPOT (ms): 15.38\n---------------Inter-token Latency----------------\nMean ITL (ms): 13.28\nMedian ITL (ms): 11.69\nP99 ITL (ms): 21.97\n================================================== \n\nRequest:\n vllm bench serve --backend openai --base-url http://127.0.0.1:8000 --dataset-name random --num-prompts 1000 --request-rate 4.5 --model meta-llama/Llama-3.1-8B-Instruct --random-input-len 64 --random-output-len 64 \n\nServer start:\n CUDA_VISIBLE_DEVICES=0,1 python3 -m vllm.entrypoints.openai.api_server --model meta-llama/Llama-3.1-8B-Instruct --dtype bfloat16 --tensor-parallel-size 1 --max-model-len 8192 --gpu-memory-utilization 0.90 --max-num-seqs 64 --max-num-batched-tokens 131072 --enable-chunked-prefill\\",
+      "tps": [],
+      "ttft_ms": [
+        30.42,
+        29.76
+      ]
+    },
+    {
+      "id": "1425226788451127348",
+      "month": "2025-10",
+      "timestamp": "Tuesday, October 7, 2025 2:02\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "glm-4.6",
+      "hardware": "8xH200",
+      "quantization": "",
+      "speed": "44 tokens \u00b7 44 tok/s",
+      "message": "the thing is that even guys with 8xH200 are getting 44 tokens on GLM-4.6",
+      "tps": [
+        44.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1425375834121699328",
+      "month": "2025-10",
+      "timestamp": "Tuesday, October 7, 2025 11:54\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "mixtral 8x7B, 70B models",
+      "hardware": "64GB system ram, 10GB VRAM",
+      "quantization": "",
+      "speed": "~5 T/s, ~18T/s \u00b7 5 tok/s, 18 tok/s, 5 tok/s, 18 tok/s",
+      "message": "I've got 64GB of system ram, but it's just dual channel DDR5 so even with a MOE it will probably be faily slow. \n\nHavn't tried any of the newer MoE models but back when I just hat 10GB of VRAM I ran mixtral 8x7B partially offloaded at like ~5 T/s I while I now get ~18T/s on 70B models.",
+      "tps": [
+        5.0,
+        18.0,
+        5.0,
+        18.0,
+        18.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1427961944916230175",
+      "month": "2025-10",
+      "timestamp": "Wednesday, October 15, 2025 3:10\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3-4b",
+      "hardware": "16gb vram",
+      "quantization": "",
+      "speed": "50% slower compared to phi",
+      "message": "Hey people!\nWhats the current consensus on the top <4b model for rag/agentic retrieval?\nI've been using phi-4 mini for a while, but it's really stupid at times. In terms of forgetting about instructions or format requirements.\nI was considering some newer models, like LFM8b a1b( not 4b, but still OK, since it fits in 16gb vram and active params are small enough), AI21 Jamba reasoning 3b, the latest qwen3 4b.\nI've been looking at some community comments and Jamba seems to be quite criticized. Also, since it's reasoning, I wonder if the extra reasoning time is worth the quality improvement.\n\nIt seems like qwen 3 is regarded highly, but from my tests a few month ago, it was like 50% slower slower compared to phi despite only ~20% param size difference.\n\nI don't really need world/common knowledge. Just the ability to reason about the user query, follow instructions, call some tools and synthesize a response.",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1431498834038624428",
+      "month": "2025-10",
+      "timestamp": "Friday, October 24, 2025 9:25\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3",
+      "hardware": "dual 3090s",
+      "quantization": "",
+      "speed": "above 30 TPS \u00b7 30 tok/s, 40 tok/s, 25 tok/s",
+      "message": "I also have dual 3090s. You'll find you are going to test out many models on your own. Each one will be different in terms of performance, both in speed and the output quality you are looking for with the tasks you're looking to accomplish. I find that running models in the 15-32b range in LM Studio, especially ones that are MoE or Hybrid, tesnds to be the sweet spot for me. Qwen3 30b/reasoning, Granite 4.0 Small, Apriel 1.5 15b Thinker, and GPT OSS 20 are my go-to general models. They each are different and all good at different tasks. I get above 30 TPS on each of those models, and I feel the 30-40 TPS range to be the slowest I can deal with. Once things get below 25 TPS you will notice and wish they were working faster.\n\nQwen is a great all-rounder, but I find how it responds too much like the big AI models; lots of emojis and bullets. Not my preferred style. Fast, though.\nGranite is a sleeper - super fast and intelligent non-thinking model, but it is not great at more creative type things. It's a workhorse for document analysis and processing.\nApriel is my favorite of this bunch. A great thinker (though it can think for a long time) and delivers quality content in a nice, readable manner. It needs prompt format adjustments and special thinking token notation - it doesn't work out of the box like the others. I have also had a hard time with its ability to call tools in OpenWebUI. \nGPT OSS 20 is similar to Apriel but its thinking budget can be adjusted. I tend to prefer the output from Apriel, plus Apriel is multimodal. Crazy fast, though.\nAnother is the Mistral model in this range - I think 22b. It is also in the same range as Apriel, especially because it is multimodal, but I tend to prefer the Apriel model.",
+      "tps": [
+        30.0,
+        40.0,
+        25.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1433138295361245327",
+      "month": "2025-10",
+      "timestamp": "Wednesday, October 29, 2025 9:59\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "snowflake-arctic-embed-m-v2.0",
+      "hardware": "CPU",
+      "quantization": "",
+      "speed": "10x faster on CPU",
+      "message": "on nano-beir benchmark snowflake-arctic-embed-m-v2.0 beats embeddinggemma while being about 10x faster on CPU",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1433524993806962849",
+      "month": "2025-10",
+      "timestamp": "Thursday, October 30, 2025 11:36\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "llama.cpp",
+      "hardware": "AMD RDNA3/Strix Halo, DGX Spark",
+      "quantization": "",
+      "speed": "prefill increase 50-100%, decode 100%+",
+      "message": "btw maybe of interest to anyone using llama.cpp on AMD RDNA3/Strix Halo, I made a few small changes to the ROCm/HIP WMMA backend that increases long context performance on prefill by 50-100%, and decode by 100%+ (tg now matches the DGX Spark modulo 10% w/o degrading on long context). PR was rejected since ggml-cuda maintainer doesn't want to take any fixes on that code path so I made a post for posterity/to give some visibility for anyone interested: https://www.reddit.com/r/LocalLLaMA/comments/1ok7hd4/faster_llamacpp_rocm_performance_for_amd_rdna3/",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1424120150075904102",
+      "month": "2025-10",
+      "timestamp": "Saturday, October 4, 2025 12:45\u202fPM",
+      "tier": "inferred_model",
+      "model": "glm-4.6",
+      "hardware": "RTX 6000 Pro (Blackwell)",
+      "quantization": "",
+      "speed": "100 tok/s, 100 tok/s, 100 tok/s",
+      "message": "Hey all.. just jumping in here cause trying to figure out which way to go.. read a bit of the last comments but there is a lot. What is AI MAx? I am trying to figure out if buying an RTX 6000 Pro (Blackwell) is a better buy than the Mac M3 Ultra with 512GB RAM. I have a 24 core threadripper (7960x) with 64GB ram, PCIe5 SSD, etc. Right now it has a 7900XTX in it (24GB VRAM). But I am a bit bummed with Antropics insane limits now (I am doing a lot of large context, etc) and hitting limits in a day on the $200 max plan. That's with opus AND sonnet 4.5. So my quest now is.. would I be better served buying a Mac setup with 512GB, run GLM 4.6 or the next DeepSeek, etc and using it as much as I want without any concerns to limits, etc like I hit now. I DO realize $200 a month.. buying a 2nd or 3rd account and that as of now Sonnet 4.5 and Opus 4.1 are probably the best coding models to use, but from what I am reading GLM 4.6 is very good and DeepSeek R2 soon to come out and in the next year or two many more improvements/etc that I could load when they arrive to take advantage of. For me.. though I'd love Blackwell token speeds, I am more worried about overall quality. I'd rather have larger context window and better quality output at a 5x token speed drop.. than 100tk/s or so that Blackwell might give me on a 30b model with 25K context window due to 96GB limitation. I am also worried apple about to release (well.. announce maybe) the rumored M4 Ultra setup whcih would see a pretty decent boost in performance. What is the take of you pros..",
+      "tps": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1413161065172308110",
+      "month": "2025-09",
+      "timestamp": "Thursday, September 4, 2025 6:57\u202fAM",
+      "tier": "full",
+      "model": "Qwen2-4B-Instruct-2507",
+      "hardware": "A10G GPU",
+      "quantization": "AWQ quantized (w4a16)",
+      "speed": "~0.8s per sample",
+      "message": "Hi everyone! I'm running inference on a large batch (10k samples) using a fine-tuned Qwen2-4B-Instruct-2507 model on an A10G GPU with vLLM.\n\nI've tested two versions:\n1. 16-bit (from Unsloth fine-tuning)\n2. AWQ quantized (w4a16 via LLM Compressor)\n\nUnexpectedly, both versions are giving me the same speed: ~0.8s per sample. The context is ~1850 system + 400 user tokens, generating 900 output tokens.\n\nHas anyone experienced this? Shouldn't the AWQ model be significantly faster? Any tips on how to improve throughput or diagnose the bottleneck would be greatly appreciated!",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1420500118947500173",
+      "month": "2025-09",
+      "timestamp": "Wednesday, September 24, 2025 1:00\u202fPM",
+      "tier": "full",
+      "model": "glm-4.5",
+      "hardware": "5090, 26gb of vram",
+      "quantization": "q4 gguff",
+      "speed": "5tk/s \u00b7 5 tok/s, 5 tok/s, 5 tok/s",
+      "message": "q4 gguff GLM 4.5 running on 5090 seems to fit. 26gb of vram - but it's like 5tk/s lol",
+      "tps": [
+        5.0,
+        5.0,
+        5.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1421853430724694017",
+      "month": "2025-09",
+      "timestamp": "Sunday, September 28, 2025 6:37\u202fAM",
+      "tier": "full",
+      "model": "qwen3-8b",
+      "hardware": "i7 Ultra H-series, NPU, CPU, GPU",
+      "quantization": "4bin quant",
+      "speed": "~ 9 tps NPU, ~11 CPU, ~13 GPU \u00b7 9 tok/s",
+      "message": "depends on the model I guess. I have an i7 Ultra H-series, and on the same OpenVINO model server container and the same model (Qwen3-8B 4bin quant from the OpenVINO repo), on short context, I got ~ 9 tps NPU, ~11 CPU, ~13 GPU.",
+      "tps": [
+        9.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1414343083155263568",
+      "month": "2025-09",
+      "timestamp": "Sunday, September 7, 2025 1:14\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "glm-4.5-air",
+      "hardware": "16gb of vram and 128gb ram",
+      "quantization": "",
+      "speed": "8tok/s \u00b7 8 tok/s, 8 tok/s",
+      "message": "Yall think GLM 4.5 Air is probably the best I can do with 16gb of vram and 128gb ram? Running it at about 8tok/s but slows at larger contexts",
+      "tps": [
+        8.0,
+        8.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1414529399017181245",
+      "month": "2025-09",
+      "timestamp": "Monday, September 8, 2025 1:34\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "gpt-oss-120b",
+      "hardware": "3x3090",
+      "quantization": "",
+      "speed": "110t/s \u00b7 110 tok/s, 110 tok/s, 110 tok/s",
+      "message": "what are you running 120b at 110t/s on? 3x3090?",
+      "tps": [
+        110.0,
+        110.0,
+        110.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1415194791108411464",
+      "month": "2025-09",
+      "timestamp": "Tuesday, September 9, 2025 9:38\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "glm-4.5-air",
+      "hardware": "16gb of vram, 128gb ram",
+      "quantization": "",
+      "speed": "8tok/s \u00b7 8 tok/s, 8 tok/s",
+      "message": "Yall think GLM 4.5 Air is probably the best I can do with 16gb of vram and 128gb ram? Running it at about 8tok/s but slows at larger contexts",
+      "tps": [
+        8.0,
+        8.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1415425291433672795",
+      "month": "2025-09",
+      "timestamp": "Wednesday, September 10, 2025 12:54\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "8b",
+      "hardware": "3060",
+      "quantization": "",
+      "speed": "10 second response",
+      "message": "Total 10 second response isnt bad. Its an 8b, but Im not sure how fast the 3060 is so that could be a pretty acceptable speed.",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1419822885605736528",
+      "month": "2025-09",
+      "timestamp": "Monday, September 22, 2025 4:09\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "gemma3-12b",
+      "hardware": "3090",
+      "quantization": "",
+      "speed": "1-2 tokens per request \u00b7 2 tok/s",
+      "message": "3090, using vllm to generate training data from gemma 3 12b right now. output speed is low cuz i'm only outputting 1-2 tokens per request:",
+      "tps": [
+        2.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1419823672423874611",
+      "month": "2025-09",
+      "timestamp": "Monday, September 22, 2025 4:12\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "qwen3-4b",
+      "hardware": "7900XT",
+      "quantization": "",
+      "speed": "~80",
+      "message": "I know i get ~80 but that is for Qwen 3 4B on a 7900XT",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1420468257260830832",
+      "month": "2025-09",
+      "timestamp": "Wednesday, September 24, 2025 10:53\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "qwen3-30b-a3b",
+      "hardware": "Raspberry Pi 5 + SSD",
+      "quantization": "",
+      "speed": "5 t/s \u00b7 5 tok/s, 5 tok/s",
+      "message": "You know Qwen3-30B-A3B-Instruct-2507 / Qwen3-30B-A3B-Thinking-2507 ? they run on my Raspberry Pi 5 + SSD @ 5 t/s",
+      "tps": [
+        5.0,
+        5.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1421278220451319839",
+      "month": "2025-09",
+      "timestamp": "Friday, September 26, 2025 4:32\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "Qwen MoE",
+      "hardware": "Intel NPU",
+      "quantization": "",
+      "speed": "2 tps \u00b7 2 tok/s, 4096 tok/s",
+      "message": "Anyone knows (a) how to jerry rig Intel NPU on Fedora and (b) what's the largest Qwen MoE, or otherwise something interesting, one can run on that NPU, given 64G RAM? By run I mean like at least 2 tps at 4096t context",
+      "tps": [
+        2.0,
+        4096.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1421797975046492293",
+      "month": "2025-09",
+      "timestamp": "Sunday, September 28, 2025 2:57\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "llama-3-8b",
+      "hardware": "4 x RTX PRO 6000s",
+      "quantization": "",
+      "speed": "1.3B tokens/day",
+      "message": "btw, some of you guys might appreciate this. here's some vllm-bench/sharegpt benchmarks of what throughput looks like for llama3-8b w/ 4 x RTX PRO 6000s - at that rate you can generate about 1.3B tokens/day",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1414294135350886411",
+      "month": "2025-09",
+      "timestamp": "Sunday, September 7, 2025 9:59\u202fAM",
+      "tier": "inferred_model",
+      "model": "gpt-oss-20b",
+      "hardware": "rtx-4090, m3",
+      "quantization": "",
+      "speed": "730tps, 60tps, 10,000 tps \u00b7 730 tok/s, 60 tok/s",
+      "message": "Is this for agents? For conversational use, I really think that M3 is in a good spot right now with the new MOEs . Im getting 730tps prompt process and 60tps write on OSS-120b, and even on the bigger models like GLM 4.5 I'm not quite at ranges that make me want to throw myself out windows even at 20k tokens.\n\nBut for agents, it doesn't remotely compare to numbers like Parker was getting on his 4090 for oss-20b (10,000 tps lol)",
+      "tps": [
+        730.0,
+        60.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1405560674096123963",
+      "month": "2025-08",
+      "timestamp": "Thursday, August 14, 2025 7:36\u202fAM",
+      "tier": "full",
+      "model": "qwen3-30b-a3b",
+      "hardware": "GTX1080Ti, Radeon RX9700XT (16 GB VRAM)",
+      "quantization": "Q4_K_XL",
+      "speed": "~40 tk/s \u00b7 40 tok/s, 40 tok/s",
+      "message": "Hey guys. So, after ~9 years of running my rock solid GTX1080Ti I've migrated to the Radeon RX9700XT (16 GB VRAM). I've played with ollama.cpp yesterday for the first time, I've decided to skip ROCm altogether and go straight to Vulkan backend. After some errors and trials I managed to run unsloth-Qwen3-30B-A3B-UD-Q4_K_XL.gguf with 8096 ctx at stable ~40 tk/s. I need a very rough reference point: is this performance within the expected margin? Or is there room for improvement (w/o the quality loss/further quantization)?",
+      "tps": [
+        40.0,
+        40.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1406963978969681950",
+      "month": "2025-08",
+      "timestamp": "Monday, August 18, 2025 4:32\u202fAM",
+      "tier": "full",
+      "model": "qwen3-coder-30b",
+      "hardware": "4080S gaming PC",
+      "quantization": "6 bit",
+      "speed": "47 TPS \u00b7 47 tok/s",
+      "message": "Hi all,\n\nI currently get 47 TPS on my 4080S gaming PC running qwen3-coder 6 bit quant. I\u2019m using llama.cpp with -fa -ngl 99 \u2014n-cpu moe 25.\n\nIs this reasonable performance or can I squeeze out more?",
+      "tps": [
+        47.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1406466525619032085",
+      "month": "2025-08",
+      "timestamp": "Saturday, August 16, 2025 7:35\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "Parakeet",
+      "hardware": "4090, 4080, 24gb",
+      "quantization": "",
+      "speed": "600x realtime",
+      "message": "Parakeet by Nvidia, no question. Runs 600x realtime on a 4090. It'll burn rubber on a 4080. It's light as hell, so you can pretty easily run it alongside the rest of your stack without taking up too much vram. I frequently run it alongside kokoro (100x realtime voice output) and a LLM on the same 24gb for a fully high-speed low latency voice chat.",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1406655415437230181",
+      "month": "2025-08",
+      "timestamp": "Sunday, August 17, 2025 8:06\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "gpt-oss-120b",
+      "hardware": "64gb ddr4 (3600), 5900x, 4090 (24gb)",
+      "quantization": "",
+      "speed": "23-30 t/s \u00b7 30 tok/s, 30 tok/s",
+      "message": "Yeah, I was honestly impressed that the 120b ran well on 64gb ddr4 (3600) and a 5900x with a 4090 (24gb). At 131k getting the 23-30 t/s is still pretty good for a 120b model",
+      "tps": [
+        30.0,
+        30.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1406747663348662374",
+      "month": "2025-08",
+      "timestamp": "Sunday, August 17, 2025 2:12\u202fPM",
+      "tier": "hw_speed_model",
+      "model": "gpt-oss-20b",
+      "hardware": "4090",
+      "quantization": "",
+      "speed": "10000 tokens/second",
+      "message": "https://www.reddit.com/r/LocalLLaMA/comments/1mt2iev/gptoss20b_at_10000_tokenssecond_on_a_4090_sure/",
+      "tps": [],
+      "ttft_ms": []
+    },
+    {
+      "id": "1407312558330740807",
+      "month": "2025-08",
+      "timestamp": "Tuesday, August 19, 2025 3:37\u202fAM",
+      "tier": "hw_speed_model",
+      "model": "8B",
+      "hardware": "A10G",
+      "quantization": "",
+      "speed": "2000 tok/s \u00b7 2000 tok/s",
+      "message": "for throughput, largely is just a matter of having high concurrency. these are some tests from earlier this year on an A10G (~3090 compute, even less MBW). As you can see it can push throughput on an 8B model of close to 2000 tok/s at c=32",
+      "tps": [
+        2000.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1406655126558478347",
+      "month": "2025-08",
+      "timestamp": "Sunday, August 17, 2025 8:05\u202fAM",
+      "tier": "inferred_model",
+      "model": "gpt-oss-20b",
+      "hardware": "rtx-4090",
+      "quantization": "",
+      "speed": "190t/s \u00b7 190 tok/s, 190 tok/s, 190 tok/s",
+      "message": "Yes, I was talking 20b - 20b on llama cpp in 4090 runs about 190t/s",
+      "tps": [
+        190.0,
+        190.0,
+        190.0
+      ],
+      "ttft_ms": []
+    },
+    {
+      "id": "1409156206727008400",
+      "month": "2025-08",
+      "timestamp": "Sunday, August 24, 2025 5:43\u202fAM",
+      "tier": "inferred_model",
+      "model": "qwen3-235b",
+      "hardware": "rtx-pro-6000-blackwell, mac-studio, rtx-5090",
+      "quantization": "",
+      "speed": "210 tok/s, 20 tok/s",
+      "message": "It does matter, especially as the context windows runs long. The cached information needs to travel as fast as possible, adding on top of processing power.\n\nI can say the top Mac Studio with 512GB is a better investment compared to a single RTX Pro 6000 GPU with 96GB of VRAM, but the latter offers far better performance.\n\nMy RTX 5090 has 1,792GB/s and 21,760 CUDA cores, and can process e.g. GPT-OSS-20B at +210 toks/sec at full model context, or GPT-OSS-120B at +20 toks/sec with some RAM offloading.\n\nI understand Mac Studio top spec has nowhere near the same performance specs for Inference, only VRAM. \n\nHaving tested bigger models, the most efficient \"bigger model\" you can fit for a reasonable hardware will be a Qwen3 235B, and that's pushing outside the consumer grade. A lower grade Mac Studio could run it, somewhat great since its a MoE.\n\nOther than that, the top Mac Studio is waste unless you're doing serious editing where memory matters. For inference, it's a big leap above 100B models in terms of hardware requirements.",
+      "tps": [
+        210.0,
+        20.0
+      ],
+      "ttft_ms": []
+    }
+  ]
+};
+
+const TIER_LABELS: Record<string, string> = {
+  full: "Full (all 4 tags)",
+  hw_speed_model: "HW + speed + model",
+  hw_speed_benchmark: "HW + speed + benchmark",
+  hw_speed: "HW + speed only",
+  inferred_model: "Inferred + model",
+  inferred: "Inferred",
+};
+
+type SetupRow = {
+  id: string;
+  month: string;
+  timestamp: string;
+  tier: string;
+  model: string;
+  hardware: string;
+  quantization: string;
+  speed: string;
+  message: string;
+  tps: readonly number[];
+  ttft_ms: readonly number[];
+};
+
+export default function HardwareSetupsReview() {
+  const theme = useHostTheme();
+  const [liked, setLiked] = useCanvasState<Record<string, boolean>>("liked", {});
+  const [tier, setTier] = useCanvasState("tier", "all");
+  const [query, setQuery] = useCanvasState("query", "");
+  const [page, setPage] = useCanvasState("page", 0);
+
+  const tierOptions = [
+    { value: "all", label: `All tiers (${SETUP_REVIEW_DATA.count})` },
+    ...Object.entries(SETUP_REVIEW_DATA.by_tier).map(([key, count]) => ({
+      value: key,
+      label: `${TIER_LABELS[key] ?? key} (${count})`,
+    })),
+  ];
+
+  const filtered = SETUP_REVIEW_DATA.setups.filter((row) => {
+    if (tier !== "all" && row.tier !== tier) return false;
+    if (!query.trim()) return true;
+    const hay = `${row.model} ${row.hardware} ${row.quantization} ${row.speed} ${row.message}`.toLowerCase();
+    return hay.includes(query.trim().toLowerCase());
+  });
+
+  const pageSize = 10;
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const safePage = Math.min(page, totalPages - 1);
+  const slice = filtered.slice(safePage * pageSize, safePage * pageSize + pageSize);
+
+  const likedCount = SETUP_REVIEW_DATA.setups.filter((row) => liked[row.id]).length;
+  const likedRows = SETUP_REVIEW_DATA.setups.filter((row) => liked[row.id]);
+
+  function toggleLike(id: string, checked: boolean) {
+    setLiked((prev) => ({ ...prev, [id]: checked }));
+  }
+
+  function tierTone(t: string): "success" | "info" | "warning" | "neutral" {
+    if (t === "full") return "success";
+    if (t === "hw_speed_model" || t === "hw_speed_benchmark") return "info";
+    if (t === "hw_speed") return "warning";
+    return "neutral";
+  }
+
+  function formatMetrics(row: SetupRow) {
+    const parts: string[] = [];
+    if (row.tps?.length) parts.push(`${row.tps.join(", ")} tok/s`);
+    if (row.ttft_ms?.length) parts.push(`TTFT ${row.ttft_ms.join(", ")} ms`);
+    return parts.join(" · ");
+  }
+
+  return (
+    <Stack gap={20} style={{ padding: 24 }}>
+      <Stack gap={6}>
+        <H1>Hardware setup review</H1>
+        <Text tone="secondary">
+          Source: hardware-setups.json · {SETUP_REVIEW_DATA.count} setups (model + speed required) · check the ones you want to keep
+        </Text>
+      </Stack>
+
+      <Row gap={12} wrap>
+        <Stat label="Total setups" value={String(SETUP_REVIEW_DATA.count)} />
+        <Stat label="Liked" value={String(likedCount)} tone="success" />
+        <Stat label="In filter" value={String(filtered.length)} tone="info" />
+      </Row>
+
+      <Row gap={12} align="center" wrap>
+        <Select
+          value={tier}
+          onChange={(v) => {
+            setTier(v);
+            setPage(0);
+          }}
+          options={tierOptions}
+          style={{ minWidth: 280 }}
+        />
+        <TextInput
+          value={query}
+          onChange={(v) => {
+            setQuery(v);
+            setPage(0);
+          }}
+          placeholder="Search model, hardware, message…"
+          style={{ minWidth: 280, flex: 1 }}
+        />
+        <Text tone="tertiary" size="small">
+          page {safePage + 1}/{totalPages}
+        </Text>
+        <Button disabled={safePage <= 0} onClick={() => setPage(safePage - 1)}>
+          Prev
+        </Button>
+        <Button disabled={safePage >= totalPages - 1} onClick={() => setPage(safePage + 1)}>
+          Next
+        </Button>
+      </Row>
+
+      {slice.map((row, idx) => {
+        const isLiked = !!liked[row.id];
+        const border = isLiked
+          ? `2px solid ${theme.category.green}`
+          : `1px solid ${theme.stroke.primary}`;
+        const metrics = formatMetrics(row);
+
+        return (
+          <Card key={row.id} style={{ border }}>
+            <CardHeader
+              trailing={
+                <Checkbox
+                  checked={isLiked}
+                  onChange={(v) => toggleLike(row.id, v)}
+                  label="Like this setup"
+                />
+              }
+            >
+              #{safePage * pageSize + idx + 1} · {row.month} · {row.id}
+            </CardHeader>
+            <CardBody>
+              <Stack gap={10}>
+                <Row gap={8} wrap align="center">
+                  <Pill tone={tierTone(row.tier)}>{TIER_LABELS[row.tier] ?? row.tier}</Pill>
+                  <Text tone="tertiary" size="small">
+                    {row.timestamp}
+                  </Text>
+                </Row>
+
+                <Row gap={16} wrap>
+                  <Stack gap={2} style={{ minWidth: 160 }}>
+                    <Text tone="tertiary" size="small">
+                      Model
+                    </Text>
+                    <Text>{row.model || "—"}</Text>
+                  </Stack>
+                  <Stack gap={2} style={{ minWidth: 160 }}>
+                    <Text tone="tertiary" size="small">
+                      Hardware
+                    </Text>
+                    <Text>{row.hardware || "—"}</Text>
+                  </Stack>
+                  <Stack gap={2} style={{ minWidth: 120 }}>
+                    <Text tone="tertiary" size="small">
+                      Quant
+                    </Text>
+                    <Text>{row.quantization || "—"}</Text>
+                  </Stack>
+                  <Stack gap={2} style={{ minWidth: 140 }}>
+                    <Text tone="tertiary" size="small">
+                      Speed
+                    </Text>
+                    <Text>{row.speed || "—"}</Text>
+                  </Stack>
+                </Row>
+
+                {metrics && (
+                  <Text tone="secondary" size="small">
+                    Parsed: {metrics}
+                  </Text>
+                )}
+
+                <Text style={{ whiteSpace: "pre-wrap" }}>{row.message}</Text>
+              </Stack>
+            </CardBody>
+          </Card>
+        );
+      })}
+
+      {likedCount > 0 && (
+        <Card>
+          <CardHeader>Liked setups ({likedCount})</CardHeader>
+          <CardBody>
+            <Stack gap={12}>
+              <Text tone="secondary" size="small">
+                Message IDs — tell me what to do with these after you finish reviewing.
+              </Text>
+              <Text style={{ fontFamily: "monospace", fontSize: 12, whiteSpace: "pre-wrap" }}>
+                {likedRows.map((row) => row.id).join("\n")}
+              </Text>
+              <Stack gap={8}>
+                {likedRows.map((row) => (
+                  <Text key={row.id} size="small" tone="secondary">
+                    {row.id} · {row.tier} · {row.model || "?"} · {row.hardware || "?"} · {row.speed || "?"}
+                  </Text>
+                ))}
+              </Stack>
+            </Stack>
+          </CardBody>
+        </Card>
+      )}
+    </Stack>
+  );
+}

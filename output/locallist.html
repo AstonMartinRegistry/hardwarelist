@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>locallist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --copper1:#b87333; --copper2:#7a3f16; --ink:#111; --line:#d8d2c8; --black:#000;
+  --copper-g1:#f2d4a8; --copper-g2:#e8b070; --copper-g3:#b87333; --copper-g4:#965520; --copper-g5:#5c3010;
+  /* Instrument panel (first-card language) */
+  --rich-ink:#141414; --rich-mute:#8a8a8a; --rich-line:#ececec;
+  --rich-panel:#fafafa; --rich-radius:8px; --page-inset:14px;
+  /* Vertical rhythm: brand breathes, tools sit closer to content */
+  --space-brand-to-tools: 40px;
+  --space-tools-to-cards: 22px;
+  --space-section: 18px; /* match .grid gap — even card rhythm across providers */
+}
+* { box-sizing: border-box; }
+body {
+  font-family: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--ink); background: #fff; margin: 0; padding: 28px 24px 40px;
+  display: flex; flex-direction: column; gap: 0;
+}
+.header-box {
+  border: none; padding: 18px var(--page-inset) 10px;
+  text-align: center;
+  margin-bottom: var(--space-brand-to-tools);
+}
+.header-copy h1 { margin: 0; font-size: 56px; letter-spacing: 1px; line-height: 1.05; }
+.tagline-row {
+  margin-top: 14px;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 12px;
+}
+.tagline {
+  margin: 0; font-size: 13px; color: #444;
+  text-decoration: underline;
+}
+a.tagline:hover { color: #111; }
+/* Top bar: black chips + gradient-grain count badges + icon-only filter */
+.chrome {
+  margin: 0 var(--page-inset) var(--space-tools-to-cards);
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  display: flex; flex-wrap: wrap; gap: 10px 14px;
+  align-items: center;
+}
+.navlinks {
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center; flex: 1;
+  min-width: 0;
+}
+.navlink {
+  --cat: #888;
+  position: relative;
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 12px; font-weight: 400; color: #d8d8d8;
+  text-decoration: none; letter-spacing: .01em;
+  border-radius: 8px;
+  padding: 6px 6px 6px 12px; line-height: 1.2;
+  background: var(--rich-ink);
+  transition: background-color .15s ease, color .15s ease;
+}
+.navlink .nav-label { text-transform: none; font-weight: 400; }
+.navlink:hover { background: #232323; color: #fff; }
+.navlink.is-active {
+  color: #fff;
+  background: #232323;
+  box-shadow: none;
+}
+.navlink.is-active .nav-label { font-weight: 400; }
+.navlink .navn {
+  position: relative; overflow: hidden;
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 20px; height: 20px; padding: 0 6px;
+  border-radius: 6px;
+  background-image: linear-gradient(
+    105deg,
+    var(--cat) 0%,
+    color-mix(in srgb, var(--cat) 78%, #fff) 70%,
+    color-mix(in srgb, var(--cat) 55%, #fff) 100%
+  );
+}
+.navlink .navn::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  opacity: 0.85; mix-blend-mode: overlay;
+  background-size: 70px 70px; background-repeat: repeat;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.8 -0.45'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.navlink .navn::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, transparent 45%, rgba(255,255,255,.32) 100%);
+  mix-blend-mode: soft-light;
+}
+.navlink .navn-num {
+  position: relative; z-index: 1;
+  font-size: 10px; font-weight: 600; color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.navlink.nav-qwen { --cat: #2f6fed; }
+.navlink.nav-glm { --cat: #7c3aed; }
+.navlink.nav-gemma { --cat: #0f9d58; }
+.navlink.nav-minimax { --cat: #e67e22; }
+.navlink.nav-mistral { --cat: #e11d48; }
+.navlink.nav-other { --cat: #b87333; }
+.navlink.is-off {
+  color: #8a8a8a;
+}
+.navlink.is-off:hover { color: #b0b0b0; }
+.navlink.is-off .navn {
+  filter: grayscale(1);
+  background-image: linear-gradient(
+    105deg,
+    #3a3a3a 0%,
+    #5a5a5a 70%,
+    #2e2e2e 100%
+  );
+}
+.navlink.is-off .navn-num { color: #e6e6e6; }
+.nav-clear {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; flex-shrink: 0;
+  margin-left: 2px; padding: 0;
+  border: none; border-radius: 8px; cursor: pointer;
+  background: transparent; color: #888;
+  font-size: 18px; line-height: 1; font-weight: 400;
+  transition: color .15s ease, background-color .15s ease;
+}
+.nav-clear:hover { color: #111; background: #f0f0f0; }
+.nav-clear.is-all-off { color: #111; }
+.chrome-tools {
+  display: flex; align-items: stretch; gap: 8px;
+  margin-left: auto;
+}
+.filter-menu { position: relative; display: flex; z-index: 200; }
+.filter-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; flex-shrink: 0;
+  border: none; border-radius: 8px; cursor: pointer;
+  background: var(--rich-ink); color: #d8d8d8;
+  transition: background-color .15s ease, color .15s ease;
+}
+.filter-btn:hover { background: #232323; color: #fff; }
+.filter-btn[aria-expanded="true"] {
+  background: #232323; color: #fff;
+  box-shadow: inset 0 0 0 1.5px #4a4a4a;
+}
+.filter-dropdown {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 210;
+  display: flex; flex-direction: column; gap: 2px;
+  min-width: 196px; padding: 6px;
+  border: none; border-radius: 8px;
+  color: #e8e8e8;
+  background: var(--rich-ink);
+  box-shadow: 0 16px 40px rgba(0,0,0,.32);
+}
+.filter-dropdown[hidden] { display: none; }
+.filter-group {
+  font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+  color: #777; padding: 8px 9px 3px;
+}
+.filter-group:first-child { padding-top: 4px; }
+.filter-rule {
+  height: 1px; margin: 5px 6px; background: rgba(255,255,255,.1);
+  border: 0;
+}
+.filter-option {
+  position: relative;
+  display: block; width: 100%; text-align: left;
+  font-family: inherit; font-size: 12px; letter-spacing: .01em;
+  color: #cfcfcf; background: none; border: none; border-radius: 6px;
+  padding: 8px 10px; cursor: pointer;
+  overflow: hidden;
+  transition: color .12s ease, background-color .12s ease;
+}
+.filter-option:hover { background: rgba(255,255,255,.08); color: #fff; }
+.filter-option.is-selected {
+  color: #fff;
+  isolation: isolate;
+  background-image: linear-gradient(
+    105deg,
+    #141414 0%,
+    color-mix(in srgb, #141414 70%, #3a3a3a) 60%,
+    color-mix(in srgb, #141414 45%, #5a5a5a) 100%
+  );
+}
+.filter-option.is-selected::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  opacity: .8; mix-blend-mode: overlay;
+  background-size: 120px 120px; background-repeat: repeat;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.8 -0.45'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.filter-option.is-selected::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(90deg, transparent 40%, rgba(255,255,255,.22) 100%);
+  mix-blend-mode: soft-light;
+}
+.search-shell {
+  position: relative;
+  display: flex; align-items: center; gap: 8px;
+  min-width: min(220px, 55vw); flex: 0 1 260px; height: 34px;
+  border: 1px solid #ddd; border-radius: 8px;
+  padding: 0 10px; background: #fff;
+  box-shadow: none;
+  transition: border-color .2s ease;
+}
+.search-shell:focus-within {
+  border-color: #bbb;
+  box-shadow: none;
+}
+.search-shell .search-ico {
+  display: inline-flex; align-items: center; justify-content: center;
+  color: #aaa; flex-shrink: 0; pointer-events: none;
+  transition: color .2s ease;
+}
+.search-shell:focus-within .search-ico { color: var(--rich-ink); }
+.search-clear {
+  display: none; align-items: center; justify-content: center;
+  border: none; background: none; color: #aaa;
+  font-size: 14px; line-height: 1; cursor: pointer; padding: 0;
+  transition: color .15s ease;
+}
+.search-clear:hover { color: var(--rich-ink); }
+.search-shell.has-value .search-clear { display: inline-flex; }
+#model-search {
+  flex: 1; min-width: 0;
+  font-family: inherit; font-size: 12px; font-weight: 400;
+  border: none; outline: none;
+  padding: 0;
+  background: transparent; color: var(--rich-ink);
+  box-shadow: none;
+}
+#model-search:focus { outline: none; box-shadow: none; }
+#model-search::placeholder { color: #b0b0b0; font-weight: 400; }
+#model-search::-webkit-search-cancel-button { display: none; }
+.link-plain {
+  display: inline; font-size: inherit; color: var(--ink); text-decoration: underline;
+  background: none; border: none; padding: 0; cursor: pointer;
+}
+.link-plain:hover { color: #444; }
+.cats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-section);
+}
+.cat { scroll-margin-top: 24px; }
+.cathead {
+  --cat: #b87333;
+  position: relative; overflow: hidden;
+  font-size: 15px; letter-spacing: .5px; margin: 0;
+  border: none; padding: 8px 12px; color: #fff; border-radius: 8px;
+  background-image: linear-gradient(
+    105deg,
+    var(--cat) 0%,
+    color-mix(in srgb, var(--cat) 72%, #fff) 55%,
+    color-mix(in srgb, var(--cat) 35%, #fff) 100%
+  );
+}
+.cathead.cat-qwen { --cat: #2f6fed; }
+.cathead.cat-glm { --cat: #7c3aed; }
+.cathead.cat-gemma { --cat: #0f9d58; }
+.cathead.cat-minimax { --cat: #e67e22; }
+.cathead.cat-mistral { --cat: #e11d48; }
+.cathead.cat-other { --cat: #b87333; }
+.cathead::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .22;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+}
+.cathead::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, transparent 40%, rgba(255,255,255,.28) 100%);
+}
+.cathead > * { position: relative; z-index: 1; }
+.cathead .catn { color: rgba(255,255,255,.85); font-size: 12px; margin-left: 4px; }
+.cat-results { border: none; padding: 0 var(--page-inset); }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+@media (max-width: 960px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+  .chrome {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .navlinks { flex: none; width: 100%; }
+  .chrome-tools {
+    margin-left: 0;
+    width: 100%;
+  }
+  .chrome-tools .search-shell {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  /* Filter sits on the left in this layout — open menu to the right */
+  .filter-dropdown {
+    left: 0;
+    right: auto;
+  }
+}
+@media (max-width: 600px) {
+  .grid { grid-template-columns: 1fr; }
+}
+.setup { display: flex; flex-direction: column; gap: 0; }
+.model-box {
+  --cat: #888;
+  position: relative; overflow: hidden;
+  border: none; padding: 8px 12px; font-size: 13px;
+  font-weight: 600; word-break: break-word; color: #fff;
+  border-radius: 8px 8px 0 0;
+  background-image: linear-gradient(
+    105deg,
+    var(--cat) 0%,
+    color-mix(in srgb, var(--cat) 72%, #fff) 55%,
+    color-mix(in srgb, var(--cat) 35%, #fff) 100%
+  );
+}
+.cat.cat-qwen .model-box, .setup.cat-qwen .model-box { --cat: #2f6fed; }
+.cat.cat-glm .model-box, .setup.cat-glm .model-box { --cat: #7c3aed; }
+.cat.cat-gemma .model-box, .setup.cat-gemma .model-box { --cat: #0f9d58; }
+.cat.cat-minimax .model-box, .setup.cat-minimax .model-box { --cat: #e67e22; }
+.cat.cat-mistral .model-box, .setup.cat-mistral .model-box { --cat: #e11d48; }
+.cat.cat-other .model-box, .setup.cat-other .model-box { --cat: #b87333; }
+.model-box::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .22;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+}
+.model-box::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, transparent 40%, rgba(255,255,255,.28) 100%);
+}
+.model-box .model-name { position: relative; z-index: 1; }
+.results-box {
+  border: none; padding: 12px;
+  background: #f7f7f7; border-radius: 0 0 8px 8px;
+}
+.spec-subhead {
+  border-top: 1px solid #e0e0e0; margin: 10px -12px 8px; padding: 6px 12px 0;
+  font-size: 12px; letter-spacing: .4px; color: #666;
+}
+.spec-subhead-line { padding: 0; margin: 10px -12px 8px; height: 0; }
+.f { display: flex; gap: 8px; margin: 3px 0; font-size: 13px; }
+.f .k { min-width: 74px; color: #666; flex-shrink: 0; }
+.f .v { flex: 1; min-width: 0; word-break: break-word; white-space: pre-wrap; }
+.f .hint { color: var(--copper1); font-size: 11px; }
+.info-clamp {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  overflow: hidden; white-space: normal;
+}
+.info-v.expanded .info-clamp {
+  display: block; -webkit-line-clamp: unset; overflow: visible;
+}
+.read-more-btn {
+  font-family: inherit; font-size: 12px; color: #666; background: none;
+  border: none; padding: 0; margin-top: 4px; cursor: pointer; text-decoration: underline;
+}
+.read-more-btn:hover { color: #111; }
+.quant-bits { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; white-space: normal; }
+.quant-bit {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 2.4em; height: 2.4em; padding: 0 8px;
+  border: 1.5px solid #bbb; border-radius: 999px;
+  font-size: 12px; color: #333; background: none; line-height: 1;
+}
+/* First card — quiet instrument panel */
+.setup-rich {
+  --cat: #888;
+  --rich-ink: #141414;
+  --rich-mute: #8a8a8a;
+  --rich-line: #ececec;
+}
+.cat.cat-qwen .setup-rich, .setup-rich.cat-qwen { --cat: #2f6fed; }
+.cat.cat-glm .setup-rich, .setup-rich.cat-glm { --cat: #7c3aed; }
+.cat.cat-gemma .setup-rich, .setup-rich.cat-gemma { --cat: #0f9d58; }
+.cat.cat-minimax .setup-rich, .setup-rich.cat-minimax { --cat: #e67e22; }
+.cat.cat-mistral .setup-rich, .setup-rich.cat-mistral { --cat: #e11d48; }
+.cat.cat-other .setup-rich, .setup-rich.cat-other { --cat: #b87333; }
+.setup-rich .model-box {
+  padding: 10px 14px;
+  letter-spacing: .02em;
+  background-image: linear-gradient(
+    105deg,
+    var(--cat) 0%,
+    color-mix(in srgb, var(--cat) 78%, #fff) 70%,
+    color-mix(in srgb, var(--cat) 55%, #fff) 100%
+  );
+}
+.setup-rich .model-box::before {
+  display: block;
+  opacity: 0.85;
+  mix-blend-mode: overlay;
+  background-size: 140px 140px;
+  background-repeat: repeat;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.8 -0.45'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.setup-rich .model-box::after {
+  display: block;
+  background: linear-gradient(90deg, transparent 45%, rgba(255,255,255,.32) 100%);
+  mix-blend-mode: soft-light;
+}
+.setup-rich .model-name {
+  font-weight: 500;
+  font-size: 13px;
+}
+.setup-rich .results-box {
+  background: #fafafa;
+  padding: 14px 14px 12px;
+}
+.setup-rich .rich-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.setup-rich .rf {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 10px;
+  align-items: baseline;
+  font-size: 12px;
+  line-height: 1.35;
+}
+.setup-rich .rl {
+  color: var(--rich-mute);
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+.setup-rich .rv {
+  color: var(--rich-ink);
+  min-width: 0;
+  word-break: break-word;
+}
+.setup-rich .rv .link-plain {
+  font-size: 12px;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+.setup-rich .rich-rule {
+  height: 1px;
+  background: var(--rich-line);
+  margin: 4px 0 2px;
+}
+.setup-rich .rank-n { font-variant-numeric: tabular-nums; }
+.setup-rich .rank-t { color: var(--rich-mute); font-variant-numeric: tabular-nums; }
+.setup-rich .rank-note {
+  color: var(--rich-mute); font-size: 10px; letter-spacing: .04em;
+  margin-left: 2px;
+}
+.setup-rich .rank-src {
+  font-size: 10px; letter-spacing: .04em; color: var(--rich-mute);
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.setup-rich .rank-src:hover { color: var(--cat); }
+.setup-rich,
+.setup-rich .results-box,
+.setup-rich .rich-stack,
+.setup-rich .rf { overflow: visible; }
+.setup-rich:hover,
+.setup-rich:focus-within { z-index: 40; position: relative; }
+body.filter-open .setup-rich:focus-within { z-index: auto; }
+body.filter-open .tip-rich { display: none !important; }
+.setup-rich .mem-ratio {
+  display: block;
+  font-variant-numeric: tabular-nums;
+}
+.setup-rich .mem-used { font-weight: 500; }
+.setup-rich .mem-sep,
+.setup-rich .mem-total { color: #555; }
+.setup-rich .mem-allow {
+  color: var(--cat);
+  font-size: 11px;
+}
+.setup-rich .mem-bar {
+  position: relative;
+  margin-top: 6px;
+  width: 100%;
+  height: 3px;
+  border-radius: 0;
+  background: #e6e6e6;
+  overflow: hidden;
+}
+.setup-rich .mem-bar-allow,
+.setup-rich .mem-bar-fill {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  border-radius: 0;
+}
+.setup-rich .mem-bar-allow {
+  background: color-mix(in srgb, var(--cat) 32%, #fff);
+}
+.setup-rich .mem-bar-fill {
+  background: var(--cat);
+  z-index: 1;
+}
+.setup-rich .info-clamp { -webkit-line-clamp: 1; white-space: pre-wrap; }
+.setup-rich .read-more-btn {
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--rich-mute);
+  text-decoration: none;
+  border-bottom: 1px solid #ccc;
+}
+.setup-rich .read-more-btn:hover { color: var(--rich-ink); border-bottom-color: #999; }
+.hovtxt { position: relative; cursor: help; display: inline; }
+.tip {
+  display: none; position: absolute; left: 0; top: 100%; z-index: 20;
+  min-width: 260px; max-width: 340px; margin-top: 6px; padding: 10px 12px;
+  background: #1c1712; color: #f2e9df; border: 1px solid var(--copper2);
+  border-radius: 6px; font-size: 12px; box-shadow: 0 6px 20px rgba(0,0,0,.35);
+}
+.hovtxt:hover .tip:not(.tip-rich) { display: block; }
+.setup-rich .tip-rich { display: none; }
+.setup-rich .tip-rich.is-open { display: block; }
+.tip .tiplink { color: #e6b483; text-decoration: none; font-weight: 600; display: block; margin-bottom: 6px; }
+.tip .tr { display: flex; justify-content: space-between; gap: 12px; padding: 2px 0; }
+.tip .tl { color: #cbb9a6; }
+.tip .tv { color: #fff; }
+.tip .rk { color: #b87333; }
+.tip .tn { color: #a98f74; font-size: 11px; margin-top: 6px; }
+.tip .tsec { color: #e6b483; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; margin: 8px 0 3px; border-top: 1px solid #3a2c1f; padding-top: 6px; }
+.tip .tsec:first-of-type { border-top: none; }
+.tip .tnn { color: #a98f74; text-transform: none; letter-spacing: 0; }
+/* Rich tip — dark ink sheet, grain banner, compact rows */
+.setup-rich .hovtxt { border-bottom: none; }
+.setup-rich .tip-rich {
+  position: fixed; left: 0; top: 0; right: auto; margin: 0;
+  width: 260px; max-height: min(72vh, 420px); overflow: hidden;
+  z-index: 120; padding: 0; border: none; border-radius: 8px;
+  background: var(--rich-ink); color: #e8e8e8;
+  box-shadow: 0 16px 40px rgba(0,0,0,.32);
+  opacity: 0; transform: translateY(4px);
+  transition: opacity .12s ease, transform .12s ease;
+  pointer-events: none;
+}
+.setup-rich .tip-rich.is-open {
+  display: block; opacity: 1; transform: none; pointer-events: auto;
+}
+.setup-rich .tip-rich .tip-banner {
+  position: relative; overflow: hidden;
+  padding: 10px 12px;
+  background-image: linear-gradient(
+    105deg,
+    #141414 0%,
+    color-mix(in srgb, #141414 70%, #3a3a3a) 60%,
+    color-mix(in srgb, #141414 45%, #5a5a5a) 100%
+  );
+}
+.setup-rich .tip-rich .tip-banner::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  opacity: .8; mix-blend-mode: overlay;
+  background-size: 120px 120px; background-repeat: repeat;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.8 -0.45'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.setup-rich .tip-rich .tip-banner::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, transparent 40%, rgba(255,255,255,.22) 100%);
+  mix-blend-mode: soft-light;
+}
+.setup-rich .tip-rich .tip-head {
+  position: relative; z-index: 1;
+  display: block; font-size: 12px; font-weight: 500; color: #fff;
+  text-decoration: none; letter-spacing: .02em;
+}
+.setup-rich .tip-rich .tip-head:hover { color: #fff; text-decoration: underline; }
+.setup-rich .tip-rich .tip-body {
+  padding: 10px 12px 11px;
+  max-height: min(58vh, 340px); overflow-y: auto;
+}
+.setup-rich .tip-rich .tip-note {
+  margin: 0 0 8px; font-size: 10px; color: #888;
+  letter-spacing: .04em; text-transform: uppercase;
+}
+.setup-rich .tip-rich .tip-hero {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 10px; margin-bottom: 10px; padding-bottom: 9px;
+  border-bottom: 1px solid #2e2e2e;
+}
+.setup-rich .tip-rich .tip-hero-k {
+  font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: #888;
+}
+.setup-rich .tip-rich .tip-hero-v {
+  font-size: 16px; font-weight: 600; color: #fff;
+  font-variant-numeric: tabular-nums; letter-spacing: -.02em;
+}
+.setup-rich .tip-rich .tip-hero-t {
+  font-size: 12px; font-weight: 500; color: #9a9a9a;
+}
+.setup-rich .tip-rich .tip-list { display: flex; flex-direction: column; gap: 5px; }
+.setup-rich .tip-rich .tip-row {
+  display: grid; grid-template-columns: 1fr auto; gap: 10px;
+  align-items: baseline;
+}
+.setup-rich .tip-rich .tip-k {
+  font-size: 11px; color: #9a9a9a; min-width: 0;
+}
+.setup-rich .tip-rich .tip-v {
+  font-size: 11px; color: #eee; font-variant-numeric: tabular-nums;
+  text-align: right; white-space: nowrap;
+}
+.setup-rich .tip-rich .tip-rank {
+  color: #777; margin-left: 4px;
+}
+.copper {
+  font-family: inherit; font-size: 14px; cursor: pointer;
+  border: none; background: #fff; color: var(--ink);
+  padding: 9px 22px;
+}
+.copper:hover { background: #f5f5f5; }
+#submit {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .02em;
+  text-transform: none;
+  padding: 8px 14px;
+  border: none;
+  border-radius: var(--rich-radius);
+  background: var(--rich-ink);
+  color: #fff;
+  cursor: pointer;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+#submit:hover { background: #2a2a2a; }
+/* Submit modal — same black panel language as filter dropdown */
+.submit-modal {
+  position: fixed; inset: 0; z-index: 400;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px 16px;
+}
+.submit-modal[hidden] { display: none; }
+.submit-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,.55);
+}
+.submit-panel {
+  position: relative; z-index: 1;
+  width: min(440px, 100%);
+  max-height: min(88vh, 720px);
+  display: flex; flex-direction: column;
+  border-radius: 8px;
+  color: #e8e8e8;
+  background: var(--rich-ink);
+  box-shadow: 0 16px 40px rgba(0,0,0,.32);
+  overflow: hidden;
+}
+.submit-head {
+  position: relative; overflow: hidden; isolation: isolate;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 14px;
+  flex-shrink: 0;
+  background-image: linear-gradient(
+    105deg,
+    #141414 0%,
+    color-mix(in srgb, #141414 70%, #3a3a3a) 60%,
+    color-mix(in srgb, #141414 45%, #5a5a5a) 100%
+  );
+}
+.submit-head::before {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  opacity: .8; mix-blend-mode: overlay;
+  background-size: 120px 120px; background-repeat: repeat;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.8 -0.45'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.submit-head::after {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: linear-gradient(90deg, transparent 40%, rgba(255,255,255,.22) 100%);
+  mix-blend-mode: soft-light;
+}
+.submit-head > * { position: relative; z-index: 1; }
+.submit-head h2 {
+  margin: 0; font-size: 13px; font-weight: 500;
+  letter-spacing: .02em; color: #fff;
+}
+.submit-x {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; padding: 0;
+  border: none; border-radius: 6px; cursor: pointer;
+  background: #141414; color: #b0b0b0;
+  font-size: 18px; line-height: 1;
+}
+.submit-x:hover { color: #fff; background: #222; }
+.submit-form {
+  overflow: auto; padding: 0 8px 12px;
+  display: flex; flex-direction: column; gap: 2px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.submit-form::-webkit-scrollbar { display: none; width: 0; height: 0; }
+.submit-group {
+  font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+  color: #777; padding: 10px 9px 4px;
+}
+.submit-group:first-child { padding-top: 2px; }
+.submit-field {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 6px 8px 8px;
+}
+.submit-label {
+  font-size: 11px; color: #9a9a9a; letter-spacing: .01em;
+}
+.submit-hint {
+  font-size: 10px; color: #666; margin: 0;
+}
+.submit-field input,
+.submit-field textarea {
+  font-family: inherit; font-size: 12px;
+  color: #e8e8e8; background: #1c1c1c;
+  border: none; border-radius: 6px;
+  padding: 8px 10px; outline: none;
+  width: 100%; box-sizing: border-box;
+  transition: background-color .12s ease;
+}
+.submit-field input::placeholder,
+.submit-field textarea::placeholder { color: #555; }
+.submit-field input:focus,
+.submit-field textarea:focus {
+  background: #222;
+}
+.submit-field textarea {
+  min-height: 72px; resize: none; line-height: 1.4;
+}
+.submit-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+}
+.submit-provider { position: relative; }
+.submit-provider-btn {
+  --cat: #555;
+  position: relative; isolation: isolate; overflow: hidden;
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; text-align: left;
+  font-family: inherit; font-size: 12px;
+  color: #888; background: #1c1c1c;
+  border: none; border-radius: 6px; cursor: pointer;
+  padding: 8px 10px;
+}
+.submit-provider-btn:hover { background: #222; color: #cfcfcf; }
+.submit-provider-btn.is-set {
+  color: #fff;
+  background-image: linear-gradient(
+    105deg,
+    var(--cat) 0%,
+    color-mix(in srgb, var(--cat) 78%, #fff) 70%,
+    color-mix(in srgb, var(--cat) 55%, #fff) 100%
+  );
+}
+.submit-provider-btn.is-set::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  opacity: .85; mix-blend-mode: overlay;
+  background-size: 70px 70px; background-repeat: repeat;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.8 -0.45'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.submit-provider-btn.is-set::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(90deg, transparent 45%, rgba(255,255,255,.32) 100%);
+  mix-blend-mode: soft-light;
+}
+.submit-provider-btn > * { position: relative; z-index: 1; }
+.submit-provider-menu {
+  position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 5;
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 6px; border-radius: 8px;
+  background: #111;
+  box-shadow: 0 16px 40px rgba(0,0,0,.4);
+}
+.submit-provider-menu[hidden] { display: none; }
+.submit-provider-opt {
+  --cat: #888;
+  position: relative; isolation: isolate; overflow: hidden;
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; text-align: left;
+  font-family: inherit; font-size: 12px;
+  color: #cfcfcf; background: none;
+  border: none; border-radius: 6px; cursor: pointer;
+  padding: 8px 10px;
+}
+.submit-provider-opt:hover { background: rgba(255,255,255,.08); color: #fff; }
+.submit-provider-opt.is-selected {
+  color: #fff;
+  background-image: linear-gradient(
+    105deg,
+    var(--cat) 0%,
+    color-mix(in srgb, var(--cat) 78%, #fff) 70%,
+    color-mix(in srgb, var(--cat) 55%, #fff) 100%
+  );
+}
+.submit-provider-opt.is-selected::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  opacity: .85; mix-blend-mode: overlay;
+  background-size: 70px 70px; background-repeat: repeat;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.8 -0.45'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.submit-provider-opt.is-selected::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(90deg, transparent 45%, rgba(255,255,255,.32) 100%);
+  mix-blend-mode: soft-light;
+}
+.submit-provider-opt > * { position: relative; z-index: 1; }
+.submit-provider-swatch {
+  position: relative; overflow: hidden; flex-shrink: 0;
+  width: 14px; height: 14px; border-radius: 3px;
+  background-image: linear-gradient(
+    105deg,
+    var(--cat) 0%,
+    color-mix(in srgb, var(--cat) 78%, #fff) 70%,
+    color-mix(in srgb, var(--cat) 55%, #fff) 100%
+  );
+}
+.submit-provider-swatch::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  opacity: .85; mix-blend-mode: overlay;
+  background-size: 40px 40px; background-repeat: repeat;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.8 -0.45'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.submit-provider-swatch::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, transparent 45%, rgba(255,255,255,.32) 100%);
+  mix-blend-mode: soft-light;
+}
+.submit-provider-other[hidden] { display: none; }
+.submit-provider-other {
+  margin-top: 6px;
+}
+.submit-actions {
+  padding: 10px 8px 4px; flex-shrink: 0;
+}
+.submit-go {
+  position: relative; isolation: isolate; overflow: hidden;
+  display: block; width: 100%;
+  font-family: inherit; font-size: 12px; font-weight: 500;
+  letter-spacing: .02em; color: #fff;
+  border: none; border-radius: 6px; cursor: pointer;
+  padding: 10px 12px;
+  background-image: linear-gradient(
+    105deg,
+    #141414 0%,
+    color-mix(in srgb, #141414 70%, #3a3a3a) 60%,
+    color-mix(in srgb, #141414 45%, #5a5a5a) 100%
+  );
+}
+.submit-go::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  opacity: .8; mix-blend-mode: overlay;
+  background-size: 120px 120px; background-repeat: repeat;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.8 -0.45'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.submit-go:hover { color: #fff; filter: brightness(1.12); }
+body.submit-open { overflow: hidden; }
+body.submit-open .tip-rich { display: none !important; }
+</style>
+</head>
+<body>
+<div class="header-box">
+<div class="header-copy">
+<h1>locallist</h1>
+<div class="tagline-row">
+<a class="tagline" href="hamsters.html">“The hamsters go brrrrr”</a>
+<button id="submit" type="button" onclick="locallistSubmit()">Submit your setup</button>
+</div>
+</div>
+</div>
+<div class="chrome"><div class="navlinks"><a class="navlink nav-qwen" href="#cat-qwen"><span class="nav-label">Qwen</span><span class="navn"><span class="navn-num">21</span></span></a><a class="navlink nav-glm" href="#cat-glm"><span class="nav-label">GLM</span><span class="navn"><span class="navn-num">4</span></span></a><a class="navlink nav-gemma" href="#cat-gemma"><span class="nav-label">Gemma</span><span class="navn"><span class="navn-num">4</span></span></a><a class="navlink nav-minimax" href="#cat-minimax"><span class="nav-label">MiniMax</span><span class="navn"><span class="navn-num">1</span></span></a><a class="navlink nav-mistral" href="#cat-mistral"><span class="nav-label">Mistral</span><span class="navn"><span class="navn-num">1</span></span></a><button type="button" class="nav-clear" id="nav-clear" aria-label="deselect all providers" title="deselect all">×</button></div><div class="chrome-tools"><div class="filter-menu"><button type="button" id="filter-btn" class="filter-btn" aria-haspopup="true" aria-expanded="false" aria-label="sort setups"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3.2h12L9.4 8.3v4.9l-2.8 1.4V8.3L2 3.2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/></svg></button><div class="filter-dropdown" id="filter-dropdown" role="menu" hidden><div class="filter-group">Price</div><button type="button" class="filter-option" data-sort="price-asc" role="menuitem">Ascending</button><button type="button" class="filter-option" data-sort="price-desc" role="menuitem">Descending</button><div class="filter-group">Model rank</div><button type="button" class="filter-option" data-sort="rank-asc" role="menuitem">Ascending</button><button type="button" class="filter-option" data-sort="rank-desc" role="menuitem">Descending</button><hr class="filter-rule"><button type="button" class="filter-option is-selected" data-sort="" role="menuitem">Default order</button></div></div><div class="search-shell"><svg class="search-ico" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.25" stroke="currentColor" stroke-width="1.3"/><path d="M10.2 10.2L13.5 13.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><input id="model-search" type="search" placeholder="search" aria-label="search setups"><button type="button" class="search-clear" aria-label="clear search">×</button></div></div></div>
+<div class="cats">
+<section class="cat cat-qwen" id="cat-qwen"><div class="cat-results"><div class="grid"><div class="setup setup-rich" data-search="qwen3.6-35b-a3b q6_k_xl 2× rtx 3060 12gb" data-price="700" data-rank="15"><div class="model-box"><span class="model-name">qwen3.6-35b-a3b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">6bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/unsloth/Qwen3.6-35B-A3B-GGUF" target="_blank" rel="noopener" title="Qwen3.6-35B-A3B-UD-Q6_K_XL">Qwen3.6-35B-A3B-UD-Q6_K_XL</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#15</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/qwen-qwen3.6-35b-a3b/" target="_blank" rel="noopener">Qwen3.6 35B A3B →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#15<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">31.6 pts <span class="tip-rank">#118/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">84.1% <span class="tip-rank">#81/437</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">20.2% <span class="tip-rank">#83/425</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">63.7 <span class="tip-rank">#82/371</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">44.9% <span class="tip-rank">#62/143</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">75 <span class="tip-rank">#43/203</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">35.8% <span class="tip-rank">#157/415</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/qwen-qwen3.6-35b-a3b/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">2× RTX 3060 12GB</span></div><div class="rf"><span class="rl">price</span><span class="rv">$700</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">31.8</span><span class="mem-allow" title="KV = 2×10L×2kv×256d×131072ctx×2B = 2.5 GiB (full_attention layers from HF config)"> +kv 2.5</span><span class="mem-sep"> / </span><span class="mem-total">24 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="24" aria-valuenow="31.8"><div class="mem-bar-allow" style="width:100.0%"></div><div class="mem-bar-fill" style="width:100.0%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">260t/s pp</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">llama.cpp, Qwen3.6-35B-A3B-UD-Q6_K_XL, MoE offloaded to CPU, -c 131072. Prefill ~260t/s on CUDA0 (PCIe x16 to CPU) vs ~170t/s on CUDA1 (PCIe x8); tg/sec similar on both. Asking whether the x16 vs x8 link explains the pp gap.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="qwen3.6-35b-a3b rtx 3060 12gb · xeon e5-2650 v4 · 32gb ram" data-price="850" data-rank="15"><div class="model-box"><span class="model-name">qwen3.6-35b-a3b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">4bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/mudler/Qwen3.6-35B-A3B-APEX-MTP-GGUF/blob/main/Qwen3.6-35B-A3B-APEX-MTP-I-Compact.gguf" target="_blank" rel="noopener" title="Qwen3.6-35B-A3B-APEX-MTP-I-Compact">Qwen3.6-35B-A3B-APEX-MTP-I-Compact</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#15</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/qwen-qwen3.6-35b-a3b/" target="_blank" rel="noopener">Qwen3.6 35B A3B →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#15<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">31.6 pts <span class="tip-rank">#118/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">84.1% <span class="tip-rank">#81/437</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">20.2% <span class="tip-rank">#83/425</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">63.7 <span class="tip-rank">#82/371</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">44.9% <span class="tip-rank">#62/143</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">75 <span class="tip-rank">#43/203</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">35.8% <span class="tip-rank">#157/415</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/qwen-qwen3.6-35b-a3b/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">RTX 3060 12GB · Xeon E5-2650 v4 · 32GB RAM</span></div><div class="rf"><span class="rl">price</span><span class="rv">$850</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">17.3</span><span class="mem-allow" title="KV = 2×10L×2kv×256d×90000ctx×2B = 1.71661 GiB (full_attention layers from HF config)"> +kv 1.71661</span><span class="mem-sep"> / </span><span class="mem-total">44 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="44" aria-valuenow="17.3"><div class="mem-bar-allow" style="width:43.2%"></div><div class="mem-bar-fill" style="width:39.3%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">35t/s</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">llama-server, APEX-MTP-I-Compact.gguf, -ngl all, --n-cpu-moe 15, -c 90000, -b 2048 -ub 1024, -fa on, -ctk/-ctv turbo3_tcq. Reported 35.20 t/s (2.301 tokens in ~65s sample). Asking if that&#x27;s good for this hybrid GPU+CPU MoE setup.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="qwen3.6-27b int8 4× rtx 5060 ti 16gb" data-price="2400" data-rank="18"><div class="model-box"><span class="model-name">qwen3.6-27b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">8bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/Minachist/Qwen3.6-27B-INT8-AutoRound" target="_blank" rel="noopener" title="Qwen3.6-27B-INT8-AutoRound">Qwen3.6-27B-INT8-AutoRound</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#18</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/qwen-qwen3.6-27b/" target="_blank" rel="noopener">Qwen3.6 27B →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#18<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">37.1 pts <span class="tip-rank">#92/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">84.2% <span class="tip-rank">#79/437</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">21.6% <span class="tip-rank">#79/425</span></span></div><div class="tip-row"><span class="tip-k">SWE-bench</span><span class="tip-v">70% <span class="tip-rank">#43/68</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">68.7 <span class="tip-rank">#40/371</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">60.7% <span class="tip-rank">#44/143</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">74.6 <span class="tip-rank">#47/203</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">39.8% <span class="tip-rank">#103/415</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/qwen-qwen3.6-27b/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">4× RTX 5060 Ti 16GB</span></div><div class="rf"><span class="rl">price</span><span class="rv">$2400</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">36.8</span><span class="mem-allow" title="KV = 2×16L×4kv×256d×200000ctx×2B = 12.207 GiB (full_attention layers from HF config)"> +kv 12.207</span><span class="mem-sep"> / </span><span class="mem-total">64 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="64" aria-valuenow="36.8"><div class="mem-bar-allow" style="width:76.6%"></div><div class="mem-bar-fill" style="width:57.5%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">128t/s · 177t/s pp</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">SGLang with Minachist/Qwen3.6-27B-INT8-AutoRound — 8 concurrency, TP=4, MTP, 16K batch tokens, 200K context, bfloat16 KV cache. 4× RTX 5060 Ti (4 lanes of gen4 per card via bifurcation, ~8GB/s each). Serving bench: input 177.35 tok/s, output 127.63 tok/s, mean TTFT 7.5s. Lower TTFT than vLLM at the same concurrency on this rig.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="qwen3.6-27b q4_k_m, q8_0 rtx quadro 4000 8gb · amd bc-250 16gb" data-price="400" data-rank="18"><div class="model-box"><span class="model-name">qwen3.6-27b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">4bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/bottlecapai/ThinkingCap-Qwen3.6-27B-GGUF" target="_blank" rel="noopener" title="ThinkingCap-Qwen3.6-27B-Q4_K_M">ThinkingCap-Qwen3.6-27B-Q4_K_M</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#18</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/qwen-qwen3.6-27b/" target="_blank" rel="noopener">Qwen3.6 27B →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#18<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">37.1 pts <span class="tip-rank">#92/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">84.2% <span class="tip-rank">#79/437</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">21.6% <span class="tip-rank">#79/425</span></span></div><div class="tip-row"><span class="tip-k">SWE-bench</span><span class="tip-v">70% <span class="tip-rank">#43/68</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">68.7 <span class="tip-rank">#40/371</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">60.7% <span class="tip-rank">#44/143</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">74.6 <span class="tip-rank">#47/203</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">39.8% <span class="tip-rank">#103/415</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/qwen-qwen3.6-27b/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">RTX Quadro 4000 8GB · AMD BC-250 16GB</span></div><div class="rf"><span class="rl">price</span><span class="rv">$400</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">13.5</span><span class="mem-allow" title="KV = 2×16L×4kv×256d×65536ctx×1B = 2 GiB (full_attention layers from HF config)"> +kv 2</span><span class="mem-sep"> / </span><span class="mem-total">24 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="24" aria-valuenow="13.5"><div class="mem-bar-allow" style="width:64.6%"></div><div class="mem-bar-fill" style="width:56.2%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">20t/s · 100t/s pp</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">Running with llama.cpp RPC (cuda backend on the RTX, vulkan on the BC-250). llama-server --backend-sampling --n-gpu-layers -1 --rpc 192.168.100.10:50052 --jinja --cache-ram 32768 -fa on --model /opt/models/bottlecapai/ThinkingCap-Qwen3.6-27B-GGUF/ThinkingCap-Qwen3.6-27B-Q4_K_M.gguf --cache-type-k q8_0 --cache-type-v q8_0 --ctx-size 65536 --temp 1.0 --top-p 0.95 --top-k 64 -b 4096 -ub 1024 --spec-type draft-mtp --spec-draft-n-max 2</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="qwen3.6-27b q4 rtx 3090 24gb" data-price="1400" data-rank="18"><div class="model-box"><span class="model-name">qwen3.6-27b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">4bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/models?search=Qwen3.6-27B-Q4" target="_blank" rel="noopener" title="Qwen3.6-27B-Q4_M">Qwen3.6-27B-Q4_M</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#18</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/qwen-qwen3.6-27b/" target="_blank" rel="noopener">Qwen3.6 27B →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#18<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">37.1 pts <span class="tip-rank">#92/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">84.2% <span class="tip-rank">#79/437</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">21.6% <span class="tip-rank">#79/425</span></span></div><div class="tip-row"><span class="tip-k">SWE-bench</span><span class="tip-v">70% <span class="tip-rank">#43/68</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">68.7 <span class="tip-rank">#40/371</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">60.7% <span class="tip-rank">#44/143</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">74.6 <span class="tip-rank">#47/203</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">39.8% <span class="tip-rank">#103/415</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/qwen-qwen3.6-27b/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">RTX 3090 24GB</span></div><div class="rf"><span class="rl">price</span><span class="rv">$1400</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">13.5</span><span class="mem-allow" title="KV ≈ 20% of weight footprint (estimate)"> +kv 2.7</span><span class="mem-sep"> / </span><span class="mem-total">24 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="24" aria-valuenow="13.5"><div class="mem-bar-allow" style="width:67.5%"></div><div class="mem-bar-fill" style="width:56.2%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">30-35t/s</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">llama.cpp, Qwen3.6-27B Q4_M on a 3090 — 30–35 t/s out of the box. No ctx/KV details given.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="qwen3.5-397b q4, q8 kv cache rtx pro 6000 max-q 96gb · rtx a6000 48gb · 128gb ddr4" data-price="17000" data-rank="10"><div class="model-box"><span class="model-name">qwen3.5-397b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">4bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/unsloth/Qwen3.5-397B-A17B-GGUF/tree/main/Q4_K_M" target="_blank" rel="noopener" title="Qwen3.5-397B-A17B-Q4_K_M">Qwen3.5-397B-A17B-Q4_K_M</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#10</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/qwen-qwen3.5-397b-a17b/" target="_blank" rel="noopener">Qwen3.5 397B A17B →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#10<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">33.7 pts <span class="tip-rank">#103/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">89.3% <span class="tip-rank">#38/437</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">27.3% <span class="tip-rank">#56/425</span></span></div><div class="tip-row"><span class="tip-k">SWE-bench</span><span class="tip-v">69.9 <span class="tip-rank">#28/29</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">65.7 <span class="tip-rank">#64/371</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">51.3% <span class="tip-rank">#54/143</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">77.3 <span class="tip-rank">#30/203</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">42% <span class="tip-rank">#71/415</span></span></div><div class="tip-row"><span class="tip-k">LiveCode</span><span class="tip-v">79.3% <span class="tip-rank">#13/44</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/qwen-qwen3.5-397b-a17b/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">RTX PRO 6000 Max-Q 96GB · RTX A6000 48GB · 128GB DDR4</span></div><div class="rf"><span class="rl">price</span><span class="rv">$17000</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">244</span><span class="mem-allow" title="KV = 2×15L×2kv×256d×131072ctx×1B = 1.875 GiB (full_attention layers from HF config)"> +kv 1.875</span><span class="mem-sep"> / </span><span class="mem-total">272 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="272" aria-valuenow="244"><div class="mem-bar-allow" style="width:90.4%"></div><div class="mem-bar-fill" style="width:89.7%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">13-14t/s</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">Qwen3.5-397B-A17B Q4_K_M (~244GB) with 128K Q8 KV (~1.9GB) squeezed across PRO 6000 Max-Q 96GB + A6000 48GB + 128GB DDR4 (PCIe Gen3) — ~13–14 t/s.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="qwen3.5-122b 4bit apple m3 ultra 512gb (80 gpu cores)" data-price="10000" data-rank="9"><div class="model-box"><span class="model-name">qwen3.5-122b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">4bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/mlx-community/Qwen3.5-122B-A10B-4bit" target="_blank" rel="noopener" title="Qwen3.5-122B-A10B-4bit">Qwen3.5-122B-A10B-4bit</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#9</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/qwen-qwen3.5-122b-a10b/" target="_blank" rel="noopener">Qwen3.5-122B-A10B →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#9<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">32.3 pts <span class="tip-rank">#114/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">85.7% <span class="tip-rank">#62/437</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">23.4% <span class="tip-rank">#72/425</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">66.7 <span class="tip-rank">#53/371</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">47.6% <span class="tip-rank">#58/143</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">75 <span class="tip-rank">#45/203</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">42% <span class="tip-rank">#72/415</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/qwen-qwen3.5-122b-a10b/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">Apple M3 Ultra 512GB (80 GPU cores)</span></div><div class="rf"><span class="rl">price</span><span class="rv">$10000</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">69.6</span><span class="mem-allow" title="KV = 2×12L×2kv×256d×512ctx×2B = 0.0117188 GiB (full_attention layers from HF config)"> +kv 0.0117188</span><span class="mem-sep"> / </span><span class="mem-total">512 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="512" aria-valuenow="69.6"><div class="mem-bar-allow" style="width:13.6%"></div><div class="mem-bar-fill" style="width:13.6%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">54t/s · 605t/s pp</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">MLX 4bit on M3 Ultra 512GB — ~54 t/s tg at short ctx (~70GB resident), falling to ~32 t/s / 91.7GB at 128k. Also tables an M5 Max 128GB for comparison (faster pp/tg).</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="qwen3.5-122b q3-k-m, q4-k-m rtx 5060 ti 16gb" data-price="600" data-rank="9"><div class="model-box"><span class="model-name">qwen3.5-122b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">3bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/models?search=Qwen3.5-122B-A10B-GGUF" target="_blank" rel="noopener" title="Qwen3.5-122B-A10B-Q3_K_M">Qwen3.5-122B-A10B-Q3_K_M</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#9</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/qwen-qwen3.5-122b-a10b/" target="_blank" rel="noopener">Qwen3.5-122B-A10B →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#9<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">32.3 pts <span class="tip-rank">#114/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">85.7% <span class="tip-rank">#62/437</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">23.4% <span class="tip-rank">#72/425</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">66.7 <span class="tip-rank">#53/371</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">47.6% <span class="tip-rank">#58/143</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">75 <span class="tip-rank">#45/203</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">42% <span class="tip-rank">#72/415</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/qwen-qwen3.5-122b-a10b/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">RTX 5060 Ti 16GB</span></div><div class="rf"><span class="rl">price</span><span class="rv">$600</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">58.2</span><span class="mem-allow" title="KV ≈ 20% of weight footprint (estimate)"> +kv 11.64</span><span class="mem-sep"> / </span><span class="mem-total">16 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="16" aria-valuenow="58.2"><div class="mem-bar-allow" style="width:100.0%"></div><div class="mem-bar-fill" style="width:100.0%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">14.4t/s · 140t/s pp</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">llama.cpp + tools. 122B Q3_K_M on single 5060 Ti: 140t/s pp @2.7k / 14.4t/s tg @2k.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="qwen3.5-35b-a3b 8bit macbook m1 max 64gb" data-price="2000" data-rank="16"><div class="model-box"><span class="model-name">qwen3.5-35b-a3b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">8bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/mlx-community/Qwen3.5-35B-A3B-8bit" target="_blank" rel="noopener" title="Qwen3.5-35B-A3B-8bit">Qwen3.5-35B-A3B-8bit</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#16</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/qwen-qwen3.5-35b-a3b/" target="_blank" rel="noopener">Qwen3.5-35B-A3B →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#16<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">29.3 pts <span class="tip-rank">#131/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">84.5% <span class="tip-rank">#75/437</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">19.7% <span class="tip-rank">#86/425</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">62.7 <span class="tip-rank">#89/371</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">40.8% <span class="tip-rank">#69/143</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">72.7 <span class="tip-rank">#62/203</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">37.7% <span class="tip-rank">#128/415</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/qwen-qwen3.5-35b-a3b/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">MacBook M1 Max 64GB</span></div><div class="rf"><span class="rl">price</span><span class="rv">$2000</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">37.7</span><span class="mem-allow" title="KV = 2×10L×2kv×256d×36371ctx×2B = 0.693722 GiB (full_attention layers from HF config)"> +kv 0.693722</span><span class="mem-sep"> / </span><span class="mem-total">64 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="64" aria-valuenow="37.7"><div class="mem-bar-allow" style="width:60.0%"></div><div class="mem-bar-fill" style="width:58.9%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">41t/s · 483t/s pp</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">MLX mlx-community/Qwen3.5-35B-A3B-8bit on M1 Max 64GB. Baseline (no KV quant): prefill 483.3 / decode 41.0 t/s on ~36k prompt. TurboQuant 3.5bit KV tanks decode to 6.6 t/s.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="qwen3.5-35b-a3b q8 2× rtx 5060 ti 16gb" data-price="1200" data-rank="16"><div class="model-box"><span class="model-name">qwen3.5-35b-a3b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">8bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/unsloth/Qwen3.5-35B-A3B-GGUF" target="_blank" rel="noopener" title="Qwen3.5-35B-A3B-Q8_0">Qwen3.5-35B-A3B-Q8_0</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#16</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/qwen-qwen3.5-35b-a3b/" target="_blank" rel="noopener">Qwen3.5-35B-A3B →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#16<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">29.3 pts <span class="tip-rank">#131/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">84.5% <span class="tip-rank">#75/437</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">19.7% <span class="tip-rank">#86/425</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">62.7 <span class="tip-rank">#89/371</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">40.8% <span class="tip-rank">#69/143</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">72.7 <span class="tip-rank">#62/203</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">37.7% <span class="tip-rank">#128/415</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/qwen-qwen3.5-35b-a3b/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">2× RTX 5060 Ti 16GB</span></div><div class="rf"><span class="rl">price</span><span class="rv">$1200</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">36.9</span><span class="mem-allow" title="KV ≈ 20% of weight footprint (estimate)"> +kv 7.38</span><span class="mem-sep"> / </span><span class="mem-total">32 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="32" aria-valuenow="36.9"><div class="mem-bar-allow" style="width:100.0%"></div><div class="mem-bar-fill" style="width:100.0%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">58t/s · 826t/s pp</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">Qwen3.5-35B-A3B Q8 on dual 5060 Ti — prompt eval 826 t/s, gen 58 t/s. PP limited by x1 PCIe 4.0 link.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="qwen3.5-35b-a3b q8 2× rtx 4090 24gb" data-price="4800" data-rank="16"><div class="model-box"><span class="model-name">qwen3.5-35b-a3b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">8bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/unsloth/Qwen3.5-35B-A3B-GGUF" target="_blank" rel="noopener" title="Qwen3.5-35B-A3B-Q8_0">Qwen3.5-35B-A3B-Q8_0</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#16</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/qwen-qwen3.5-35b-a3b/" target="_blank" rel="noopener">Qwen3.5-35B-A3B →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#16<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">29.3 pts <span class="tip-rank">#131/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">84.5% <span class="tip-rank">#75/437</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">19.7% <span class="tip-rank">#86/425</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">62.7 <span class="tip-rank">#89/371</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">40.8% <span class="tip-rank">#69/143</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">72.7 <span class="tip-rank">#62/203</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">37.7% <span class="tip-rank">#128/415</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/qwen-qwen3.5-35b-a3b/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">2× RTX 4090 24GB</span></div><div class="rf"><span class="rl">price</span><span class="rv">$4800</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">36.9</span><span class="mem-allow" title="KV ≈ 20% of weight footprint (estimate)"> +kv 7.38</span><span class="mem-sep"> / </span><span class="mem-total">48 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="48" aria-valuenow="36.9"><div class="mem-bar-allow" style="width:92.2%"></div><div class="mem-bar-fill" style="width:76.9%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">94t/s · 4505t/s pp</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">Dual 4090, Q8 KV. 35B-A3B Q8_0: 4505 t/s pp / 94 t/s tg. Also quotes 27B Q8_0 at 1462 pp / 23.45 tg on the same rig.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="qwen3.5-35b-a3b 8bit macbook m1 max 64gb" data-price="2000" data-rank="16"><div class="model-box"><span class="model-name">qwen3.5-35b-a3b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">8bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/mlx-community/Qwen3.5-35B-A3B-8bit" target="_blank" rel="noopener" title="Qwen3.5-35B-A3B-8bit">Qwen3.5-35B-A3B-8bit</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#16</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/qwen-qwen3.5-35b-a3b/" target="_blank" rel="noopener">Qwen3.5-35B-A3B →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#16<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">29.3 pts <span class="tip-rank">#131/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">84.5% <span class="tip-rank">#75/437</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">19.7% <span class="tip-rank">#86/425</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">62.7 <span class="tip-rank">#89/371</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">40.8% <span class="tip-rank">#69/143</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">72.7 <span class="tip-rank">#62/203</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">37.7% <span class="tip-rank">#128/415</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/qwen-qwen3.5-35b-a3b/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">MacBook M1 Max 64GB</span></div><div class="rf"><span class="rl">price</span><span class="rv">$2000</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">37.7</span><span class="mem-allow" title="KV = 2×10L×2kv×256d×43000ctx×2B = 0.82016 GiB (full_attention layers from HF config)"> +kv 0.82016</span><span class="mem-sep"> / </span><span class="mem-total">64 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="64" aria-valuenow="37.7"><div class="mem-bar-allow" style="width:60.2%"></div><div class="mem-bar-fill" style="width:58.9%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">39t/s</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">M1 Max 64GB multi-model note. Headline in post: 35B-A3B@8bit 38.54 t/s at ~43k ctx. Also 9B MLX bf16 17.3 and 9B@9bit 26.5 at ~40–44k (row model tagged 9b).</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="qwen3.5-35b-a3b 5.5bit macbook pro m1 max 64gb" data-price="2000" data-rank="16"><div class="model-box"><span class="model-name">qwen3.5-35b-a3b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">5.5bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://modelscope.cn/models/inferencerlabs/Qwen3.5-35B-A3B-MLX-5.5bit" target="_blank" rel="noopener" title="Qwen3.5-35B-A3B-MLX-5.5bit">Qwen3.5-35B-A3B-MLX-5.5bit</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#16</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/qwen-qwen3.5-35b-a3b/" target="_blank" rel="noopener">Qwen3.5-35B-A3B →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#16<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">29.3 pts <span class="tip-rank">#131/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">84.5% <span class="tip-rank">#75/437</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">19.7% <span class="tip-rank">#86/425</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">62.7 <span class="tip-rank">#89/371</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">40.8% <span class="tip-rank">#69/143</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">72.7 <span class="tip-rank">#62/203</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">37.7% <span class="tip-rank">#128/415</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/qwen-qwen3.5-35b-a3b/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">MacBook Pro M1 Max 64GB</span></div><div class="rf"><span class="rl">price</span><span class="rv">$2000</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">22.3</span><span class="mem-allow" title="KV = 2×10L×2kv×256d×42000ctx×1B = 0.400543 GiB (full_attention layers from HF config)"> +kv 0.400543</span><span class="mem-sep"> / </span><span class="mem-total">64 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="64" aria-valuenow="22.3"><div class="mem-bar-allow" style="width:35.5%"></div><div class="mem-bar-fill" style="width:34.8%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">45t/s</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">M1 Max 64GB, ~40–44k context (70-page PDF summarize). Best: inferencerlabs 5.5bit MLX 45 t/s (8bit KV in LM Studio). Also 9bit 39, mlx 6bit 23, GGUF MXFP4 10, UD-Q4_K_XL 20 t/s.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="qwen3.5-35b-a3b q4_k_m nvidia dgx spark 128gb" data-price="4800" data-rank="16"><div class="model-box"><span class="model-name">qwen3.5-35b-a3b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">4bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/unsloth/Qwen3.5-35B-A3B-GGUF" target="_blank" rel="noopener" title="Qwen3.5-35B-A3B-Q4_K_M">Qwen3.5-35B-A3B-Q4_K_M</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#16</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/qwen-qwen3.5-35b-a3b/" target="_blank" rel="noopener">Qwen3.5-35B-A3B →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#16<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">29.3 pts <span class="tip-rank">#131/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">84.5% <span class="tip-rank">#75/437</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">19.7% <span class="tip-rank">#86/425</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">62.7 <span class="tip-rank">#89/371</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">40.8% <span class="tip-rank">#69/143</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">72.7 <span class="tip-rank">#62/203</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">37.7% <span class="tip-rank">#128/415</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/qwen-qwen3.5-35b-a3b/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">NVIDIA DGX Spark 128GB</span></div><div class="rf"><span class="rl">price</span><span class="rv">$4800</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">22</span><span class="mem-allow" title="KV ≈ 20% of weight footprint (estimate)"> +kv 4.4</span><span class="mem-sep"> / </span><span class="mem-total">128 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="128" aria-valuenow="22"><div class="mem-bar-allow" style="width:20.6%"></div><div class="mem-bar-fill" style="width:17.2%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">70t/s</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">DGX Spark running Qwen3.5-35B Q4_K_M at 70+ t/s full context, alongside Kokoro TTS, Parakeet ASR, z-image-turbo, and qwen-image-edit.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="qwen3.5-35b-a3b unsloth quant rx 9070 xt 16gb" data-price="700" data-rank="16"><div class="model-box"><span class="model-name">qwen3.5-35b-a3b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">2bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/unsloth/Qwen3.5-35B-A3B-GGUF/blob/main/Qwen3.5-35B-A3B-UD-Q2_K_XL.gguf" target="_blank" rel="noopener" title="Qwen3.5-35B-A3B-UD-Q2_K_XL">Qwen3.5-35B-A3B-UD-Q2_K_XL</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#16</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/qwen-qwen3.5-35b-a3b/" target="_blank" rel="noopener">Qwen3.5-35B-A3B →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#16<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">29.3 pts <span class="tip-rank">#131/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">84.5% <span class="tip-rank">#75/437</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">19.7% <span class="tip-rank">#86/425</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">62.7 <span class="tip-rank">#89/371</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">40.8% <span class="tip-rank">#69/143</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">72.7 <span class="tip-rank">#62/203</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">37.7% <span class="tip-rank">#128/415</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/qwen-qwen3.5-35b-a3b/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">RX 9070 XT 16GB</span></div><div class="rf"><span class="rl">price</span><span class="rv">$700</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">12.2</span><span class="mem-allow" title="KV = 2×10L×2kv×256d×65536ctx×2B = 1.25 GiB (full_attention layers from HF config)"> +kv 1.25</span><span class="mem-sep"> / </span><span class="mem-total">16 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="16" aria-valuenow="12.2"><div class="mem-bar-allow" style="width:84.1%"></div><div class="mem-bar-fill" style="width:76.2%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">111t/s</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">Unsloth UD-Q2_K_XL, 64k context, fully on 16GB RX 9070 XT with no offloading — 111 t/s.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="qwen3.5-27b q8_0 2× amd instinct mi50/mi60 16gb" data-price="400" data-rank="11"><div class="model-box"><span class="model-name">qwen3.5-27b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">8bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/unsloth/Qwen3.5-27B-GGUF" target="_blank" rel="noopener" title="Qwen3.5-27B-Q8_0">Qwen3.5-27B-Q8_0</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#11</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/qwen-qwen3.5-27b/" target="_blank" rel="noopener">Qwen3.5-27B →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#11<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">33.8 pts <span class="tip-rank">#103/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">85.8% <span class="tip-rank">#60/437</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">22.2% <span class="tip-rank">#78/425</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">67.3 <span class="tip-rank">#47/371</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">75 <span class="tip-rank">#43/203</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">39.5% <span class="tip-rank">#108/415</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/qwen-qwen3.5-27b/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">2× AMD Instinct MI50/MI60 16GB</span></div><div class="rf"><span class="rl">price</span><span class="rv">$400</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">28.6</span><span class="mem-allow" title="KV = 2×16L×4kv×256d×16384ctx×2B = 1 GiB (full_attention layers from HF config)"> +kv 1</span><span class="mem-sep"> / </span><span class="mem-total">32 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="32" aria-valuenow="28.6"><div class="mem-bar-allow" style="width:92.5%"></div><div class="mem-bar-fill" style="width:89.4%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">28t/s · 256t/s pp</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">llama.cpp on 2× AMD Instinct MI50/MI60, Qwen 27B Q8_0. Tensor (Full) bench: pp2048 256.29 t/s, tg256 28.45 t/s; at 16k context pp 233.83 / tg 27.43. Tensor over PCIe 1.0 drops prefill ~30% (pp 180 → still ok decode). MTP wasn&#x27;t a big win on MI50 — compute-bound more than interconnect.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="qwen3.5-27b q5_k_l rtx 5090 32gb" data-price="4200" data-rank="11"><div class="model-box"><span class="model-name">qwen3.5-27b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">5bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/bartowski/Qwen_Qwen3.5-27B-GGUF/blob/main/Qwen_Qwen3.5-27B-Q5_K_L.gguf" target="_blank" rel="noopener" title="Qwen_Qwen3.5-27B-Q5_K_L">Qwen_Qwen3.5-27B-Q5_K_L</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#11</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/qwen-qwen3.5-27b/" target="_blank" rel="noopener">Qwen3.5-27B →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#11<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">33.8 pts <span class="tip-rank">#103/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">85.8% <span class="tip-rank">#60/437</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">22.2% <span class="tip-rank">#78/425</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">67.3 <span class="tip-rank">#47/371</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">75 <span class="tip-rank">#43/203</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">39.5% <span class="tip-rank">#108/415</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/qwen-qwen3.5-27b/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">RTX 5090 32GB</span></div><div class="rf"><span class="rl">price</span><span class="rv">$4200</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">21.7</span><span class="mem-allow" title="KV ≈ 20% of weight footprint (estimate)"> +kv 4.34</span><span class="mem-sep"> / </span><span class="mem-total">32 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="32" aria-valuenow="21.7"><div class="mem-bar-allow" style="width:81.4%"></div><div class="mem-bar-fill" style="width:67.8%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">52t/s</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">RTX 5090 — Qwen3.5-27B Q5_K_L at 52 t/s generation (comparison datapoint).</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="qwen3.5-0.8b q8_0 i5-1145g7 (cpu only)" data-price="300" data-rank="153"><div class="model-box"><span class="model-name">qwen3.5-0.8b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">8bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/unsloth/Qwen3.5-0.8B-GGUF" target="_blank" rel="noopener" title="Qwen3.5-0.8B-Q8_0">Qwen3.5-0.8B-Q8_0</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#153</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/qwen-qwen3.5-0.8b/" target="_blank" rel="noopener">Qwen3.5-0.8B →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#153<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">5.5 pts <span class="tip-rank">#451/464</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">23.6% <span class="tip-rank">#444/454</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">4.9% <span class="tip-rank">#306/443</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">6.7 <span class="tip-rank">#280/370</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">0.4% <span class="tip-rank">#137/142</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">25.8 <span class="tip-rank">#181/197</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">2.9% <span class="tip-rank">#419/433</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/qwen-qwen3.5-0.8b/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">i5-1145G7 (CPU only)</span></div><div class="rf"><span class="rl">price</span><span class="rv">$300</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">0.8</span><span class="mem-allow" title="KV ≈ 20% of weight footprint (estimate)"> +kv 0.16</span><span class="mem-sep"> / </span><span class="mem-total">16 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="16" aria-valuenow="0.8"><div class="mem-bar-allow" style="width:6.0%"></div><div class="mem-bar-fill" style="width:5.0%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">12t/s</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">qwen3.5-0.8b Q8_0 in LM Studio — 12 t/s CPU-only on i5-1145G7.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="qwen3-coder-next q4-k-m rtx 5060 ti 16gb · 96gb ddr5" data-price="2200" data-rank="63"><div class="model-box"><span class="model-name">qwen3-coder-next</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">4bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/unsloth/Qwen3-Coder-Next-GGUF" target="_blank" rel="noopener" title="Qwen3-Coder-Next-Q4_K_M">Qwen3-Coder-Next-Q4_K_M</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#63</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/qwen-qwen3-coder-next/" target="_blank" rel="noopener">Qwen3 Coder Next →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#63<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">21.1 pts <span class="tip-rank">#193/464</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">73.7% <span class="tip-rank">#170/454</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">9.3% <span class="tip-rank">#173/443</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">40 <span class="tip-rank">#168/370</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">38.2% <span class="tip-rank">#73/142</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">32.3% <span class="tip-rank">#200/433</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/qwen-qwen3-coder-next/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">RTX 5060 Ti 16GB · 96GB DDR5</span></div><div class="rf"><span class="rl">price</span><span class="rv">$2200</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">48.5</span><span class="mem-allow" title="KV ≈ 20% of weight footprint (estimate)"> +kv 9.7</span><span class="mem-sep"> / </span><span class="mem-total">112 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="112" aria-valuenow="48.5"><div class="mem-bar-allow" style="width:52.0%"></div><div class="mem-bar-fill" style="width:43.3%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">14.75t/s</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">qwen3-coder-next Q4_K_M on 5060 Ti 16GB + 96GB DDR5. ik_llama 14.75t/s vs llama.cpp 8t/s vs krasis 26.5t/s. Side note: krasis OpenAI API issues with openclaw.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="qwen3-coder-next nvfp4 nvidia dgx spark 128gb" data-price="4800" data-rank="63"><div class="model-box"><span class="model-name">qwen3-coder-next</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">4bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/RedHatAI/Qwen3-Coder-Next-NVFP4" target="_blank" rel="noopener" title="Qwen3-Coder-Next-NVFP4">Qwen3-Coder-Next-NVFP4</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#63</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/qwen-qwen3-coder-next/" target="_blank" rel="noopener">Qwen3 Coder Next →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#63<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">21.1 pts <span class="tip-rank">#193/464</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">73.7% <span class="tip-rank">#170/454</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">9.3% <span class="tip-rank">#173/443</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">40 <span class="tip-rank">#168/370</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">38.2% <span class="tip-rank">#73/142</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">32.3% <span class="tip-rank">#200/433</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/qwen-qwen3-coder-next/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">NVIDIA DGX Spark 128GB</span></div><div class="rf"><span class="rl">price</span><span class="rv">$4800</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">45</span><span class="mem-allow" title="KV ≈ 20% of weight footprint (estimate)"> +kv 9</span><span class="mem-sep"> / </span><span class="mem-total">128 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="128" aria-valuenow="45"><div class="mem-bar-allow" style="width:42.2%"></div><div class="mem-bar-fill" style="width:35.2%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">95t/s · 45000t/s pp</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">Qwen3-Coder-Next NVFP4 on DGX Spark — 45000 t/s PP2048, 95 t/s tg512.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="qwen3-coder-next q4_0 rtx 4070 12gb · 64gb ddr5 · 7950x" data-price="1500" data-rank="63"><div class="model-box"><span class="model-name">qwen3-coder-next</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">4bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/unsloth/Qwen3-Coder-Next-GGUF" target="_blank" rel="noopener" title="Qwen3-Coder-Next-Q4_K_M">Qwen3-Coder-Next-Q4_K_M</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#63</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/qwen-qwen3-coder-next/" target="_blank" rel="noopener">Qwen3 Coder Next →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#63<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">21.1 pts <span class="tip-rank">#193/464</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">73.7% <span class="tip-rank">#170/454</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">9.3% <span class="tip-rank">#173/443</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">40 <span class="tip-rank">#168/370</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">38.2% <span class="tip-rank">#73/142</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">32.3% <span class="tip-rank">#200/433</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/qwen-qwen3-coder-next/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">RTX 4070 12GB · 64GB DDR5 · 7950X</span></div><div class="rf"><span class="rl">price</span><span class="rv">$1500</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">48.5</span><span class="mem-allow" title="KV = 2×48L×2kv×256d×40960ctx×0.5B = 0.9375 GiB (full_attention layers from HF config)"> +kv 0.9375</span><span class="mem-sep"> / </span><span class="mem-total">76 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="76" aria-valuenow="48.5"><div class="mem-bar-allow" style="width:65.0%"></div><div class="mem-bar-fill" style="width:63.8%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">26t/s · 307t/s pp</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">llama-server unsloth Coder-Next Q4_K_M, ctx 40k, flash-attn, -ctk/-ctv q4_0, --fit on. 30k-token prompt: 307 t/s pp / 25.54 t/s tg.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div></div></div></section>
+<section class="cat cat-glm" id="cat-glm"><div class="cat-results"><div class="grid"><div class="setup setup-rich" data-search="glm-5.2 rtx 5070 laptop 8gb · ryzen ai 7 350 · 32gb ram" data-price="1500" data-rank="2"><div class="model-box"><span class="model-name">glm-5.2</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">1bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/unsloth/GLM-5.2-GGUF" target="_blank" rel="noopener" title="GLM-5.2-UD-IQ1_M">GLM-5.2-UD-IQ1_M</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#2</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/z-ai-glm-5.2/" target="_blank" rel="noopener">GLM 5.2 →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#2<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">51.1 pts <span class="tip-rank">#28/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">91.2% <span class="tip-rank">#31/112</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">40.1% <span class="tip-rank">#24/425</span></span></div><div class="tip-row"><span class="tip-k">SWE-bench</span><span class="tip-v">82.8% <span class="tip-rank">#6/68</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">71.3 <span class="tip-rank">#17/371</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">82.7% <span class="tip-rank">#11/143</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">50.5% <span class="tip-rank">#26/415</span></span></div><div class="tip-row"><span class="tip-k">LiveCode</span><span class="tip-v">69.5% <span class="tip-rank">#75/119</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/z-ai-glm-5.2/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">RTX 5070 Laptop 8GB · Ryzen AI 7 350 · 32GB RAM</span></div><div class="rf"><span class="rl">price</span><span class="rv">$1500</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">228</span><span class="mem-allow" title="KV ≈ 20% of weight footprint (estimate)"> +kv 45.6</span><span class="mem-sep"> / </span><span class="mem-total">40 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="40" aria-valuenow="228"><div class="mem-bar-allow" style="width:100.0%"></div><div class="mem-bar-fill" style="width:100.0%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">0.2t/s · 0.3t/s pp</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">GLM-5.2 UD-IQ1_M (~228GB) streaming experts from NVMe on a 5070 Laptop 8GB + 32GB RAM — ~0.3 t/s pp / ~0.2 t/s tg (~3.7GB VRAM + ~31GB RAM).</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="glm-4.7 q4 rtx pro 6000 96gb · 9950x · 256gb ddr5-6000" data-price="20000" data-rank="43"><div class="model-box"><span class="model-name">glm-4.7</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">4bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/unsloth/GLM-4.7-GGUF" target="_blank" rel="noopener" title="GLM-4.7-Q4_K_M">GLM-4.7-Q4_K_M</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#43</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/z-ai-glm-4.7/" target="_blank" rel="noopener">GLM 4.7 →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#43<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">26.6 pts <span class="tip-rank">#149/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">66.4% <span class="tip-rank">#53/112</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">6.1% <span class="tip-rank">#221/425</span></span></div><div class="tip-row"><span class="tip-k">SWE-bench</span><span class="tip-v">69.4% <span class="tip-rank">#48/68</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">36.3 <span class="tip-rank">#172/371</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">35.4% <span class="tip-rank">#160/415</span></span></div><div class="tip-row"><span class="tip-k">LiveCode</span><span class="tip-v">82.2% <span class="tip-rank">#40/119</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/z-ai-glm-4.7/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">RTX PRO 6000 96GB · 9950X · 256GB DDR5-6000</span></div><div class="rf"><span class="rl">price</span><span class="rv">$20000</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">216</span><span class="mem-allow" title="KV = 2×92L×8kv×128d×32768ctx×2B = 11.5 GiB (full_attention layers from HF config)"> +kv 11.5</span><span class="mem-sep"> / </span><span class="mem-total">352 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="352" aria-valuenow="216"><div class="mem-bar-allow" style="width:64.6%"></div><div class="mem-bar-fill" style="width:61.4%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">5.8t/s</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">GLM-4.7 Q4_K_M (~216GB) on 9950X + 256GB DDR5-6000 + RTX PRO 6000 — ~5.8 t/s.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="glm-4.7 q3_k_l 2× radeon ai pro r9700 32gb · epyc 7532 · 256gb ddr4-3200" data-price="6000" data-rank="43"><div class="model-box"><span class="model-name">glm-4.7</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">3bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/bartowski/zai-org_GLM-4.7-GGUF" target="_blank" rel="noopener" title="GLM-4.7-Q3_K_L">GLM-4.7-Q3_K_L</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#43</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/z-ai-glm-4.7/" target="_blank" rel="noopener">GLM 4.7 →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#43<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">26.6 pts <span class="tip-rank">#149/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">66.4% <span class="tip-rank">#53/112</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">6.1% <span class="tip-rank">#221/425</span></span></div><div class="tip-row"><span class="tip-k">SWE-bench</span><span class="tip-v">69.4% <span class="tip-rank">#48/68</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">36.3 <span class="tip-rank">#172/371</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">35.4% <span class="tip-rank">#160/415</span></span></div><div class="tip-row"><span class="tip-k">LiveCode</span><span class="tip-v">82.2% <span class="tip-rank">#40/119</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/z-ai-glm-4.7/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">2× Radeon AI PRO R9700 32GB · EPYC 7532 · 256GB DDR4-3200</span></div><div class="rf"><span class="rl">price</span><span class="rv">$6000</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">171</span><span class="mem-allow" title="KV = 2×92L×8kv×128d×32768ctx×2B = 11.5 GiB (full_attention layers from HF config)"> +kv 11.5</span><span class="mem-sep"> / </span><span class="mem-total">320 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="320" aria-valuenow="171"><div class="mem-bar-allow" style="width:57.0%"></div><div class="mem-bar-fill" style="width:53.4%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">12t/s</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">GLM-4.7 Q3_K_L (~171GB, ~16GB active) on EPYC 7532 + 256GB DDR4 + 2× R9700 — 12 t/s with -ncmoe 0 (attention on GPU, experts in RAM).</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="glm-4.5 iq3-xxs 2× rx 7900 xtx 24gb · 192gb ddr5" data-price="11000" data-rank="62"><div class="model-box"><span class="model-name">glm-4.5</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">3bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/unsloth/GLM-4.5-GGUF" target="_blank" rel="noopener" title="GLM-4.5-IQ3_XXS">GLM-4.5-IQ3_XXS</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#62</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/z-ai-glm-4.5/" target="_blank" rel="noopener">GLM 4.5 →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#62<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">19.5 pts <span class="tip-rank">#204/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">78.2% <span class="tip-rank">#69/112</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">12.2% <span class="tip-rank">#125/425</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">48.3 <span class="tip-rank">#148/371</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">34.8% <span class="tip-rank">#166/415</span></span></div><div class="tip-row"><span class="tip-k">LiveCode</span><span class="tip-v">67.4% <span class="tip-rank">#76/119</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/z-ai-glm-4.5/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">2× RX 7900 XTX 24GB · 192GB DDR5</span></div><div class="rf"><span class="rl">price</span><span class="rv">$11000</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">145</span><span class="mem-allow" title="KV = 2×92L×8kv×128d×32768ctx×2B = 11.5 GiB (full_attention layers from HF config)"> +kv 11.5</span><span class="mem-sep"> / </span><span class="mem-total">240 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="240" aria-valuenow="145"><div class="mem-bar-allow" style="width:65.2%"></div><div class="mem-bar-fill" style="width:60.4%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">5t/s</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">GLM-4.5 IQ3_XXS (~145GB) on 2× 7900 XTX + 192GB DDR5 — only ~5 t/s; quality not acceptable — first prompt was &quot;Hello&quot; and it responded in Chinese.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div></div></div></section>
+<section class="cat cat-gemma" id="cat-gemma"><div class="cat-results"><div class="grid"><div class="setup setup-rich" data-search="gemma4-31b bf16 rtx pro 6000 96gb" data-price="12000" data-rank="20"><div class="model-box"><span class="model-name">gemma4-31b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">16bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/google/gemma-4-31B-it" target="_blank" rel="noopener" title="gemma-4-31B-it-BF16">gemma-4-31B-it-BF16</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#20</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/google-gemma-4-31b-it/" target="_blank" rel="noopener">Gemma 4 31B →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#20<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">29.4 pts <span class="tip-rank">#131/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">85.7% <span class="tip-rank">#62/437</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">26.5% <span class="tip-rank">#61/425</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">62 <span class="tip-rank">#92/371</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">43.4% <span class="tip-rank">#66/143</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">73.4 <span class="tip-rank">#55/203</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">43.4% <span class="tip-rank">#58/415</span></span></div><div class="tip-row"><span class="tip-k">LiveCode</span><span class="tip-v">80% <span class="tip-rank">#12/44</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/google-gemma-4-31b-it/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">RTX PRO 6000 96GB</span></div><div class="rf"><span class="rl">price</span><span class="rv">$12000</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">63</span><span class="mem-allow" title="KV = 2×10L×16kv×256d×131072ctx×2B = 20 GiB (full_attention layers from HF config)"> +kv 20</span><span class="mem-sep"> / </span><span class="mem-total">96 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="96" aria-valuenow="63"><div class="mem-bar-allow" style="width:86.5%"></div><div class="mem-bar-fill" style="width:65.6%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">23t/s</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">Gemma 4 31B BF16 (~63GB) on RTX PRO 6000 — 23 t/s at max context, ~10GB VRAM spare, GPU power capped ~440W / 600W.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="gemma4-31b iq4_xs rtx 5060 ti 16gb · rtx 3060 12gb" data-price="950" data-rank="20"><div class="model-box"><span class="model-name">gemma4-31b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">4bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/zerofata/G4-MeroMero-31B-gguf" target="_blank" rel="noopener" title="G4-MeroMero-31B-IQ4_XS">G4-MeroMero-31B-IQ4_XS</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#20</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/google-gemma-4-31b-it/" target="_blank" rel="noopener">Gemma 4 31B →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#20<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">29.4 pts <span class="tip-rank">#131/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">85.7% <span class="tip-rank">#62/437</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">26.5% <span class="tip-rank">#61/425</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">62 <span class="tip-rank">#92/371</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">43.4% <span class="tip-rank">#66/143</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">73.4 <span class="tip-rank">#55/203</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">43.4% <span class="tip-rank">#58/415</span></span></div><div class="tip-row"><span class="tip-k">LiveCode</span><span class="tip-v">80% <span class="tip-rank">#12/44</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/google-gemma-4-31b-it/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">RTX 5060 Ti 16GB · RTX 3060 12GB</span></div><div class="rf"><span class="rl">price</span><span class="rv">$950</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">16.7</span><span class="mem-allow" title="KV = 2×10L×16kv×256d×32768ctx×2B = 5 GiB (full_attention layers from HF config)"> +kv 5</span><span class="mem-sep"> / </span><span class="mem-total">28 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="28" aria-valuenow="16.7"><div class="mem-bar-allow" style="width:77.5%"></div><div class="mem-bar-fill" style="width:59.6%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">14.6t/s</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">Gemma 4 31B MeroMero IQ4_XS (~16.7GB) on KoboldCPP — 5060 Ti + 3060 layer split, 14.6 t/s.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="gemma4-31b 2× rtx 3090 24gb" data-price="2800" data-rank="20"><div class="model-box"><span class="model-name">gemma4-31b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">4bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/unsloth/gemma-4-31B-it-GGUF" target="_blank" rel="noopener" title="gemma-4-31B-it-Q4_K_M">gemma-4-31B-it-Q4_K_M</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#20</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/google-gemma-4-31b-it/" target="_blank" rel="noopener">Gemma 4 31B →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#20<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">29.4 pts <span class="tip-rank">#131/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">85.7% <span class="tip-rank">#62/437</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">26.5% <span class="tip-rank">#61/425</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">62 <span class="tip-rank">#92/371</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">43.4% <span class="tip-rank">#66/143</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">73.4 <span class="tip-rank">#55/203</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">43.4% <span class="tip-rank">#58/415</span></span></div><div class="tip-row"><span class="tip-k">LiveCode</span><span class="tip-v">80% <span class="tip-rank">#12/44</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/google-gemma-4-31b-it/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">2× RTX 3090 24GB</span></div><div class="rf"><span class="rl">price</span><span class="rv">$2800</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">14.7</span><span class="mem-allow" title="KV ≈ 20% of weight footprint (estimate)"> +kv 2.94</span><span class="mem-sep"> / </span><span class="mem-total">48 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="48" aria-valuenow="14.7"><div class="mem-bar-allow" style="width:36.8%"></div><div class="mem-bar-fill" style="width:30.6%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">50t/s · 1200t/s pp</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">Gemma 4 31B (~14.7GB) with llama.cpp speculative decoding on 2× 3090 — up to ~50 t/s / ~1200 t/s pp on some tasks (~2× vs Qwen3.5-27B for this user).</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div>
+<div class="setup setup-rich" data-search="gemma4-12b asus rog g700 · rtx 5080 16gb · ultra 7 265kf · 32gb ram" data-price="3000" data-rank="46"><div class="model-box"><span class="model-name">gemma4-12b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">4bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/unsloth/gemma-4-12B-it-qat-GGUF" target="_blank" rel="noopener" title="gemma-4-12B-it-qat-UD-Q4_K_XL">gemma-4-12B-it-qat-UD-Q4_K_XL</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#46</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/google-gemma-4-12b-it/" target="_blank" rel="noopener">Gemma 4 12B →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#46<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">22 pts <span class="tip-rank">#188/464</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">75.3% <span class="tip-rank">#159/454</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">14.8% <span class="tip-rank">#112/443</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">55.3 <span class="tip-rank">#121/370</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">69.7 <span class="tip-rank">#65/197</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">38.2% <span class="tip-rank">#125/433</span></span></div><div class="tip-row"><span class="tip-k">LiveCode</span><span class="tip-v">72% <span class="tip-rank">#20/41</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/google-gemma-4-12b-it/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">ASUS ROG G700 · RTX 5080 16GB · Ultra 7 265KF · 32GB RAM</span></div><div class="rf"><span class="rl">price</span><span class="rv">$3000</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">6.72</span><span class="mem-allow" title="KV = 2×8L×8kv×256d×32768ctx×2B = 2 GiB (full_attention layers from HF config)"> +kv 2</span><span class="mem-sep"> / </span><span class="mem-total">16 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="16" aria-valuenow="6.72"><div class="mem-bar-allow" style="width:54.5%"></div><div class="mem-bar-fill" style="width:42.0%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">96t/s</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">google/gemma-4-12b-qat (~6.72GB) on ASUS ROG G700 (RTX 5080 16GB, Ultra 7 265KF, 32GB) — 96 t/s.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div></div></div></section>
+<section class="cat cat-minimax" id="cat-minimax"><div class="cat-results"><div class="grid"><div class="setup setup-rich" data-search="minimax-m2.5 q3-k rtx pro 6000 96gb" data-price="12000" data-rank="34"><div class="model-box"><span class="model-name">minimax-m2.5</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">3bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/unsloth/MiniMax-M2.5-GGUF" target="_blank" rel="noopener" title="MiniMax-M2.5-Q3_K_M">MiniMax-M2.5-Q3_K_M</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#34</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/minimax-minimax-m2.5/" target="_blank" rel="noopener">MiniMax M2.5 →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#34<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">33.7 pts <span class="tip-rank">#104/442</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">84.8% <span class="tip-rank">#44/112</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">19.1% <span class="tip-rank">#89/425</span></span></div><div class="tip-row"><span class="tip-k">SWE-bench</span><span class="tip-v">74.2% <span class="tip-rank">#30/68</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">66 <span class="tip-rank">#60/371</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">42.6% <span class="tip-rank">#67/415</span></span></div><div class="tip-row"><span class="tip-k">LiveCode</span><span class="tip-v">79.2% <span class="tip-rank">#58/119</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/minimax-minimax-m2.5/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">RTX PRO 6000 96GB</span></div><div class="rf"><span class="rl">price</span><span class="rv">$12000</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">109</span><span class="mem-allow" title="KV = 2×62L×8kv×128d×32768ctx×2B = 7.75 GiB (full_attention layers from HF config)"> +kv 7.75</span><span class="mem-sep"> / </span><span class="mem-total">96 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="96" aria-valuenow="109"><div class="mem-bar-allow" style="width:100.0%"></div><div class="mem-bar-fill" style="width:100.0%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">20t/s · 200t/s pp</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">MiniMax M2.5 Q3 (~109GB) on a single RTX PRO 6000 — 20 t/s tg / 200 t/s pp. Planning to add a 5090 for layer offload.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div></div></div></section>
+<section class="cat cat-mistral" id="cat-mistral"><div class="cat-results"><div class="grid"><div class="setup setup-rich" data-search="mistral-small-4-119b iq4_xs rtx pro 6000 96gb" data-price="12000" data-rank="88"><div class="model-box"><span class="model-name">mistral-small-4-119b</span></div><div class="results-box"><div class="rich-stack"><div class="rf"><span class="rl">quant</span><span class="rv">4bit</span></div><div class="rf"><span class="rl">version</span><span class="rv"><a class="link-plain" href="https://huggingface.co/unsloth/Mistral-Small-4-119B-2603-GGUF" target="_blank" rel="noopener" title="Mistral-Small-4-119B-2603-UD-IQ4_XS">Mistral-Small-4-119B-2603-UD-IQ4_XS</a></span></div><div class="rf"><span class="rl">rank</span><span class="rv"><span class="hovtxt"><span class="rank-n">#88</span><span class="rank-t"> / 154</span> <span class="rank-note">open-weight</span><span class="tip tip-rich"><div class="tip-banner"><a class="tip-head" href="https://benchmarklist.com/models/mistral-small-4/" target="_blank" rel="noopener">Mistral Small →</a></div><div class="tip-body"><div class="tip-hero"><span class="tip-hero-k">open-weight</span><span class="tip-hero-v">#88<span class="tip-hero-t"> / 154</span></span></div><div class="tip-list"><div class="tip-row"><span class="tip-k">AA Index</span><span class="tip-v">19.6 pts <span class="tip-rank">#208/464</span></span></div><div class="tip-row"><span class="tip-k">GPQA</span><span class="tip-v">76.9% <span class="tip-rank">#143/454</span></span></div><div class="tip-row"><span class="tip-k">HLE</span><span class="tip-v">9.5% <span class="tip-rank">#172/443</span></span></div><div class="tip-row"><span class="tip-k">AA-LCR</span><span class="tip-v">44.7 <span class="tip-rank">#157/370</span></span></div><div class="tip-row"><span class="tip-k">Terminal</span><span class="tip-v">21% <span class="tip-rank">#92/142</span></span></div><div class="tip-row"><span class="tip-k">MMMU-Pro</span><span class="tip-v">56.8 <span class="tip-rank">#117/197</span></span></div><div class="tip-row"><span class="tip-k">SciCode</span><span class="tip-v">38% <span class="tip-rank">#130/433</span></span></div></div></div></span></span> <a class="rank-src" href="https://benchmarklist.com/models/mistral-small-4/" target="_blank" rel="noopener">benchmarklist</a></span></div><div class="rich-rule" aria-hidden="true"></div><div class="rf"><span class="rl">hardware</span><span class="rv">RTX PRO 6000 96GB</span></div><div class="rf"><span class="rl">price</span><span class="rv">$12000</span></div><div class="rf"><span class="rl">memory</span><span class="rv"><span class="mem-ratio"><span class="mem-used">58.1</span><span class="mem-allow" title="KV = 2×36L×32kv×128d×32768ctx×2B = 18 GiB (full_attention layers from HF config)"> +kv 18</span><span class="mem-sep"> / </span><span class="mem-total">96 GB</span></span><div class="mem-bar" role="meter" aria-label="memory weights plus kv cache" aria-valuemin="0" aria-valuemax="96" aria-valuenow="58.1"><div class="mem-bar-allow" style="width:79.3%"></div><div class="mem-bar-fill" style="width:60.5%"></div></div></span></div><div class="rf"><span class="rl">speed</span><span class="rv">189.7t/s · 3494t/s pp</span></div><div class="rf"><span class="rl">info</span><span class="rv"><span class="info-v"><span class="info-clamp">Mistral Small 4 119B UD-IQ4_XS (~58.1GB) on RTX PRO 6000 — llama-bench pp512 3494 t/s / tg128 190 t/s, no RAM offload.</span> <button type="button" class="read-more-btn" onclick="toggleInfo(this)">read more</button></span></span></div></div></div></div></div></div></section>
+<section class="cat cat-sorted" id="cat-sorted" style="display:none" aria-label="sorted setups">
+<div class="cat-results"><div class="grid"></div></div>
+</section>
+</div>
+
+<div id="submit-modal" class="submit-modal" hidden>
+  <div class="submit-backdrop" data-close-submit></div>
+  <div class="submit-panel" role="dialog" aria-modal="true" aria-labelledby="submit-title">
+    <div class="submit-head">
+      <h2 id="submit-title">Submit your setup</h2>
+      <button type="button" class="submit-x" data-close-submit aria-label="close">×</button>
+    </div>
+    <form id="submit-form" class="submit-form">
+      <div class="submit-group">Model</div>
+      <div class="submit-field">
+        <span class="submit-label">Provider</span>
+        <div class="submit-provider" id="submit-provider">
+          <button type="button" class="submit-provider-btn" id="submit-provider-btn"
+            aria-haspopup="listbox" aria-expanded="false">
+            <span class="submit-provider-text">Select family</span>
+          </button>
+          <div class="submit-provider-menu" id="submit-provider-menu" role="listbox" hidden>
+            <button type="button" class="submit-provider-opt" role="option" data-value="qwen" data-label="Qwen" style="--cat:#2f6fed">
+              <span class="submit-provider-swatch" aria-hidden="true"></span><span>Qwen</span>
+            </button>
+            <button type="button" class="submit-provider-opt" role="option" data-value="glm" data-label="GLM" style="--cat:#7c3aed">
+              <span class="submit-provider-swatch" aria-hidden="true"></span><span>GLM</span>
+            </button>
+            <button type="button" class="submit-provider-opt" role="option" data-value="gemma" data-label="Gemma" style="--cat:#0f9d58">
+              <span class="submit-provider-swatch" aria-hidden="true"></span><span>Gemma</span>
+            </button>
+            <button type="button" class="submit-provider-opt" role="option" data-value="minimax" data-label="MiniMax" style="--cat:#e67e22">
+              <span class="submit-provider-swatch" aria-hidden="true"></span><span>MiniMax</span>
+            </button>
+            <button type="button" class="submit-provider-opt" role="option" data-value="mistral" data-label="Mistral" style="--cat:#e11d48">
+              <span class="submit-provider-swatch" aria-hidden="true"></span><span>Mistral</span>
+            </button>
+            <button type="button" class="submit-provider-opt" role="option" data-value="other" data-label="Other" style="--cat:#b87333">
+              <span class="submit-provider-swatch" aria-hidden="true"></span><span>Other</span>
+            </button>
+          </div>
+          <input type="hidden" name="provider" id="submit-provider-value" value="">
+          <input class="submit-provider-other" name="provider_other" id="submit-provider-other"
+            autocomplete="off" placeholder="Family name" hidden>
+        </div>
+      </div>
+      <label class="submit-field">
+        <span class="submit-label">Name</span>
+        <input name="model" required autocomplete="off" placeholder="qwen3.6-35b-a3b">
+      </label>
+      <label class="submit-field">
+        <span class="submit-label">Quantization</span>
+        <input name="quant" required autocomplete="off" placeholder="4bit">
+      </label>
+      <label class="submit-field">
+        <span class="submit-label">Version</span>
+        <input name="version" required autocomplete="off" placeholder="Qwen3.6-35B-A3B-UD-Q6_K_XL">
+      </label>
+      <label class="submit-field">
+        <span class="submit-label">Context length</span>
+        <input name="kv_ctx" inputmode="numeric" autocomplete="off" placeholder="65536">
+        <p class="submit-hint">Tokens you actually run — used for the +kv bar</p>
+      </label>
+      <label class="submit-field">
+        <span class="submit-label">Link</span>
+        <input name="version_url" type="url" autocomplete="off" placeholder="https://huggingface.co/…">
+      </label>
+
+      <div class="submit-group">Hardware</div>
+      <label class="submit-field">
+        <span class="submit-label">Specs</span>
+        <input name="hardware" required autocomplete="off" placeholder="2× RTX 3090 24GB">
+      </label>
+      <label class="submit-field">
+        <span class="submit-label">Price</span>
+        <input name="price" required autocomplete="off" placeholder="1400">
+      </label>
+
+      <div class="submit-group">Speed</div>
+      <div class="submit-row">
+        <label class="submit-field">
+          <span class="submit-label">Decode (t/s)</span>
+          <input name="speed" required autocomplete="off" placeholder="35">
+        </label>
+        <label class="submit-field">
+          <span class="submit-label">Prefill (t/s)</span>
+          <input name="pp" autocomplete="off" placeholder="200">
+        </label>
+      </div>
+
+      <div class="submit-group">Info</div>
+      <label class="submit-field">
+        <span class="submit-label">How you run it</span>
+        <textarea name="info" required placeholder="Engine, flags, offload, concurrency, anything extreme…"></textarea>
+      </label>
+
+      <div class="submit-actions">
+        <button type="submit" class="submit-go">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function locallistSubmit() {
+  const modal = document.getElementById('submit-modal');
+  if (!modal) return;
+  modal.hidden = false;
+  document.body.classList.add('submit-open');
+  if (typeof window.locallistResetSubmitProvider === 'function') {
+    window.locallistResetSubmitProvider();
+  }
+  document.getElementById('submit-provider-btn')?.focus();
+}
+function locallistCloseSubmit() {
+  const modal = document.getElementById('submit-modal');
+  if (!modal) return;
+  modal.hidden = true;
+  document.body.classList.remove('submit-open');
+}
+(function () {
+  const modal = document.getElementById('submit-modal');
+  const form = document.getElementById('submit-form');
+  if (!modal || !form) return;
+
+  const urlInput = form.querySelector('[name="version_url"]');
+  const modelInput = form.querySelector('[name="model"]');
+  const quantInput = form.querySelector('[name="quant"]');
+  const versionInput = form.querySelector('[name="version"]');
+  const providerRoot = document.getElementById('submit-provider');
+  const providerBtn = document.getElementById('submit-provider-btn');
+  const providerMenu = document.getElementById('submit-provider-menu');
+  const providerValue = document.getElementById('submit-provider-value');
+  const providerOther = document.getElementById('submit-provider-other');
+  const providerText = providerBtn?.querySelector('.submit-provider-text');
+  const providerOpts = [...(providerMenu?.querySelectorAll('.submit-provider-opt') || [])];
+
+  function closeProviderMenu() {
+    if (!providerMenu || !providerBtn) return;
+    providerMenu.hidden = true;
+    providerBtn.setAttribute('aria-expanded', 'false');
+  }
+  function openProviderMenu() {
+    if (!providerMenu || !providerBtn) return;
+    providerMenu.hidden = false;
+    providerBtn.setAttribute('aria-expanded', 'true');
+  }
+  function setProvider(value, label, color, opts) {
+    if (!providerValue || !providerBtn || !providerText) return;
+    const focusOther = !opts || opts.focusOther !== false;
+    providerValue.value = value || '';
+    providerText.textContent = label || 'Select family';
+    providerBtn.classList.toggle('is-set', Boolean(value));
+    if (value && color) providerBtn.style.setProperty('--cat', color);
+    else providerBtn.style.removeProperty('--cat');
+    providerOpts.forEach((opt) => {
+      opt.classList.toggle('is-selected', opt.dataset.value === value);
+    });
+    const isOther = value === 'other';
+    if (providerOther) {
+      providerOther.hidden = !isOther;
+      providerOther.required = isOther;
+      if (!isOther) providerOther.value = '';
+      if (isOther && focusOther) providerOther.focus();
+    }
+  }
+  function resetProvider() {
+    setProvider('', 'Select family', '');
+    closeProviderMenu();
+  }
+  window.locallistResetSubmitProvider = resetProvider;
+
+  function guessProvider(hay) {
+    const s = String(hay || '').toLowerCase();
+    if (s.includes('qwen')) return ['qwen', 'Qwen', '#2f6fed'];
+    if (/\bglm\b/.test(s) || s.includes('glm-') || s.includes('chatglm')) return ['glm', 'GLM', '#7c3aed'];
+    if (s.includes('gemma')) return ['gemma', 'Gemma', '#0f9d58'];
+    if (s.includes('minimax')) return ['minimax', 'MiniMax', '#e67e22'];
+    if (s.includes('mistral')) return ['mistral', 'Mistral', '#e11d48'];
+    return ['other', 'Other', '#b87333'];
+  }
+  function quantToken(hay) {
+    const s = String(hay || '');
+    return (
+      s.match(/\bUD-(?:IQ|Q)[0-9][A-Za-z0-9_]*/i) ||
+      s.match(/\b(?:IQ|Q)[0-9][A-Za-z0-9_]*/i) ||
+      s.match(/\b(?:BF16|FP16|FP8|F16|F32|INT8|NF4)\b/i) ||
+      s.match(/(?:^|[_-])(\d+)bit(?:$|[_-])/i)
+    );
+  }
+  function quantBitsFromHay(hay) {
+    const m = quantToken(hay);
+    if (!m) return '';
+    const t = m[1] ? m[1] + 'bit' : m[0];
+    const q = t.match(/^(?:UD-)?(?:IQ|Q)(\d)/i);
+    if (q) return q[1] + 'bit';
+    if (/bf16|fp16|f16/i.test(t)) return 'BF16';
+    if (/fp8/i.test(t)) return 'FP8';
+    if (/int8/i.test(t)) return '8bit';
+    if (/^\d+bit$/i.test(t)) return t.toLowerCase();
+    return t;
+  }
+  function guessModel(repo, file) {
+    let s = (file ? file.split('/').pop() : repo) || '';
+    s = s.replace(/\.gguf$/i, '').replace(/-GGUF$/i, '');
+    s = s.replace(/^zai-org_/i, '').replace(/^Qwen_/i, '');
+    s = s.replace(/[-_.](?:UD-)?(?:IQ|Q)\d[A-Za-z0-9_]*$/i, '');
+    s = s.replace(/[-_.](?:BF16|FP16|FP8|F16|F32|INT8|NF4)$/i, '');
+    return s.replace(/_/g, '-').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').toLowerCase();
+  }
+  function parseHfUrl(raw) {
+    const s = String(raw || '').trim();
+    if (!s) return null;
+    let u;
+    try { u = new URL(s); } catch (_) { return null; }
+    if (!/(^|\.)huggingface\.co$/i.test(u.hostname) && !/(^|\.)hf\.co$/i.test(u.hostname)) return null;
+    const parts = u.pathname.replace(/\/+$/, '').split('/').filter(Boolean);
+    if (parts.length < 2) return null;
+    const org = parts[0];
+    const repo = parts[1];
+    let file = '';
+    const fileIdx = parts.findIndex((p) => p === 'blob' || p === 'resolve');
+    if (fileIdx >= 0 && parts[fileIdx + 2]) {
+      file = decodeURIComponent(parts.slice(fileIdx + 2).join('/'));
+    }
+    const hay = [repo, file].filter(Boolean).join(' ');
+    let version = ((file ? file.split('/').pop() : repo) || '').replace(/\.gguf$/i, '');
+    if (!file) {
+      version = version.replace(/-GGUF$/i, '').replace(/^zai-org_/i, '').replace(/^Qwen_/i, '');
+    }
+    const quant = quantBitsFromHay(hay);
+    const model = guessModel(repo, file);
+    const [provider, providerLabel, color] = guessProvider(hay + ' ' + model);
+    return { org, repo, file, model, quant, version, provider, providerLabel, color };
+  }
+  function applyParsed(parsed) {
+    if (!parsed) return;
+    if (modelInput && parsed.model) modelInput.value = parsed.model;
+    if (quantInput && parsed.quant) quantInput.value = parsed.quant;
+    if (versionInput && parsed.version) versionInput.value = parsed.version;
+    if (parsed.provider) {
+      setProvider(parsed.provider, parsed.providerLabel, parsed.color, { focusOther: false });
+      if (parsed.provider === 'other' && providerOther && parsed.model) {
+        providerOther.value = parsed.model;
+      }
+    }
+  }
+  function clearParsedFromLink() {
+    [modelInput, quantInput, versionInput].forEach((el) => {
+      if (el) el.value = '';
+    });
+    resetProvider();
+  }
+  let hfTimer = null;
+  let hfFetchGen = 0;
+  async function enrichFromApi(parsed) {
+    if (!parsed?.org || !parsed?.repo) return parsed;
+    const gen = ++hfFetchGen;
+    try {
+      const res = await fetch(
+        'https://huggingface.co/api/models/' +
+          encodeURIComponent(parsed.org) + '/' +
+          encodeURIComponent(parsed.repo)
+      );
+      if (!res.ok || gen !== hfFetchGen) return parsed;
+      const data = await res.json();
+      const siblings = Array.isArray(data.siblings) ? data.siblings : [];
+      const ggufs = siblings
+        .map((s) => s.rfilename || '')
+        .filter((n) => /\.gguf$/i.test(n));
+      if (!parsed.file && ggufs.length === 1) {
+        parsed.file = ggufs[0];
+        parsed.version = ggufs[0].split('/').pop().replace(/\.gguf$/i, '');
+        const hay = [parsed.repo, parsed.file].join(' ');
+        if (!parsed.quant) parsed.quant = quantBitsFromHay(hay);
+        if (!parsed.model) parsed.model = guessModel(parsed.repo, parsed.file);
+      } else if (!parsed.quant && ggufs.length) {
+        for (const n of ggufs) {
+          const q = quantBitsFromHay(n);
+          if (q) { parsed.quant = q; break; }
+        }
+      }
+      if (data.modelId || data.id) {
+        const [provider, providerLabel, color] = guessProvider(
+          [parsed.repo, parsed.file, data.modelId || data.id, ...(data.tags || [])].join(' ')
+        );
+        parsed.provider = provider;
+        parsed.providerLabel = providerLabel;
+        parsed.color = color;
+      }
+    } catch (_) {
+      /* offline / CORS — local parse is enough */
+    }
+    return parsed;
+  }
+  async function onHfUrlChange() {
+    const raw = urlInput?.value || '';
+    const parsed = parseHfUrl(raw);
+    if (!String(raw).trim()) {
+      clearParsedFromLink();
+      return;
+    }
+    if (!parsed) return;
+    applyParsed(parsed);
+    const rich = await enrichFromApi(parsed);
+    if (parseHfUrl(urlInput?.value || '')?.repo !== parsed.repo) return;
+    applyParsed(rich);
+  }
+  function scheduleHfParse() {
+    clearTimeout(hfTimer);
+    hfTimer = setTimeout(onHfUrlChange, 280);
+  }
+  urlInput?.addEventListener('input', scheduleHfParse);
+  urlInput?.addEventListener('blur', onHfUrlChange);
+  urlInput?.addEventListener('change', onHfUrlChange);
+
+  providerBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    providerMenu?.hidden ? openProviderMenu() : closeProviderMenu();
+  });
+  providerOpts.forEach((opt) => {
+    opt.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const color = getComputedStyle(opt).getPropertyValue('--cat').trim() || opt.style.getPropertyValue('--cat');
+      setProvider(opt.dataset.value || '', opt.dataset.label || opt.textContent.trim(), color);
+      closeProviderMenu();
+    });
+  });
+  document.addEventListener('click', (e) => {
+    if (!providerRoot || providerMenu?.hidden) return;
+    if (!providerRoot.contains(e.target)) closeProviderMenu();
+  });
+
+  modal.querySelectorAll('[data-close-submit]').forEach((el) => {
+    el.addEventListener('click', locallistCloseSubmit);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || modal.hidden) return;
+    if (providerMenu && !providerMenu.hidden) {
+      closeProviderMenu();
+      return;
+    }
+    locallistCloseSubmit();
+  });
+
+  function withUnit(raw, unit) {
+    const s = String(raw || '').trim();
+    if (!s) return '';
+    if (/[a-zA-Z%/]/.test(s)) return s;
+    return s + unit;
+  }
+  function withMoney(raw) {
+    const s = String(raw || '').trim();
+    if (!s) return '';
+    if (s.startsWith('$')) return s;
+    return '$' + s.replace(/,/g, '');
+  }
+  function withBit(raw) {
+    const s = String(raw || '').trim();
+    if (!s) return '';
+    if (/bit/i.test(s) || /bf16|fp16|fp8/i.test(s)) return s;
+    if (/^\d+(\.\d+)?$/.test(s)) return s + 'bit';
+    return s;
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const providerKey = String(fd.get('provider') || '').trim();
+    if (!providerKey) {
+      providerBtn?.focus();
+      return;
+    }
+    const providerOtherVal = String(fd.get('provider_other') || '').trim();
+    if (providerKey === 'other' && !providerOtherVal) {
+      providerOther?.focus();
+      return;
+    }
+    const num = (key) => {
+      const v = String(fd.get(key) || '').trim();
+      if (!v) return null;
+      const n = Number(v);
+      return Number.isFinite(n) ? n : null;
+    };
+    const payload = {
+      model: String(fd.get('model') || '').trim(),
+      provider: providerKey === 'other' ? providerOtherVal : providerKey,
+      quant_bits: withBit(fd.get('quant')),
+      version_label: String(fd.get('version') || '').trim(),
+      version_url: String(fd.get('version_url') || '').trim(),
+      hardware: String(fd.get('hardware') || '').trim(),
+      kv_ctx: num('kv_ctx'),
+      speed: withUnit(fd.get('speed'), 't/s'),
+      pp: withUnit(fd.get('pp'), 't/s'),
+      price: withMoney(fd.get('price')),
+      info: String(fd.get('info') || '').trim(),
+      rich: true,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    const slug = (payload.model || 'setup').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'setup';
+    a.href = URL.createObjectURL(blob);
+    a.download = 'locallist-' + slug + '.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    form.reset();
+    resetProvider();
+    locallistCloseSubmit();
+  });
+})();
+function toggleInfo(btn) {
+  const wrap = btn.closest('.info-v');
+  if (!wrap) return;
+  const open = wrap.classList.toggle('expanded');
+  btn.textContent = open ? 'read less' : 'read more';
+  if (!open) refreshInfoButtons(wrap);
+}
+function refreshInfoButtons(root) {
+  const scope = root || document;
+  const wraps = root && root.classList?.contains('info-v')
+    ? [root]
+    : [...scope.querySelectorAll('.info-v')];
+  wraps.forEach((wrap) => {
+    const clamp = wrap.querySelector('.info-clamp');
+    const btn = wrap.querySelector('.read-more-btn');
+    if (!clamp || !btn || wrap.classList.contains('expanded')) return;
+    // One-line (rich) / two-line (plain) clamp: only show control when truncated.
+    btn.hidden = clamp.scrollHeight <= clamp.clientHeight + 1;
+  });
+}
+document.addEventListener('DOMContentLoaded', () => refreshInfoButtons());
+window.addEventListener('resize', () => refreshInfoButtons());
+
+(function () {
+  const input = document.getElementById('model-search');
+  const shell = document.querySelector('.search-shell');
+  const clearBtn = document.querySelector('.search-clear');
+  if (!input) return;
+
+  function applySearch() {
+    const q = input.value.trim().toLowerCase();
+    if (shell) shell.classList.toggle('has-value', q.length > 0);
+    if (typeof window.locallistApplyFilters === 'function') {
+      window.locallistApplyFilters();
+    }
+  }
+
+  input.addEventListener('input', applySearch);
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      input.value = '';
+      applySearch();
+      input.focus();
+    });
+  }
+  window.locallistApplySearch = applySearch;
+})();
+
+(function () {
+  const btn = document.getElementById('filter-btn');
+  const dropdown = document.getElementById('filter-dropdown');
+  if (!btn || !dropdown) return;
+  const options = [...dropdown.querySelectorAll('.filter-option')];
+  const providerLinks = [...document.querySelectorAll('.navlink')];
+  const clearBtn = document.getElementById('nav-clear');
+  const searchInput = document.getElementById('model-search');
+  const flat = document.getElementById('cat-sorted');
+  const flatGrid = flat?.querySelector('.grid');
+  let sortMode = '';
+
+  function homeSections() {
+    return [...document.querySelectorAll('section.cat:not(#cat-sorted)')];
+  }
+
+  function numAttr(el, key) {
+    const raw = el.dataset[key];
+    if (raw === undefined || raw === '') return null;
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  // Tag each card with home category + order (colors stay when flattened)
+  let gord = 0;
+  homeSections().forEach((cat) => {
+    const slug = [...cat.classList].find((c) => c.startsWith('cat-') && c !== 'cat');
+    [...cat.querySelectorAll('.setup')].forEach((s, i) => {
+      s.dataset.home = cat.id;
+      s.dataset.ord = String(i);
+      s.dataset.gord = String(gord++);
+      if (slug) s.classList.add(slug);
+    });
+  });
+
+  function cmpNullable(a, b, asc) {
+    if (a === null && b === null) return 0;
+    if (a === null) return 1;
+    if (b === null) return -1;
+    return asc ? a - b : b - a;
+  }
+
+  function sortSetups(setups, mode) {
+    if (!mode) {
+      setups.sort((a, b) => Number(a.dataset.gord || 0) - Number(b.dataset.gord || 0));
+      return;
+    }
+    if (mode === 'price-asc' || mode === 'price-desc') {
+      const asc = mode === 'price-asc';
+      setups.sort((a, b) => {
+        const c = cmpNullable(numAttr(a, 'price'), numAttr(b, 'price'), asc);
+        return c !== 0 ? c : Number(a.dataset.gord || 0) - Number(b.dataset.gord || 0);
+      });
+      return;
+    }
+    if (mode === 'rank-asc' || mode === 'rank-desc') {
+      const asc = mode === 'rank-asc';
+      setups.sort((a, b) => {
+        const c = cmpNullable(numAttr(a, 'rank'), numAttr(b, 'rank'), asc);
+        return c !== 0 ? c : Number(a.dataset.gord || 0) - Number(b.dataset.gord || 0);
+      });
+    }
+  }
+
+  function applySort(mode) {
+    sortMode = mode || '';
+    document.body.classList.toggle('is-sorted', Boolean(sortMode));
+    if (!sortMode) {
+      homeSections().forEach((cat) => {
+        const grid = cat.querySelector('.grid');
+        if (!grid) return;
+        const setups = [...document.querySelectorAll(`.setup[data-home="${cat.id}"]`)];
+        setups.sort((a, b) => Number(a.dataset.ord || 0) - Number(b.dataset.ord || 0));
+        setups.forEach((s) => grid.appendChild(s));
+      });
+    } else if (flatGrid) {
+      const setups = [...document.querySelectorAll('.setup')];
+      sortSetups(setups, sortMode);
+      setups.forEach((s) => flatGrid.appendChild(s));
+    }
+    applyFilters();
+  }
+
+  function providerEnabled(homeId) {
+    if (!homeId) return true;
+    const link = document.querySelector(`.navlink[href="#${homeId}"]`);
+    return !link || !link.classList.contains('is-off');
+  }
+
+  function applyFilters() {
+    const y = window.scrollY;
+    const q = (searchInput?.value || '').trim().toLowerCase();
+    document.querySelectorAll('.setup').forEach((setup) => {
+      const hay = (setup.dataset.search || setup.querySelector('.model-box')?.textContent || '').toLowerCase();
+      const matchSearch = !q || hay.includes(q);
+      const matchProv = providerEnabled(setup.dataset.home);
+      setup.style.display = matchSearch && matchProv ? '' : 'none';
+    });
+    if (sortMode && flat) {
+      homeSections().forEach((cat) => { cat.style.display = 'none'; });
+      const any = [...flat.querySelectorAll('.setup')].some((s) => s.style.display !== 'none');
+      flat.style.display = any ? '' : 'none';
+    } else {
+      if (flat) flat.style.display = 'none';
+      homeSections().forEach((cat) => {
+        const any = [...cat.querySelectorAll('.setup')].some((s) => s.style.display !== 'none');
+        cat.style.display = any ? '' : 'none';
+      });
+    }
+    // Hiding sections shrinks the page; keep scroll from clamping to the bottom.
+    requestAnimationFrame(() => {
+      const max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+      if (y > max) window.scrollTo(0, 0);
+    });
+  }
+  window.locallistApplyFilters = applyFilters;
+
+  function allProvidersOff() {
+    return providerLinks.length > 0 && providerLinks.every((l) => l.classList.contains('is-off'));
+  }
+  function syncClearBtn() {
+    if (!clearBtn) return;
+    const allOff = allProvidersOff();
+    clearBtn.classList.toggle('is-all-off', allOff);
+    clearBtn.setAttribute('aria-label', allOff ? 'select all providers' : 'deselect all providers');
+    clearBtn.title = allOff ? 'select all' : 'deselect all';
+  }
+
+  // Provider chips toggle category on/off (number goes B&W when off)
+  providerLinks.forEach((link) => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      link.classList.toggle('is-off');
+      applyFilters();
+      syncClearBtn();
+    });
+  });
+
+  // × toggles deselect-all / reselect-all
+  clearBtn?.addEventListener('click', () => {
+    const allOff = allProvidersOff();
+    providerLinks.forEach((l) => l.classList.toggle('is-off', !allOff));
+    applyFilters();
+    syncClearBtn();
+  });
+  syncClearBtn();
+
+  function openMenu() {
+    dropdown.hidden = false;
+    btn.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('filter-open');
+    document.querySelectorAll('.tip-rich.is-open').forEach((tip) => {
+      tip.classList.remove('is-open');
+      tip.style.visibility = '';
+    });
+  }
+  function closeMenu() {
+    dropdown.hidden = true;
+    btn.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('filter-open');
+  }
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdown.hidden ? openMenu() : closeMenu();
+  });
+  document.addEventListener('click', (e) => {
+    if (!dropdown.hidden && e.target !== btn && !dropdown.contains(e.target)) closeMenu();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMenu();
+  });
+  options.forEach((opt) => {
+    opt.addEventListener('click', () => {
+      options.forEach((o) => o.classList.toggle('is-selected', o === opt));
+      applySort(opt.dataset.sort || '');
+      closeMenu();
+    });
+  });
+  applyFilters();
+})();
+
+(function () {
+  const links = [...document.querySelectorAll('.navlink')];
+  if (!links.length) return;
+  const sections = links
+    .map((a) => document.querySelector(a.getAttribute('href')))
+    .filter(Boolean);
+  if (!sections.length) return;
+
+  function setActive(id) {
+    links.forEach((a) => {
+      a.classList.toggle('is-active', a.getAttribute('href') === '#' + id);
+    });
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      const visible = entries
+        .filter((e) => e.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (visible) setActive(visible.target.id);
+    },
+    { rootMargin: '-45% 0px -45% 0px', threshold: [0, 0.1, 0.5, 1] }
+  );
+  sections.forEach((s) => observer.observe(s));
+  setActive(sections[0].id);
+})();
+
+(function () {
+  function placeTip(wrap, tip) {
+    tip.classList.add('is-open');
+    tip.style.visibility = 'hidden';
+    const r = wrap.getBoundingClientRect();
+    const tw = tip.offsetWidth || 260;
+    const th = tip.offsetHeight || 200;
+    const pad = 10;
+    let top = r.bottom + 8;
+    let left = r.left;
+    if (top + th > window.innerHeight - pad) top = Math.max(pad, r.top - th - 8);
+    if (left + tw > window.innerWidth - pad) left = Math.max(pad, window.innerWidth - tw - pad);
+    if (left < pad) left = pad;
+    tip.style.top = top + 'px';
+    tip.style.left = left + 'px';
+    tip.style.visibility = '';
+  }
+  function closeTip(tip) {
+    tip.classList.remove('is-open');
+    tip.style.visibility = '';
+  }
+  document.querySelectorAll('.setup-rich .hovtxt').forEach((wrap) => {
+    const tip = wrap.querySelector('.tip-rich');
+    if (!tip) return;
+    let hideTimer = null;
+    const show = () => {
+      if (document.body.classList.contains('filter-open')) return;
+      clearTimeout(hideTimer);
+      placeTip(wrap, tip);
+    };
+    const hide = () => {
+      hideTimer = setTimeout(() => closeTip(tip), 120);
+    };
+    wrap.addEventListener('mouseenter', show);
+    wrap.addEventListener('mouseleave', hide);
+    tip.addEventListener('mouseenter', () => {
+      clearTimeout(hideTimer);
+      tip.classList.add('is-open');
+    });
+    tip.addEventListener('mouseleave', hide);
+    window.addEventListener('scroll', () => {
+      if (tip.classList.contains('is-open')) placeTip(wrap, tip);
+    }, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>
