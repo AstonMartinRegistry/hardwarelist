@@ -24,22 +24,13 @@ async function readBody(req) {
     /* fall through */
   }
 
-  // Some Vercel runtimes expose the raw stream via async iteration.
-  try {
-    if (req[Symbol.asyncIterator]) {
-      const chunks = [];
-      for await (const chunk of req) {
-        chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-      }
-      if (chunks.length) {
-        const raw = Buffer.concat(chunks).toString('utf8').trim();
-        if (raw) return JSON.parse(raw);
-      }
-    }
-  } catch (_) {
-    /* fall through */
+  // Fallback: read raw stream when body helper is empty.
+  if (typeof req[Symbol.asyncIterator] === 'function') {
+    const chunks = [];
+    for await (const chunk of req) chunks.push(chunk);
+    const raw = Buffer.concat(chunks.map((c) => Buffer.isBuffer(c) ? c : Buffer.from(c))).toString('utf8').trim();
+    if (raw) return JSON.parse(raw);
   }
-
   return {};
 }
 
@@ -77,19 +68,9 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  if (req.method === 'GET') {
-    res.statusCode = 200;
-    res.end(JSON.stringify({
-      ok: true,
-      service: 'submit',
-      emailConfigured: Boolean(process.env.SENDER_EMAIL && process.env.SENDER_PASSWORD),
-    }));
-    return;
-  }
-
   if (req.method !== 'POST') {
     res.statusCode = 405;
-    res.setHeader('Allow', 'GET, POST');
+    res.setHeader('Allow', 'POST');
     res.end(JSON.stringify({ error: 'Method not allowed' }));
     return;
   }
@@ -142,7 +123,7 @@ module.exports = async function handler(req, res) {
       host: 'smtp.gmail.com',
       port: 465,
       secure: true,
-      auth: { user, pass },
+      auth: { user, pass: String(pass).replace(/\s+/g, '') },
     });
 
     await transporter.sendMail({
@@ -156,11 +137,11 @@ module.exports = async function handler(req, res) {
     res.statusCode = 200;
     res.end(JSON.stringify({ ok: true }));
   } catch (err) {
-    console.error('submit mail failed', err);
+    console.error('submit mail failed', err && err.message ? err.message : err);
     res.statusCode = 502;
     res.end(JSON.stringify({
       error: 'Failed to send email',
-      detail: String(err && err.message ? err.message : err),
+      detail: err && err.message ? err.message : 'unknown',
     }));
   }
 };

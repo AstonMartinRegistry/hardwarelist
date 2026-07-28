@@ -2535,6 +2535,7 @@ SUBMIT_MODAL = """
       <div class="submit-spinner" id="submit-status-spinner" hidden></div>
       <p class="submit-status-msg" id="submit-status-msg"></p>
       <button type="button" class="submit-go" id="submit-status-done" hidden data-close-submit>Done</button>
+      <button type="button" class="submit-go" id="submit-status-retry" hidden>Try again</button>
     </div>
   </div>
 </div>
@@ -2587,6 +2588,7 @@ function locallistCloseSubmit() {
   const statusSpinner = document.getElementById('submit-status-spinner');
   const statusMsg = document.getElementById('submit-status-msg');
   const statusDone = document.getElementById('submit-status-done');
+  const statusRetry = document.getElementById('submit-status-retry');
   const formError = document.getElementById('submit-form-error');
   let swapChain = Promise.resolve();
 
@@ -2615,13 +2617,14 @@ function locallistCloseSubmit() {
     panel.classList.add('is-status');
     if (statusSpinner) statusSpinner.hidden = mode !== 'loading';
     if (statusDone) statusDone.hidden = mode !== 'done';
+    if (statusRetry) statusRetry.hidden = mode !== 'error';
     if (statusMsg) {
       statusMsg.textContent = message || '';
-      statusMsg.classList.remove('is-error');
+      statusMsg.classList.toggle('is-error', mode === 'error');
     }
     const title = document.getElementById('submit-title');
     if (title) {
-      title.textContent = mode === 'loading' ? 'Submitting' : mode === 'done' ? 'Received' : 'Submit your setup';
+      title.textContent = mode === 'loading' ? 'Submitting' : mode === 'done' ? 'Received' : mode === 'error' ? 'Something went wrong' : 'Submit your setup';
     }
   }
   function swapPanel(updateFn) {
@@ -2657,17 +2660,13 @@ function locallistCloseSubmit() {
     swapChain = swapChain.then(() => swapPanel(() => applyStatus(mode, message)));
     return swapChain;
   }
-  function returnToForm() {
-    return swapChain = swapChain.then(() => swapPanel(() => {
-      resetSubmitStatus();
-    }));
-  }
   function resetSubmitStatus() {
     if (!panel) return;
     panel.style.transition = '';
     panel.classList.remove('is-status', 'is-swap');
     if (statusSpinner) statusSpinner.hidden = true;
     if (statusDone) statusDone.hidden = true;
+    if (statusRetry) statusRetry.hidden = true;
     if (statusMsg) {
       statusMsg.textContent = '';
       statusMsg.classList.remove('is-error');
@@ -2684,6 +2683,13 @@ function locallistCloseSubmit() {
     clearFormErrors();
     resetSubmitStatus();
   };
+  statusRetry?.addEventListener('click', () => {
+    swapChain = swapChain.then(() => swapPanel(() => {
+      resetSubmitStatus();
+    })).then(() => {
+      form.querySelector('.submit-go')?.focus();
+    });
+  });
 
 
   const urlInput = form.querySelector('[name="version_url"]');
@@ -2984,15 +2990,13 @@ function locallistCloseSubmit() {
         body: JSON.stringify(payload),
       });
       let data = null;
-      const rawText = await res.text();
-      try { data = rawText ? JSON.parse(rawText) : null; } catch (_) {}
+      try { data = await res.json(); } catch (_) {}
       if (!res.ok) {
         const detail = data && Array.isArray(data.received) && data.received.length
           ? ' (got: ' + data.received.join(', ') + ')'
           : '';
-        const msg = (data && (data.error || data.detail))
-          || ('Submit failed (HTTP ' + res.status + ')');
-        throw new Error(msg + detail);
+        const base = (data && (data.detail || data.error)) || ('Submit failed (' + res.status + ')');
+        throw new Error(base + detail);
       }
       form.reset();
       resetProvider();
@@ -3000,10 +3004,8 @@ function locallistCloseSubmit() {
       showStatus('done', 'Your setup was received, it will be up shortly.');
       statusDone?.focus();
     } catch (err) {
-      await returnToForm();
-      showFormError((err && err.message) ? err.message : 'Submit failed');
-      go && (go.disabled = false);
-      form.querySelector('.submit-go')?.focus();
+      showStatus('error', (err && err.message) ? err.message : 'Submit failed');
+      statusRetry?.focus();
     }
   });
   form.addEventListener('input', (e) => {
