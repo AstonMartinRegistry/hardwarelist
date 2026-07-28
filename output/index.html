@@ -999,6 +999,11 @@ body.submit-open .tip-rich { display: none !important; }
         <span class="submit-label">How you run it</span>
         <textarea name="info" required placeholder="Engine, flags, offload, concurrency, anything extreme…"></textarea>
       </label>
+      <label class="submit-field">
+        <span class="submit-label">Email</span>
+        <input name="email" type="email" autocomplete="email" placeholder="you@example.com">
+        <p class="submit-hint">Helpful for benchmark purposes</p>
+      </label>
 
       <div class="submit-actions">
         <button type="submit" class="submit-go">Submit</button>
@@ -1300,6 +1305,7 @@ function locallistCloseSubmit() {
       pp: withUnit(fd.get('pp'), 't/s'),
       price: withMoney(fd.get('price')),
       info: String(fd.get('info') || '').trim(),
+      email: String(fd.get('email') || '').trim(),
       rich: true,
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
