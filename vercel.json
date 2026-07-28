@@ -2,6 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "outputDirectory": "output",
   "functions": {
-    "api/submit.js": { "maxDuration": 30 }
+    "api/submit.py": { "maxDuration": 30 }
   }
 }

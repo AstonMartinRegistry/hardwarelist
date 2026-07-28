@@ -1,7 +1,4 @@
 {
   "name": "hardwarelist",
-  "private": true,
-  "dependencies": {
-    "nodemailer": "^9.0.3"
-  }
+  "private": true
 }
