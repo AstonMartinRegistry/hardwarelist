@@ -40,10 +40,70 @@ function formatBody(payload) {
   return `${lines.join('\n')}\n\n---\nJSON\n${JSON.stringify(payload, null, 2)}\n`;
 }
 
-module.exports = async function handler(req, res) {
-  try {
-    res.setHeader('Content-Type', 'application/json');
+function errInfo(err) {
+  return {
+    message: String((err && err.message) || err || 'unknown'),
+    code: err && err.code != null ? String(err.code) : undefined,
+    response: err && err.response != null ? String(err.response) : undefined,
+    responseCode: err && err.responseCode != null ? err.responseCode : undefined,
+    command: err && err.command != null ? String(err.command) : undefined,
+  };
+}
 
+function withTimeout(promise, ms, message) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(Object.assign(new Error(message), { code: 'ETIMEDOUT' }));
+    }, ms);
+    promise.then(
+      (value) => { clearTimeout(timer); resolve(value); },
+      (err) => { clearTimeout(timer); reject(err); },
+    );
+  });
+}
+
+async function sendWithGmail({ user, pass, to, submitter, subject, text }) {
+  const attempts = [
+    { host: 'smtp.gmail.com', port: 465, secure: true, family: 4 },
+    { host: 'smtp.gmail.com', port: 587, secure: false, requireTLS: true, family: 4 },
+  ];
+
+  let lastErr;
+  for (const opts of attempts) {
+    try {
+      const transporter = nodemailer.createTransport({
+        ...opts,
+        auth: { user, pass },
+        connectionTimeout: 8000,
+        greetingTimeout: 8000,
+        socketTimeout: 12000,
+        tls: { servername: 'smtp.gmail.com', minVersion: 'TLSv1.2' },
+      });
+      const info = await transporter.sendMail({
+        from: `"PLM List" <${user}>`,
+        to,
+        replyTo: submitter || undefined,
+        subject,
+        text,
+      });
+      return info;
+    } catch (err) {
+      lastErr = err;
+      console.error('smtp attempt failed', opts.port, errInfo(err));
+      if (err && err.code === 'EAUTH') break;
+    }
+  }
+  throw lastErr || new Error('SMTP failed');
+}
+
+module.exports = async function handler(req, res) {
+  const json = (code, body) => {
+    res.statusCode = code;
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify(body));
+  };
+
+  try {
     if (req.method === 'OPTIONS') {
       res.statusCode = 204;
       res.end();
@@ -56,16 +116,12 @@ module.exports = async function handler(req, res) {
         && process.env.SENDER_PASSWORD
         && (process.env.RECEIVER_EMAIL || process.env.SENDER_EMAIL)
       );
-      res.statusCode = 200;
-      res.end(JSON.stringify({ ok: true, configured }));
-      return;
+      return json(200, { ok: true, configured });
     }
 
     if (req.method !== 'POST') {
-      res.statusCode = 405;
       res.setHeader('Allow', 'POST, GET, OPTIONS');
-      res.end(JSON.stringify({ error: 'Method not allowed' }));
-      return;
+      return json(405, { error: 'Method not allowed' });
     }
 
     const user = String(process.env.SENDER_EMAIL || '').trim();
@@ -73,18 +129,14 @@ module.exports = async function handler(req, res) {
     const to = String(process.env.RECEIVER_EMAIL || user).trim();
 
     if (!user || !pass || !to) {
-      res.statusCode = 500;
-      res.end(JSON.stringify({ error: 'Email is not configured on the server' }));
-      return;
+      return json(500, { error: 'Email is not configured on the server' });
     }
 
     let payload;
     try {
       payload = parseBody(req);
-    } catch (err) {
-      res.statusCode = 400;
-      res.end(JSON.stringify({ error: 'Invalid JSON' }));
-      return;
+    } catch (_) {
+      return json(400, { error: 'Invalid JSON' });
     }
 
     const versionUrl = String(payload.version_url || payload.link || '').trim();
@@ -94,12 +146,10 @@ module.exports = async function handler(req, res) {
     const hasKvCtx = kvCtx != null && String(kvCtx).trim() !== '' && Number.isFinite(Number(kvCtx));
 
     if (!versionUrl || !hardware || !speed || !hasKvCtx) {
-      res.statusCode = 400;
-      res.end(JSON.stringify({
+      return json(400, {
         error: 'Link, hardware, decode speed, and context length are required',
         received: Object.keys(payload || {}),
-      }));
-      return;
+      });
     }
 
     payload.version_url = versionUrl;
@@ -111,36 +161,25 @@ module.exports = async function handler(req, res) {
     const model = String(payload.model || '').trim() || 'setup';
     const subject = `PLM List setup: ${model} on ${hardware}`;
 
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false,
-      requireTLS: true,
-      auth: { user, pass },
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 15000,
-    });
+    await withTimeout(
+      sendWithGmail({
+        user,
+        pass,
+        to,
+        submitter,
+        subject,
+        text: formatBody(payload),
+      }),
+      25000,
+      'Email server timed out, please try again',
+    );
 
-    await transporter.sendMail({
-      from: `"PLM List" <${user}>`,
-      to,
-      replyTo: submitter || undefined,
-      subject,
-      text: formatBody(payload),
-    });
-
-    res.statusCode = 200;
-    res.end(JSON.stringify({ ok: true }));
+    return json(200, { ok: true });
   } catch (err) {
-    console.error('submit failed', err);
-    if (!res.headersSent) {
-      res.statusCode = 502;
-      res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify({
-        error: 'Failed to send email',
-        detail: err && err.message ? err.message : 'unknown',
-      }));
-    }
+    console.error('submit failed', errInfo(err));
+    return json(502, {
+      error: 'Failed to send email',
+      detail: errInfo(err),
+    });
   }
 };

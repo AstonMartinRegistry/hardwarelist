@@ -1,12 +1,7 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "api/submit.js", "use": "@vercel/node" },
-    { "src": "output/**", "use": "@vercel/static" }
-  ],
-  "routes": [
-    { "src": "/api/submit", "dest": "/api/submit.js" },
-    { "src": "/", "dest": "/output/index.html" },
-    { "src": "/(.*)", "dest": "/output/$1" }
-  ]
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "outputDirectory": "output",
+  "functions": {
+    "api/submit.js": { "maxDuration": 30 }
+  }
 }
