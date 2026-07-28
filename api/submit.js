@@ -1,36 +1,17 @@
 const nodemailer = require('nodemailer');
 
-function asObject(value) {
-  if (value == null) return null;
+function parseBody(req) {
+  const value = req.body;
+  if (value == null) return {};
   if (Buffer.isBuffer(value)) {
     const raw = value.toString('utf8').trim();
-    if (!raw) return null;
-    return JSON.parse(raw);
+    return raw ? JSON.parse(raw) : {};
   }
   if (typeof value === 'string') {
     const raw = value.trim();
-    if (!raw) return null;
-    return JSON.parse(raw);
+    return raw ? JSON.parse(raw) : {};
   }
   if (typeof value === 'object') return value;
-  return null;
-}
-
-async function readBody(req) {
-  try {
-    const fromBody = asObject(req.body);
-    if (fromBody && Object.keys(fromBody).length) return fromBody;
-  } catch (_) {
-    /* fall through */
-  }
-
-  // Fallback: read raw stream when body helper is empty.
-  if (typeof req[Symbol.asyncIterator] === 'function') {
-    const chunks = [];
-    for await (const chunk of req) chunks.push(chunk);
-    const raw = Buffer.concat(chunks.map((c) => Buffer.isBuffer(c) ? c : Buffer.from(c))).toString('utf8').trim();
-    if (raw) return JSON.parse(raw);
-  }
   return {};
 }
 
@@ -60,70 +41,85 @@ function formatBody(payload) {
 }
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Content-Type', 'application/json');
-
-  if (req.method === 'OPTIONS') {
-    res.statusCode = 204;
-    res.end();
-    return;
-  }
-
-  if (req.method !== 'POST') {
-    res.statusCode = 405;
-    res.setHeader('Allow', 'POST');
-    res.end(JSON.stringify({ error: 'Method not allowed' }));
-    return;
-  }
-
-  const user = process.env.SENDER_EMAIL;
-  const pass = process.env.SENDER_PASSWORD;
-  const to = process.env.RECEIVER_EMAIL || user;
-
-  if (!user || !pass || !to) {
-    res.statusCode = 500;
-    res.end(JSON.stringify({ error: 'Email is not configured on the server' }));
-    return;
-  }
-
-  let payload;
   try {
-    payload = await readBody(req);
-  } catch (err) {
-    res.statusCode = 400;
-    res.end(JSON.stringify({ error: err.message || 'Invalid JSON' }));
-    return;
-  }
+    res.setHeader('Content-Type', 'application/json');
 
-  const versionUrl = String(payload.version_url || payload.link || '').trim();
-  const hardware = String(payload.hardware || payload.specs || '').trim();
-  const speed = String(payload.speed || payload.decode || '').trim();
-  const kvCtx = payload.kv_ctx != null ? payload.kv_ctx : payload.context;
-  const hasKvCtx = kvCtx != null && String(kvCtx).trim() !== '' && Number.isFinite(Number(kvCtx));
+    if (req.method === 'OPTIONS') {
+      res.statusCode = 204;
+      res.end();
+      return;
+    }
 
-  if (!versionUrl || !hardware || !speed || !hasKvCtx) {
-    res.statusCode = 400;
-    res.end(JSON.stringify({
-      error: 'Link, hardware, decode speed, and context length are required',
-      received: Object.keys(payload || {}),
-    }));
-    return;
-  }
+    if (req.method === 'GET') {
+      const configured = Boolean(
+        process.env.SENDER_EMAIL
+        && process.env.SENDER_PASSWORD
+        && (process.env.RECEIVER_EMAIL || process.env.SENDER_EMAIL)
+      );
+      res.statusCode = 200;
+      res.end(JSON.stringify({ ok: true, configured }));
+      return;
+    }
 
-  payload.version_url = versionUrl;
-  payload.hardware = hardware;
-  payload.speed = speed;
-  payload.kv_ctx = Number(kvCtx);
+    if (req.method !== 'POST') {
+      res.statusCode = 405;
+      res.setHeader('Allow', 'POST, GET, OPTIONS');
+      res.end(JSON.stringify({ error: 'Method not allowed' }));
+      return;
+    }
 
-  const submitter = String(payload.email || '').trim();
-  const model = String(payload.model || '').trim() || 'setup';
-  const subject = `PLM List setup: ${model} on ${hardware}`;
+    const user = String(process.env.SENDER_EMAIL || '').trim();
+    const pass = String(process.env.SENDER_PASSWORD || '').replace(/\s+/g, '');
+    const to = String(process.env.RECEIVER_EMAIL || user).trim();
 
-  try {
+    if (!user || !pass || !to) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: 'Email is not configured on the server' }));
+      return;
+    }
+
+    let payload;
+    try {
+      payload = parseBody(req);
+    } catch (err) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ error: 'Invalid JSON' }));
+      return;
+    }
+
+    const versionUrl = String(payload.version_url || payload.link || '').trim();
+    const hardware = String(payload.hardware || payload.specs || '').trim();
+    const speed = String(payload.speed || payload.decode || '').trim();
+    const kvCtx = payload.kv_ctx != null ? payload.kv_ctx : payload.context;
+    const hasKvCtx = kvCtx != null && String(kvCtx).trim() !== '' && Number.isFinite(Number(kvCtx));
+
+    if (!versionUrl || !hardware || !speed || !hasKvCtx) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({
+        error: 'Link, hardware, decode speed, and context length are required',
+        received: Object.keys(payload || {}),
+      }));
+      return;
+    }
+
+    payload.version_url = versionUrl;
+    payload.hardware = hardware;
+    payload.speed = speed;
+    payload.kv_ctx = Number(kvCtx);
+
+    const submitter = String(payload.email || '').trim();
+    const model = String(payload.model || '').trim() || 'setup';
+    const subject = `PLM List setup: ${model} on ${hardware}`;
+
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
-      auth: { user, pass: String(pass).replace(/\s+/g, '') },
+      port: 587,
+      secure: false,
+      requireTLS: true,
+      auth: { user, pass },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 15000,
     });
 
     await transporter.sendMail({
@@ -137,11 +133,14 @@ module.exports = async function handler(req, res) {
     res.statusCode = 200;
     res.end(JSON.stringify({ ok: true }));
   } catch (err) {
-    console.error('submit mail failed', err && err.message ? err.message : err);
-    res.statusCode = 502;
-    res.end(JSON.stringify({
-      error: 'Failed to send email',
-      detail: err && err.message ? err.message : 'unknown',
-    }));
+    console.error('submit failed', err);
+    if (!res.headersSent) {
+      res.statusCode = 502;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({
+        error: 'Failed to send email',
+        detail: err && err.message ? err.message : 'unknown',
+      }));
+    }
   }
 };
