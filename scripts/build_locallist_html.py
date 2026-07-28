@@ -2984,12 +2984,15 @@ function locallistCloseSubmit() {
         body: JSON.stringify(payload),
       });
       let data = null;
-      try { data = await res.json(); } catch (_) {}
+      const rawText = await res.text();
+      try { data = rawText ? JSON.parse(rawText) : null; } catch (_) {}
       if (!res.ok) {
         const detail = data && Array.isArray(data.received) && data.received.length
           ? ' (got: ' + data.received.join(', ') + ')'
           : '';
-        throw new Error(((data && data.error) || 'Submit failed') + detail);
+        const msg = (data && (data.error || data.detail))
+          || ('Submit failed (HTTP ' + res.status + ')');
+        throw new Error(msg + detail);
       }
       form.reset();
       resetProvider();

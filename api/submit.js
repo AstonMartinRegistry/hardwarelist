@@ -16,14 +16,30 @@ function asObject(value) {
   return null;
 }
 
-function readBody(req) {
-  // Vercel Node functions expose a parsed body; streaming req.on('data') is unreliable.
+async function readBody(req) {
   try {
     const fromBody = asObject(req.body);
     if (fromBody && Object.keys(fromBody).length) return fromBody;
   } catch (_) {
     /* fall through */
   }
+
+  // Some Vercel runtimes expose the raw stream via async iteration.
+  try {
+    if (req[Symbol.asyncIterator]) {
+      const chunks = [];
+      for await (const chunk of req) {
+        chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+      }
+      if (chunks.length) {
+        const raw = Buffer.concat(chunks).toString('utf8').trim();
+        if (raw) return JSON.parse(raw);
+      }
+    }
+  } catch (_) {
+    /* fall through */
+  }
+
   return {};
 }
 
@@ -61,9 +77,19 @@ module.exports = async function handler(req, res) {
     return;
   }
 
+  if (req.method === 'GET') {
+    res.statusCode = 200;
+    res.end(JSON.stringify({
+      ok: true,
+      service: 'submit',
+      emailConfigured: Boolean(process.env.SENDER_EMAIL && process.env.SENDER_PASSWORD),
+    }));
+    return;
+  }
+
   if (req.method !== 'POST') {
     res.statusCode = 405;
-    res.setHeader('Allow', 'POST');
+    res.setHeader('Allow', 'GET, POST');
     res.end(JSON.stringify({ error: 'Method not allowed' }));
     return;
   }
@@ -74,13 +100,13 @@ module.exports = async function handler(req, res) {
 
   if (!user || !pass || !to) {
     res.statusCode = 500;
-    res.end(JSON.stringify({ error: 'Email is not configured' }));
+    res.end(JSON.stringify({ error: 'Email is not configured on the server' }));
     return;
   }
 
   let payload;
   try {
-    payload = readBody(req);
+    payload = await readBody(req);
   } catch (err) {
     res.statusCode = 400;
     res.end(JSON.stringify({ error: err.message || 'Invalid JSON' }));
@@ -102,7 +128,6 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  // Normalize onto expected keys for the email body.
   payload.version_url = versionUrl;
   payload.hardware = hardware;
   payload.speed = speed;
@@ -133,6 +158,9 @@ module.exports = async function handler(req, res) {
   } catch (err) {
     console.error('submit mail failed', err);
     res.statusCode = 502;
-    res.end(JSON.stringify({ error: 'Failed to send email' }));
+    res.end(JSON.stringify({
+      error: 'Failed to send email',
+      detail: String(err && err.message ? err.message : err),
+    }));
   }
 };
