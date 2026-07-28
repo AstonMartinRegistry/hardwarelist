@@ -2230,6 +2230,22 @@ body.filter-open .tip-rich { display: none !important; }
 .submit-hint {
   font-size: 10px; color: #666; margin: 0;
 }
+.submit-field.is-invalid input,
+.submit-field.is-invalid textarea {
+  background: #2a1818;
+  box-shadow: inset 0 0 0 1px #8a3a3a;
+}
+.submit-form-error {
+  display: none;
+  margin: 0 8px 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #f0c0c0;
+  background: #2a1818;
+}
+.submit-form-error.is-visible { display: block; }
 .submit-field input,
 .submit-field textarea {
   font-family: inherit; font-size: 12px;
@@ -2511,6 +2527,7 @@ SUBMIT_MODAL = """
       </label>
 
       <div class="submit-actions">
+        <p class="submit-form-error" id="submit-form-error" role="alert"></p>
         <button type="submit" class="submit-go">Submit</button>
       </div>
     </form>
@@ -2518,7 +2535,6 @@ SUBMIT_MODAL = """
       <div class="submit-spinner" id="submit-status-spinner" hidden></div>
       <p class="submit-status-msg" id="submit-status-msg"></p>
       <button type="button" class="submit-go" id="submit-status-done" hidden data-close-submit>Done</button>
-      <button type="button" class="submit-go" id="submit-status-retry" hidden>Try again</button>
     </div>
   </div>
 </div>
@@ -2571,22 +2587,41 @@ function locallistCloseSubmit() {
   const statusSpinner = document.getElementById('submit-status-spinner');
   const statusMsg = document.getElementById('submit-status-msg');
   const statusDone = document.getElementById('submit-status-done');
-  const statusRetry = document.getElementById('submit-status-retry');
+  const formError = document.getElementById('submit-form-error');
   let swapChain = Promise.resolve();
 
+  function clearFormErrors() {
+    form.querySelectorAll('.submit-field.is-invalid').forEach((el) => el.classList.remove('is-invalid'));
+    if (formError) {
+      formError.textContent = '';
+      formError.classList.remove('is-visible');
+    }
+  }
+  function showFormError(message, fieldName) {
+    clearFormErrors();
+    if (formError) {
+      formError.textContent = message || 'Please check the form.';
+      formError.classList.add('is-visible');
+    }
+    if (fieldName) {
+      const input = form.querySelector('[name="' + fieldName + '"]');
+      const field = input?.closest('.submit-field');
+      field?.classList.add('is-invalid');
+      input?.focus();
+    }
+  }
   function applyStatus(mode, message) {
     if (!panel) return;
     panel.classList.add('is-status');
     if (statusSpinner) statusSpinner.hidden = mode !== 'loading';
     if (statusDone) statusDone.hidden = mode !== 'done';
-    if (statusRetry) statusRetry.hidden = mode !== 'error';
     if (statusMsg) {
       statusMsg.textContent = message || '';
-      statusMsg.classList.toggle('is-error', mode === 'error');
+      statusMsg.classList.remove('is-error');
     }
     const title = document.getElementById('submit-title');
     if (title) {
-      title.textContent = mode === 'loading' ? 'Submitting' : mode === 'done' ? 'Received' : mode === 'error' ? 'Something went wrong' : 'Submit your setup';
+      title.textContent = mode === 'loading' ? 'Submitting' : mode === 'done' ? 'Received' : 'Submit your setup';
     }
   }
   function swapPanel(updateFn) {
@@ -2604,7 +2639,6 @@ function locallistCloseSubmit() {
         if (e.target !== panel || e.propertyName !== 'opacity') return;
         finish();
       };
-      // Same interval as opening the form: snap closed, swap content, ease in once.
       panel.style.transition = 'none';
       panel.classList.add('is-swap');
       updateFn();
@@ -2623,13 +2657,17 @@ function locallistCloseSubmit() {
     swapChain = swapChain.then(() => swapPanel(() => applyStatus(mode, message)));
     return swapChain;
   }
+  function returnToForm() {
+    return swapChain = swapChain.then(() => swapPanel(() => {
+      resetSubmitStatus();
+    }));
+  }
   function resetSubmitStatus() {
     if (!panel) return;
     panel.style.transition = '';
     panel.classList.remove('is-status', 'is-swap');
     if (statusSpinner) statusSpinner.hidden = true;
     if (statusDone) statusDone.hidden = true;
-    if (statusRetry) statusRetry.hidden = true;
     if (statusMsg) {
       statusMsg.textContent = '';
       statusMsg.classList.remove('is-error');
@@ -2642,14 +2680,10 @@ function locallistCloseSubmit() {
       go.textContent = 'Submit';
     }
   }
-  window.locallistResetSubmitStatus = resetSubmitStatus;
-  statusRetry?.addEventListener('click', () => {
-    swapChain = swapChain.then(() => swapPanel(() => {
-      resetSubmitStatus();
-    })).then(() => {
-      form.querySelector('.submit-go')?.focus();
-    });
-  });
+  window.locallistResetSubmitStatus = () => {
+    clearFormErrors();
+    resetSubmitStatus();
+  };
 
 
   const urlInput = form.querySelector('[name="version_url"]');
@@ -2896,6 +2930,7 @@ function locallistCloseSubmit() {
     e.preventDefault();
     const go = form.querySelector('.submit-go');
     if (go && go.disabled) return;
+    clearFormErrors();
     const fd = new FormData(form);
     const providerKey = String(fd.get('provider') || '').trim();
     const providerOtherVal = String(fd.get('provider_other') || '').trim();
@@ -2904,19 +2939,19 @@ function locallistCloseSubmit() {
     const speedRaw = String(fd.get('speed') || '').trim();
     const kvCtxRaw = String(fd.get('kv_ctx') || '').trim();
     if (!versionUrl) {
-      urlInput?.focus();
+      showFormError('Hugging Face link is required.', 'version_url');
+      return;
+    }
+    if (!kvCtxRaw || !Number.isFinite(Number(kvCtxRaw))) {
+      showFormError('Context length is required.', 'kv_ctx');
       return;
     }
     if (!hardware) {
-      form.querySelector('[name="hardware"]')?.focus();
+      showFormError('Hardware specs are required.', 'hardware');
       return;
     }
     if (!speedRaw) {
-      form.querySelector('[name="speed"]')?.focus();
-      return;
-    }
-    if (!kvCtxRaw) {
-      form.querySelector('[name="kv_ctx"]')?.focus();
+      showFormError('Decode speed (t/s) is required.', 'speed');
       return;
     }
     const num = (key) => {
@@ -2958,11 +2993,22 @@ function locallistCloseSubmit() {
       }
       form.reset();
       resetProvider();
+      clearFormErrors();
       showStatus('done', 'Your setup was received, it will be up shortly.');
       statusDone?.focus();
     } catch (err) {
-      showStatus('error', (err && err.message) ? err.message : 'Submit failed');
-      statusRetry?.focus();
+      await returnToForm();
+      showFormError((err && err.message) ? err.message : 'Submit failed');
+      go && (go.disabled = false);
+      form.querySelector('.submit-go')?.focus();
+    }
+  });
+  form.addEventListener('input', (e) => {
+    const field = e.target?.closest?.('.submit-field');
+    field?.classList.remove('is-invalid');
+    if (formError?.classList.contains('is-visible')) {
+      formError.textContent = '';
+      formError.classList.remove('is-visible');
     }
   });
 })();
