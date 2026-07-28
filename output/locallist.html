@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>locallist</title>
+<title>PLM List</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -30,7 +30,18 @@ body {
   text-align: center;
   margin-bottom: var(--space-brand-to-tools);
 }
-.header-copy h1 { margin: 0; font-size: 56px; letter-spacing: 1px; line-height: 1.05; }
+.header-copy h1 {
+  margin: 0;
+  font-size: clamp(26px, 5.5vw, 40px);
+  font-weight: 600;
+  letter-spacing: 1px;
+  line-height: 1.1;
+}
+.header-sub {
+  margin: 10px 0 0;
+  font-size: 13px; line-height: 1.55; color: #444;
+  font-style: italic;
+}
 .tagline-row {
   margin-top: 14px;
   display: flex; flex-direction: column; flex-wrap: wrap;
@@ -639,12 +650,22 @@ body.filter-open .tip-rich { display: none !important; }
   position: fixed; inset: 0; z-index: 400;
   display: flex; align-items: center; justify-content: center;
   padding: 24px 16px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .16s ease;
 }
 .submit-modal[hidden] { display: none; }
+.submit-modal.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
 .submit-backdrop {
   position: absolute; inset: 0;
   background: rgba(0,0,0,.55);
+  opacity: 0;
+  transition: opacity .18s ease;
 }
+.submit-modal.is-open .submit-backdrop { opacity: 1; }
 .submit-panel {
   position: relative; z-index: 1;
   width: min(440px, 100%);
@@ -655,6 +676,20 @@ body.filter-open .tip-rich { display: none !important; }
   background: var(--rich-ink);
   box-shadow: 0 16px 40px rgba(0,0,0,.32);
   overflow: hidden;
+  opacity: 0;
+  transform: translateY(12px) scale(0.96);
+  transition:
+    transform .22s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity .18s ease;
+}
+.submit-modal.is-open .submit-panel {
+  opacity: 1;
+  transform: none;
+}
+.submit-modal.is-open .submit-panel.is-swap {
+  opacity: 0;
+  transform: translateY(12px) scale(0.96);
+  pointer-events: none;
 }
 .submit-head {
   position: relative; overflow: hidden; isolation: isolate;
@@ -711,6 +746,7 @@ body.filter-open .tip-rich { display: none !important; }
 .submit-label {
   font-size: 11px; color: #9a9a9a; letter-spacing: .01em;
 }
+.submit-req { color: #c9a227; margin-left: 2px; }
 .submit-hint {
   font-size: 10px; color: #666; margin: 0;
 }
@@ -857,6 +893,42 @@ body.filter-open .tip-rich { display: none !important; }
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.8 -0.45'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 .submit-go:hover { color: #fff; filter: brightness(1.12); }
+.submit-go:disabled { cursor: default; filter: none; opacity: .7; }
+.submit-panel.is-status .submit-form { display: none; }
+.submit-status {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 48px 24px 40px;
+  text-align: center;
+  min-height: 180px;
+}
+.submit-panel.is-status .submit-status { display: flex; }
+.submit-spinner {
+  width: 28px; height: 28px;
+  border: 2px solid #333;
+  border-top-color: #e8e8e8;
+  border-radius: 50%;
+  animation: submit-spin .7s linear infinite;
+}
+@keyframes submit-spin { to { transform: rotate(360deg); } }
+.submit-status-msg {
+  margin: 0;
+  font-size: 13px; line-height: 1.55; color: #cfcfcf;
+  max-width: 22em;
+}
+.submit-status-msg.is-error { color: #e8a0a0; }
+.submit-status .submit-go { width: auto; min-width: 120px; margin-top: 4px; }
+@media (prefers-reduced-motion: reduce) {
+  .submit-modal,
+  .submit-backdrop,
+  .submit-panel { transition: none !important; }
+  .submit-modal.is-open .submit-panel,
+  .submit-modal.is-open .submit-panel.is-swap { opacity: 1; transform: none; }
+  .submit-spinner { animation: submit-spin 1.2s linear infinite; }
+}
 body.submit-open { overflow: hidden; }
 body.submit-open .tip-rich { display: none !important; }
 </style>
@@ -864,7 +936,8 @@ body.submit-open .tip-rich { display: none !important; }
 <body>
 <div class="header-box">
 <div class="header-copy">
-<h1>locallist</h1>
+<h1>PLM List</h1>
+<p class="header-sub">personal language model list</p>
 <div class="tagline-row">
 <a class="tagline" href="hamsters.html">“The hamsters go brrrrr”</a>
 <button id="submit" type="button" onclick="locallistSubmit()">Submit your setup</button>
@@ -952,40 +1025,40 @@ body.submit-open .tip-rich { display: none !important; }
       </div>
       <label class="submit-field">
         <span class="submit-label">Name</span>
-        <input name="model" required autocomplete="off" placeholder="qwen3.6-35b-a3b">
+        <input name="model" autocomplete="off" placeholder="qwen3.6-35b-a3b">
       </label>
       <label class="submit-field">
         <span class="submit-label">Quantization</span>
-        <input name="quant" required autocomplete="off" placeholder="4bit">
+        <input name="quant" autocomplete="off" placeholder="4bit">
       </label>
       <label class="submit-field">
         <span class="submit-label">Version</span>
-        <input name="version" required autocomplete="off" placeholder="Qwen3.6-35B-A3B-UD-Q6_K_XL">
+        <input name="version" autocomplete="off" placeholder="Qwen3.6-35B-A3B-UD-Q6_K_XL">
       </label>
       <label class="submit-field">
-        <span class="submit-label">Context length</span>
-        <input name="kv_ctx" inputmode="numeric" autocomplete="off" placeholder="65536">
+        <span class="submit-label">Context length<span class="submit-req" aria-hidden="true">*</span></span>
+        <input name="kv_ctx" inputmode="numeric" required autocomplete="off" placeholder="65536">
         <p class="submit-hint">Tokens you actually run — used for the +kv bar</p>
       </label>
       <label class="submit-field">
-        <span class="submit-label">Link</span>
-        <input name="version_url" type="url" autocomplete="off" placeholder="https://huggingface.co/…">
+        <span class="submit-label">Link<span class="submit-req" aria-hidden="true">*</span></span>
+        <input name="version_url" type="url" required autocomplete="off" placeholder="https://huggingface.co/…">
       </label>
 
       <div class="submit-group">Hardware</div>
       <label class="submit-field">
-        <span class="submit-label">Specs</span>
+        <span class="submit-label">Specs<span class="submit-req" aria-hidden="true">*</span></span>
         <input name="hardware" required autocomplete="off" placeholder="2× RTX 3090 24GB">
       </label>
       <label class="submit-field">
         <span class="submit-label">Price</span>
-        <input name="price" required autocomplete="off" placeholder="1400">
+        <input name="price" autocomplete="off" placeholder="1400">
       </label>
 
       <div class="submit-group">Speed</div>
       <div class="submit-row">
         <label class="submit-field">
-          <span class="submit-label">Decode (t/s)</span>
+          <span class="submit-label">Decode (t/s)<span class="submit-req" aria-hidden="true">*</span></span>
           <input name="speed" required autocomplete="off" placeholder="35">
         </label>
         <label class="submit-field">
@@ -997,7 +1070,7 @@ body.submit-open .tip-rich { display: none !important; }
       <div class="submit-group">Info</div>
       <label class="submit-field">
         <span class="submit-label">How you run it</span>
-        <textarea name="info" required placeholder="Engine, flags, offload, concurrency, anything extreme…"></textarea>
+        <textarea name="info" placeholder="Engine, flags, offload, concurrency, anything extreme…"></textarea>
       </label>
       <label class="submit-field">
         <span class="submit-label">Email</span>
@@ -1009,6 +1082,12 @@ body.submit-open .tip-rich { display: none !important; }
         <button type="submit" class="submit-go">Submit</button>
       </div>
     </form>
+    <div class="submit-status" id="submit-status" aria-live="polite">
+      <div class="submit-spinner" id="submit-status-spinner" hidden></div>
+      <p class="submit-status-msg" id="submit-status-msg"></p>
+      <button type="button" class="submit-go" id="submit-status-done" hidden data-close-submit>Done</button>
+      <button type="button" class="submit-go" id="submit-status-retry" hidden>Try again</button>
+    </div>
   </div>
 </div>
 
@@ -1016,8 +1095,14 @@ body.submit-open .tip-rich { display: none !important; }
 function locallistSubmit() {
   const modal = document.getElementById('submit-modal');
   if (!modal) return;
+  if (typeof window.locallistResetSubmitStatus === 'function') {
+    window.locallistResetSubmitStatus();
+  }
   modal.hidden = false;
   document.body.classList.add('submit-open');
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => modal.classList.add('is-open'));
+  });
   if (typeof window.locallistResetSubmitProvider === 'function') {
     window.locallistResetSubmitProvider();
   }
@@ -1026,13 +1111,113 @@ function locallistSubmit() {
 function locallistCloseSubmit() {
   const modal = document.getElementById('submit-modal');
   if (!modal) return;
-  modal.hidden = true;
+  if (modal.hidden) return;
+  modal.classList.remove('is-open');
   document.body.classList.remove('submit-open');
+  let done = false;
+  const finish = () => {
+    if (done) return;
+    done = true;
+    modal.hidden = true;
+    if (typeof window.locallistResetSubmitStatus === 'function') {
+      window.locallistResetSubmitStatus();
+    }
+  };
+  modal.addEventListener('transitionend', function onEnd(e) {
+    if (e.target !== modal) return;
+    modal.removeEventListener('transitionend', onEnd);
+    finish();
+  });
+  setTimeout(finish, 220);
 }
 (function () {
   const modal = document.getElementById('submit-modal');
   const form = document.getElementById('submit-form');
   if (!modal || !form) return;
+  const panel = modal.querySelector('.submit-panel');
+  const statusSpinner = document.getElementById('submit-status-spinner');
+  const statusMsg = document.getElementById('submit-status-msg');
+  const statusDone = document.getElementById('submit-status-done');
+  const statusRetry = document.getElementById('submit-status-retry');
+  let swapChain = Promise.resolve();
+
+  function applyStatus(mode, message) {
+    if (!panel) return;
+    panel.classList.add('is-status');
+    if (statusSpinner) statusSpinner.hidden = mode !== 'loading';
+    if (statusDone) statusDone.hidden = mode !== 'done';
+    if (statusRetry) statusRetry.hidden = mode !== 'error';
+    if (statusMsg) {
+      statusMsg.textContent = message || '';
+      statusMsg.classList.toggle('is-error', mode === 'error');
+    }
+    const title = document.getElementById('submit-title');
+    if (title) {
+      title.textContent = mode === 'loading' ? 'Submitting' : mode === 'done' ? 'Received' : mode === 'error' ? 'Something went wrong' : 'Submit your setup';
+    }
+  }
+  function swapPanel(updateFn) {
+    return new Promise((resolve) => {
+      if (!panel) {
+        updateFn();
+        resolve();
+        return;
+      }
+      const finish = () => {
+        panel.removeEventListener('transitionend', onEnd);
+        resolve();
+      };
+      const onEnd = (e) => {
+        if (e.target !== panel || e.propertyName !== 'opacity') return;
+        finish();
+      };
+      // Same interval as opening the form: snap closed, swap content, ease in once.
+      panel.style.transition = 'none';
+      panel.classList.add('is-swap');
+      updateFn();
+      void panel.offsetWidth;
+      panel.style.transition = '';
+      panel.addEventListener('transitionend', onEnd);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          panel.classList.remove('is-swap');
+        });
+      });
+      setTimeout(finish, 240);
+    });
+  }
+  function showStatus(mode, message) {
+    swapChain = swapChain.then(() => swapPanel(() => applyStatus(mode, message)));
+    return swapChain;
+  }
+  function resetSubmitStatus() {
+    if (!panel) return;
+    panel.style.transition = '';
+    panel.classList.remove('is-status', 'is-swap');
+    if (statusSpinner) statusSpinner.hidden = true;
+    if (statusDone) statusDone.hidden = true;
+    if (statusRetry) statusRetry.hidden = true;
+    if (statusMsg) {
+      statusMsg.textContent = '';
+      statusMsg.classList.remove('is-error');
+    }
+    const title = document.getElementById('submit-title');
+    if (title) title.textContent = 'Submit your setup';
+    const go = form.querySelector('.submit-go');
+    if (go) {
+      go.disabled = false;
+      go.textContent = 'Submit';
+    }
+  }
+  window.locallistResetSubmitStatus = resetSubmitStatus;
+  statusRetry?.addEventListener('click', () => {
+    swapChain = swapChain.then(() => swapPanel(() => {
+      resetSubmitStatus();
+    })).then(() => {
+      form.querySelector('.submit-go')?.focus();
+    });
+  });
+
 
   const urlInput = form.querySelector('[name="version_url"]');
   const modelInput = form.querySelector('[name="model"]');
@@ -1070,7 +1255,7 @@ function locallistCloseSubmit() {
     const isOther = value === 'other';
     if (providerOther) {
       providerOther.hidden = !isOther;
-      providerOther.required = isOther;
+      providerOther.required = false;
       if (!isOther) providerOther.value = '';
       if (isOther && focusOther) providerOther.focus();
     }
@@ -1274,17 +1459,31 @@ function locallistCloseSubmit() {
     return s;
   }
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const go = form.querySelector('.submit-go');
+    if (go && go.disabled) return;
     const fd = new FormData(form);
     const providerKey = String(fd.get('provider') || '').trim();
-    if (!providerKey) {
-      providerBtn?.focus();
+    const providerOtherVal = String(fd.get('provider_other') || '').trim();
+    const versionUrl = String(fd.get('version_url') || '').trim();
+    const hardware = String(fd.get('hardware') || '').trim();
+    const speedRaw = String(fd.get('speed') || '').trim();
+    const kvCtxRaw = String(fd.get('kv_ctx') || '').trim();
+    if (!versionUrl) {
+      urlInput?.focus();
       return;
     }
-    const providerOtherVal = String(fd.get('provider_other') || '').trim();
-    if (providerKey === 'other' && !providerOtherVal) {
-      providerOther?.focus();
+    if (!hardware) {
+      form.querySelector('[name="hardware"]')?.focus();
+      return;
+    }
+    if (!speedRaw) {
+      form.querySelector('[name="speed"]')?.focus();
+      return;
+    }
+    if (!kvCtxRaw) {
+      form.querySelector('[name="kv_ctx"]')?.focus();
       return;
     }
     const num = (key) => {
@@ -1295,11 +1494,11 @@ function locallistCloseSubmit() {
     };
     const payload = {
       model: String(fd.get('model') || '').trim(),
-      provider: providerKey === 'other' ? providerOtherVal : providerKey,
+      provider: providerKey === 'other' ? providerOtherVal : (providerKey || ''),
       quant_bits: withBit(fd.get('quant')),
       version_label: String(fd.get('version') || '').trim(),
-      version_url: String(fd.get('version_url') || '').trim(),
-      hardware: String(fd.get('hardware') || '').trim(),
+      version_url: versionUrl,
+      hardware,
       kv_ctx: num('kv_ctx'),
       speed: withUnit(fd.get('speed'), 't/s'),
       pp: withUnit(fd.get('pp'), 't/s'),
@@ -1308,16 +1507,25 @@ function locallistCloseSubmit() {
       email: String(fd.get('email') || '').trim(),
       rich: true,
     };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    const slug = (payload.model || 'setup').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'setup';
-    a.href = URL.createObjectURL(blob);
-    a.download = 'locallist-' + slug + '.json';
-    a.click();
-    URL.revokeObjectURL(a.href);
-    form.reset();
-    resetProvider();
-    locallistCloseSubmit();
+    if (go) go.disabled = true;
+    showStatus('loading', 'Sending…');
+    try {
+      const res = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      let data = null;
+      try { data = await res.json(); } catch (_) {}
+      if (!res.ok) throw new Error((data && data.error) || 'Submit failed');
+      form.reset();
+      resetProvider();
+      showStatus('done', 'Your setup was received, it will be up shortly.');
+      statusDone?.focus();
+    } catch (err) {
+      showStatus('error', (err && err.message) ? err.message : 'Submit failed');
+      statusRetry?.focus();
+    }
   });
 })();
 function toggleInfo(btn) {

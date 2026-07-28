@@ -1510,7 +1510,18 @@ body {
   text-align: center;
   margin-bottom: var(--space-brand-to-tools);
 }
-.header-copy h1 { margin: 0; font-size: 56px; letter-spacing: 1px; line-height: 1.05; }
+.header-copy h1 {
+  margin: 0;
+  font-size: clamp(26px, 5.5vw, 40px);
+  font-weight: 600;
+  letter-spacing: 1px;
+  line-height: 1.1;
+}
+.header-sub {
+  margin: 10px 0 0;
+  font-size: 13px; line-height: 1.55; color: #444;
+  font-style: italic;
+}
 .tagline-row {
   margin-top: 14px;
   display: flex; flex-direction: column; flex-wrap: wrap;
@@ -2119,12 +2130,22 @@ body.filter-open .tip-rich { display: none !important; }
   position: fixed; inset: 0; z-index: 400;
   display: flex; align-items: center; justify-content: center;
   padding: 24px 16px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .16s ease;
 }
 .submit-modal[hidden] { display: none; }
+.submit-modal.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
 .submit-backdrop {
   position: absolute; inset: 0;
   background: rgba(0,0,0,.55);
+  opacity: 0;
+  transition: opacity .18s ease;
 }
+.submit-modal.is-open .submit-backdrop { opacity: 1; }
 .submit-panel {
   position: relative; z-index: 1;
   width: min(440px, 100%);
@@ -2135,6 +2156,20 @@ body.filter-open .tip-rich { display: none !important; }
   background: var(--rich-ink);
   box-shadow: 0 16px 40px rgba(0,0,0,.32);
   overflow: hidden;
+  opacity: 0;
+  transform: translateY(12px) scale(0.96);
+  transition:
+    transform .22s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity .18s ease;
+}
+.submit-modal.is-open .submit-panel {
+  opacity: 1;
+  transform: none;
+}
+.submit-modal.is-open .submit-panel.is-swap {
+  opacity: 0;
+  transform: translateY(12px) scale(0.96);
+  pointer-events: none;
 }
 .submit-head {
   position: relative; overflow: hidden; isolation: isolate;
@@ -2191,6 +2226,7 @@ body.filter-open .tip-rich { display: none !important; }
 .submit-label {
   font-size: 11px; color: #9a9a9a; letter-spacing: .01em;
 }
+.submit-req { color: #c9a227; margin-left: 2px; }
 .submit-hint {
   font-size: 10px; color: #666; margin: 0;
 }
@@ -2337,6 +2373,42 @@ body.filter-open .tip-rich { display: none !important; }
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.8 -0.45'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 .submit-go:hover { color: #fff; filter: brightness(1.12); }
+.submit-go:disabled { cursor: default; filter: none; opacity: .7; }
+.submit-panel.is-status .submit-form { display: none; }
+.submit-status {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 48px 24px 40px;
+  text-align: center;
+  min-height: 180px;
+}
+.submit-panel.is-status .submit-status { display: flex; }
+.submit-spinner {
+  width: 28px; height: 28px;
+  border: 2px solid #333;
+  border-top-color: #e8e8e8;
+  border-radius: 50%;
+  animation: submit-spin .7s linear infinite;
+}
+@keyframes submit-spin { to { transform: rotate(360deg); } }
+.submit-status-msg {
+  margin: 0;
+  font-size: 13px; line-height: 1.55; color: #cfcfcf;
+  max-width: 22em;
+}
+.submit-status-msg.is-error { color: #e8a0a0; }
+.submit-status .submit-go { width: auto; min-width: 120px; margin-top: 4px; }
+@media (prefers-reduced-motion: reduce) {
+  .submit-modal,
+  .submit-backdrop,
+  .submit-panel { transition: none !important; }
+  .submit-modal.is-open .submit-panel,
+  .submit-modal.is-open .submit-panel.is-swap { opacity: 1; transform: none; }
+  .submit-spinner { animation: submit-spin 1.2s linear infinite; }
+}
 body.submit-open { overflow: hidden; }
 body.submit-open .tip-rich { display: none !important; }
 """
@@ -2385,40 +2457,40 @@ SUBMIT_MODAL = """
       </div>
       <label class="submit-field">
         <span class="submit-label">Name</span>
-        <input name="model" required autocomplete="off" placeholder="qwen3.6-35b-a3b">
+        <input name="model" autocomplete="off" placeholder="qwen3.6-35b-a3b">
       </label>
       <label class="submit-field">
         <span class="submit-label">Quantization</span>
-        <input name="quant" required autocomplete="off" placeholder="4bit">
+        <input name="quant" autocomplete="off" placeholder="4bit">
       </label>
       <label class="submit-field">
         <span class="submit-label">Version</span>
-        <input name="version" required autocomplete="off" placeholder="Qwen3.6-35B-A3B-UD-Q6_K_XL">
+        <input name="version" autocomplete="off" placeholder="Qwen3.6-35B-A3B-UD-Q6_K_XL">
       </label>
       <label class="submit-field">
-        <span class="submit-label">Context length</span>
-        <input name="kv_ctx" inputmode="numeric" autocomplete="off" placeholder="65536">
+        <span class="submit-label">Context length<span class="submit-req" aria-hidden="true">*</span></span>
+        <input name="kv_ctx" inputmode="numeric" required autocomplete="off" placeholder="65536">
         <p class="submit-hint">Tokens you actually run — used for the +kv bar</p>
       </label>
       <label class="submit-field">
-        <span class="submit-label">Link</span>
-        <input name="version_url" type="url" autocomplete="off" placeholder="https://huggingface.co/…">
+        <span class="submit-label">Link<span class="submit-req" aria-hidden="true">*</span></span>
+        <input name="version_url" type="url" required autocomplete="off" placeholder="https://huggingface.co/…">
       </label>
 
       <div class="submit-group">Hardware</div>
       <label class="submit-field">
-        <span class="submit-label">Specs</span>
+        <span class="submit-label">Specs<span class="submit-req" aria-hidden="true">*</span></span>
         <input name="hardware" required autocomplete="off" placeholder="2× RTX 3090 24GB">
       </label>
       <label class="submit-field">
         <span class="submit-label">Price</span>
-        <input name="price" required autocomplete="off" placeholder="1400">
+        <input name="price" autocomplete="off" placeholder="1400">
       </label>
 
       <div class="submit-group">Speed</div>
       <div class="submit-row">
         <label class="submit-field">
-          <span class="submit-label">Decode (t/s)</span>
+          <span class="submit-label">Decode (t/s)<span class="submit-req" aria-hidden="true">*</span></span>
           <input name="speed" required autocomplete="off" placeholder="35">
         </label>
         <label class="submit-field">
@@ -2430,7 +2502,7 @@ SUBMIT_MODAL = """
       <div class="submit-group">Info</div>
       <label class="submit-field">
         <span class="submit-label">How you run it</span>
-        <textarea name="info" required placeholder="Engine, flags, offload, concurrency, anything extreme…"></textarea>
+        <textarea name="info" placeholder="Engine, flags, offload, concurrency, anything extreme…"></textarea>
       </label>
       <label class="submit-field">
         <span class="submit-label">Email</span>
@@ -2442,6 +2514,12 @@ SUBMIT_MODAL = """
         <button type="submit" class="submit-go">Submit</button>
       </div>
     </form>
+    <div class="submit-status" id="submit-status" aria-live="polite">
+      <div class="submit-spinner" id="submit-status-spinner" hidden></div>
+      <p class="submit-status-msg" id="submit-status-msg"></p>
+      <button type="button" class="submit-go" id="submit-status-done" hidden data-close-submit>Done</button>
+      <button type="button" class="submit-go" id="submit-status-retry" hidden>Try again</button>
+    </div>
   </div>
 </div>
 """
@@ -2450,8 +2528,14 @@ SUBMIT_JS = """
 function locallistSubmit() {
   const modal = document.getElementById('submit-modal');
   if (!modal) return;
+  if (typeof window.locallistResetSubmitStatus === 'function') {
+    window.locallistResetSubmitStatus();
+  }
   modal.hidden = false;
   document.body.classList.add('submit-open');
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => modal.classList.add('is-open'));
+  });
   if (typeof window.locallistResetSubmitProvider === 'function') {
     window.locallistResetSubmitProvider();
   }
@@ -2460,13 +2544,113 @@ function locallistSubmit() {
 function locallistCloseSubmit() {
   const modal = document.getElementById('submit-modal');
   if (!modal) return;
-  modal.hidden = true;
+  if (modal.hidden) return;
+  modal.classList.remove('is-open');
   document.body.classList.remove('submit-open');
+  let done = false;
+  const finish = () => {
+    if (done) return;
+    done = true;
+    modal.hidden = true;
+    if (typeof window.locallistResetSubmitStatus === 'function') {
+      window.locallistResetSubmitStatus();
+    }
+  };
+  modal.addEventListener('transitionend', function onEnd(e) {
+    if (e.target !== modal) return;
+    modal.removeEventListener('transitionend', onEnd);
+    finish();
+  });
+  setTimeout(finish, 220);
 }
 (function () {
   const modal = document.getElementById('submit-modal');
   const form = document.getElementById('submit-form');
   if (!modal || !form) return;
+  const panel = modal.querySelector('.submit-panel');
+  const statusSpinner = document.getElementById('submit-status-spinner');
+  const statusMsg = document.getElementById('submit-status-msg');
+  const statusDone = document.getElementById('submit-status-done');
+  const statusRetry = document.getElementById('submit-status-retry');
+  let swapChain = Promise.resolve();
+
+  function applyStatus(mode, message) {
+    if (!panel) return;
+    panel.classList.add('is-status');
+    if (statusSpinner) statusSpinner.hidden = mode !== 'loading';
+    if (statusDone) statusDone.hidden = mode !== 'done';
+    if (statusRetry) statusRetry.hidden = mode !== 'error';
+    if (statusMsg) {
+      statusMsg.textContent = message || '';
+      statusMsg.classList.toggle('is-error', mode === 'error');
+    }
+    const title = document.getElementById('submit-title');
+    if (title) {
+      title.textContent = mode === 'loading' ? 'Submitting' : mode === 'done' ? 'Received' : mode === 'error' ? 'Something went wrong' : 'Submit your setup';
+    }
+  }
+  function swapPanel(updateFn) {
+    return new Promise((resolve) => {
+      if (!panel) {
+        updateFn();
+        resolve();
+        return;
+      }
+      const finish = () => {
+        panel.removeEventListener('transitionend', onEnd);
+        resolve();
+      };
+      const onEnd = (e) => {
+        if (e.target !== panel || e.propertyName !== 'opacity') return;
+        finish();
+      };
+      // Same interval as opening the form: snap closed, swap content, ease in once.
+      panel.style.transition = 'none';
+      panel.classList.add('is-swap');
+      updateFn();
+      void panel.offsetWidth;
+      panel.style.transition = '';
+      panel.addEventListener('transitionend', onEnd);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          panel.classList.remove('is-swap');
+        });
+      });
+      setTimeout(finish, 240);
+    });
+  }
+  function showStatus(mode, message) {
+    swapChain = swapChain.then(() => swapPanel(() => applyStatus(mode, message)));
+    return swapChain;
+  }
+  function resetSubmitStatus() {
+    if (!panel) return;
+    panel.style.transition = '';
+    panel.classList.remove('is-status', 'is-swap');
+    if (statusSpinner) statusSpinner.hidden = true;
+    if (statusDone) statusDone.hidden = true;
+    if (statusRetry) statusRetry.hidden = true;
+    if (statusMsg) {
+      statusMsg.textContent = '';
+      statusMsg.classList.remove('is-error');
+    }
+    const title = document.getElementById('submit-title');
+    if (title) title.textContent = 'Submit your setup';
+    const go = form.querySelector('.submit-go');
+    if (go) {
+      go.disabled = false;
+      go.textContent = 'Submit';
+    }
+  }
+  window.locallistResetSubmitStatus = resetSubmitStatus;
+  statusRetry?.addEventListener('click', () => {
+    swapChain = swapChain.then(() => swapPanel(() => {
+      resetSubmitStatus();
+    })).then(() => {
+      form.querySelector('.submit-go')?.focus();
+    });
+  });
+
 
   const urlInput = form.querySelector('[name="version_url"]');
   const modelInput = form.querySelector('[name="model"]');
@@ -2504,7 +2688,7 @@ function locallistCloseSubmit() {
     const isOther = value === 'other';
     if (providerOther) {
       providerOther.hidden = !isOther;
-      providerOther.required = isOther;
+      providerOther.required = false;
       if (!isOther) providerOther.value = '';
       if (isOther && focusOther) providerOther.focus();
     }
@@ -2708,17 +2892,31 @@ function locallistCloseSubmit() {
     return s;
   }
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const go = form.querySelector('.submit-go');
+    if (go && go.disabled) return;
     const fd = new FormData(form);
     const providerKey = String(fd.get('provider') || '').trim();
-    if (!providerKey) {
-      providerBtn?.focus();
+    const providerOtherVal = String(fd.get('provider_other') || '').trim();
+    const versionUrl = String(fd.get('version_url') || '').trim();
+    const hardware = String(fd.get('hardware') || '').trim();
+    const speedRaw = String(fd.get('speed') || '').trim();
+    const kvCtxRaw = String(fd.get('kv_ctx') || '').trim();
+    if (!versionUrl) {
+      urlInput?.focus();
       return;
     }
-    const providerOtherVal = String(fd.get('provider_other') || '').trim();
-    if (providerKey === 'other' && !providerOtherVal) {
-      providerOther?.focus();
+    if (!hardware) {
+      form.querySelector('[name="hardware"]')?.focus();
+      return;
+    }
+    if (!speedRaw) {
+      form.querySelector('[name="speed"]')?.focus();
+      return;
+    }
+    if (!kvCtxRaw) {
+      form.querySelector('[name="kv_ctx"]')?.focus();
       return;
     }
     const num = (key) => {
@@ -2729,11 +2927,11 @@ function locallistCloseSubmit() {
     };
     const payload = {
       model: String(fd.get('model') || '').trim(),
-      provider: providerKey === 'other' ? providerOtherVal : providerKey,
+      provider: providerKey === 'other' ? providerOtherVal : (providerKey || ''),
       quant_bits: withBit(fd.get('quant')),
       version_label: String(fd.get('version') || '').trim(),
-      version_url: String(fd.get('version_url') || '').trim(),
-      hardware: String(fd.get('hardware') || '').trim(),
+      version_url: versionUrl,
+      hardware,
       kv_ctx: num('kv_ctx'),
       speed: withUnit(fd.get('speed'), 't/s'),
       pp: withUnit(fd.get('pp'), 't/s'),
@@ -2742,16 +2940,25 @@ function locallistCloseSubmit() {
       email: String(fd.get('email') || '').trim(),
       rich: true,
     };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    const slug = (payload.model || 'setup').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'setup';
-    a.href = URL.createObjectURL(blob);
-    a.download = 'locallist-' + slug + '.json';
-    a.click();
-    URL.revokeObjectURL(a.href);
-    form.reset();
-    resetProvider();
-    locallistCloseSubmit();
+    if (go) go.disabled = true;
+    showStatus('loading', 'Sending…');
+    try {
+      const res = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      let data = null;
+      try { data = await res.json(); } catch (_) {}
+      if (!res.ok) throw new Error((data && data.error) || 'Submit failed');
+      form.reset();
+      resetProvider();
+      showStatus('done', 'Your setup was received, it will be up shortly.');
+      statusDone?.focus();
+    } catch (err) {
+      showStatus('error', (err && err.message) ? err.message : 'Submit failed');
+      statusRetry?.focus();
+    }
   });
 })();
 function toggleInfo(btn) {
@@ -3214,7 +3421,7 @@ def build_html(rows: list[dict], bl_stats: dict) -> str:
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>locallist</title>
+<title>PLM List</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -3223,7 +3430,8 @@ def build_html(rows: list[dict], bl_stats: dict) -> str:
 <body>
 <div class="header-box">
 <div class="header-copy">
-<h1>locallist</h1>
+<h1>PLM List</h1>
+<p class="header-sub">personal language model list</p>
 <div class="tagline-row">
 <a class="tagline" href="hamsters.html">“The hamsters go brrrrr”</a>
 <button id="submit" type="button" onclick="locallistSubmit()">Submit your setup</button>
@@ -3273,7 +3481,7 @@ body {
 .header-box h1 {
   margin: 0;
   font-size: clamp(26px, 5.5vw, 40px);
-  font-weight: 400;
+  font-weight: 600;
   letter-spacing: 1px;
   line-height: 1.1;
 }
@@ -3318,7 +3526,10 @@ body {
 }
 .essay .rule {
   border: 0; border-top: 1px solid #e0e0e0;
-  margin: 0 0 1.6em;
+  margin: 0 0 1em;
+}
+.essay .rule + .byline {
+  margin: 0 0 1.4em;
 }
 .essay .body p {
   margin: 0 0 1.15em;
@@ -3338,7 +3549,7 @@ body {
 </head>
 <body>
 <div class="shell">
-  <a class="back" href="locallist.html">← locallist</a>
+  <a class="back" href="locallist.html">← PLM List</a>
   <header class="header-box">
     <h1>The hamsters go brrrrr</h1>
     <p class="subheader">A year inside the Discord server where people spend their life savings to run a 27b model instead of paying Anthropic $20 dollars a month.</p>
@@ -3351,8 +3562,9 @@ body {
     </div>
     <p class="byline">Edited by Daniel Kiss</p>
     <hr class="rule">
+    <p class="byline">**all names are anonymized**</p>
     <div class="body">
-      <p>Ready or not, personal local language models (the smaller, more private, more efficient kind) are coming to the people.</p>
+      <p>Ready or not, personal language models (the smaller, more private, more efficient kind) are coming to the people.</p>
       <p>Should the frontier labs be worried? Not immediately. But the band of revolutionaries taking charge are coming from bedrooms all over the world, wiring 220-volt outlets by hand at 2am. Thousands of these makeshift GPU-burning data-centre enthusiasts have clustered in a Discord server named LocalLLM, where the collective wisdom is to not ask permission from OpenAI or Anthropic to access intelligence. This is their story: a year’s worth of chatter and banter, directly from those who turned their favorite hobby into a religion.</p>
       <h2>July 2025 — “It’s time to get serious”</h2>
       <p>“It’s time to get serious.” Six thumbs-up and one frowning face. This is how it all started almost a year ago on the 14th of July. What they meant by serious we will never know, but it foreshadows the storm that soon followed: the frantic new open-weight model releases, the benchmarks, and the rise of GPU prices. Serious it became…</p>
@@ -3381,11 +3593,18 @@ body {
       <p>Kimi K2 Thinking landing on the 7th of November kept the general channel buzzing for two weeks — the first trillion-parameter open-weight model ever released. The community fired back to the model’s widely shared $4.6 million training-cost claim: “Obviously that doesn’t include the cost of chips or building a datacenter. That’s their electricity bill for the training run.” Nevertheless, GLM 4.6 still held its ground for VRAM-constrained builds. The launch of Google Gemini 3 Pro turned attention to cloud models before a Cloudflare outage that same week vindicated self-hosting.</p>
       <p>ArliAI’s GLM-4.5-Air-Derestricted and gpt-oss-20b-Derestricted, using a “norm-preserving biprojected abliteration” method, also drew reactions. MellowCactus humorously commented “what a relief, I need to update my meth recipe.”</p>
       <h2>December 2025 — “shut up and give me all your money, also all your electricity”</h2>
-      <p>December started with another large model release. Mistral Large 3 with 675 billion parameters was released on the 2nd. At FP16, that meant 1.35TB of VRAM. Again, the scarce commodity was yearned for, but a real shortage started to form after November’s debacle. The conspiracy theories started: “it’s nvidia manipulating the market. They are throttling the inventories so they can keep an artificial high price.” Others blamed OpenAI’s wafer-buying instead. G.SKILL (a Taiwanese hardware manufacturer) put out price-hike notices which were forwarded around like earthquake warnings. The mood was summarized by a member: “shut up and give me all your money, also all your electricity.”</p>
+      <p>December started with another large model release. Mistral Large 3 with 675 billion parameters released on the 2nd. At FP16, that meant 1.35TB of VRAM. Again, the scarce commodity was yearned for, but a real shortage started to form after November’s debacle. The conspiracy theories started: “it’s nvidia manipulating the market. They are throttling the inventories so they can keep an artificial high price.” Others blamed OpenAI’s wafer-buying instead. G.SKILL (a Taiwanese hardware manufacturer) put out price-hike notices which were forwarded around like earthquake warnings. The mood was summarized by a member: “shut up and give me all your money, also all your electricity.”</p>
       <p>Next was the community’s favorite pastime, agonizing in public over what to buy. The DGX Spark vs. RTX 5090 vs. Strix Halo debates continued. LucidCactus announced he still had “$5832.14 left in my quarterly budget to burn through” and others spoke of their craigslist finds: “theres a guy local selling 4 of the 395 systems for $1600 each with 128gb vram each.”</p>
       <p>The money flowed but it didn’t mean once you had bought the hardware you actually had the chance to run the models. StaticMagnet, sitting on four RTX 6000 Blackwell cards, wrote “this is depressing, but I can’t get sglang or vllm to work with any models.” As models got bigger, hardware requirements increased and the software stack had a hard time cooperating whether it was vLLM’s config hell or litellm exploding the second it touched openai-agents-sdk.</p>
       <p>The server had started expanding, and so did its cast of new characters. A steady flow of curious people started using small models like Devstral-Small-2-24B and Qwen3 Coder as Claude substitutes. “Vibe coding” also started becoming ordinary labor. It was not without its critics. The chatter led a member to jab, “you don’t actually have a purpose for using the LLM other than telling people.” DeepSeek-V3.2 and Nemotron 3 Nano were also benchmarked to death on a made-up RuneScape puzzle and Devstral 2 was bullied for refusing to say bad words.</p>
       <p>Then everyone held their breath as GLM 4.7 was released on the 22nd. CoralAnchor, still exiled, ran the q8 on a Mac Studio: “Since I can’t say it on reddit, I’ll say it here: GLM 4.7 q8 is insanely good to me... there is something so inherently different about the quality.” A member credited it as the first local model to beat Claude Opus 4.1 and Gemini 2.5 Pro. It was the hot release before Nvidia’s $20b acquisition of Groq, “a clever architecture that scaled up like a toddler with Lincoln logs.” Bright days were ahead!</p>
+      <h2>January 2026 — “this feels like a war crime, ngl”</h2>
+      <p>Yann LeCun on his way out the door at Meta told a reporter on the 2nd that the Llama 4 benchmarks “were fudged a little bit.” This revelation served only to confirm the community’s existing suspicions, which naturally meant distrusting the big labs. CES 2026 also arrived a few days later on the 5th but Nvidia announced no new consumer GPU, no 50 Super refresh, nothing to replace the 5090. AMD used its CES slot to reveal a Strix Halo mini PC to rival Nvidia’s DGX Spark, and that was about it. VRAM and RAM would just have to keep getting rationed.</p>
+      <p>The hardware crunch pushed people to be more clever. On the 9th, one member wrote roughly 1,500 lines of custom NCCL networking code to cluster three DGX Sparks together, going beyond Nvidia’s official two-node limit, just to route around a triangle-mesh subnet problem the stock software couldn’t handle. This was the essence of homelabbing: you didn’t have to buy more, you just had to be scrappier. A member wrote “are you really homelabbing if it isn’t ultra janky?” The jokes extended to students crushing a 5090 into decade-old Xeon v4 servers. “This feels like a war crime, ngl,” one wrote, capturing the spirit of the extreme tinkerers who always found ways to make things work.</p>
+      <p>Then, GLM 4.7 Flash’s release on the 15th triggered a mountain of llama.cpp and vLLM breakages: repetition loops, VRAM blowups, a prefill regression that dumped prompt processing on the CPU of the Blackwell cards. One member wrote bluntly: “Even with all of the llama.cpp updates... and using Unsloth’s direct recommendations, GLM 4.7 Flash is just bad. Like really bad.” Ten days later, this same model was hailed as a breakthrough. Fixes and patches came in waves for the next few days, and a member even took it into their own hands to independently get quantized KV cache plus flash attention working for 131k context on a single 4090.</p>
+      <p>Local models also found ways to stay competitive on coding tasks. StaticHarbor ran a fifty-sample real-world harness and reported MiniMax 2.1 scoring nearly as well as Sonnet 4.5. Then later in the month Kimi K2.5 arrived and scored 76.8% on the SWE-bench Verified benchmark and was priced at a tenth of Opus for similar output. However, that still meant 240GB of RAM even when quantized to 1.8 bits… The community also accidentally created its own benchmark. A member one-shotted Flappy Bird with Qwen3 Coder and found the game apparently “hard-baked into its parameters,” which led to the “Flappy Bird Olympics.” GLM 4.7 Flash and MiniMax 2.1 suspiciously gave near-identical results which signaled overfitting rather than genuine coding skills.</p>
+      <p>The month closed with Yann LeCun, now fully departed from Meta, telling Davos that the best open-weights models were coming from China rather than the West. And it was only getting started.</p>
+      <p>to be continued . . .</p>
     </div>
   </article>
 </div>

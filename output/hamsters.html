@@ -25,7 +25,7 @@ body {
 .header-box h1 {
   margin: 0;
   font-size: clamp(26px, 5.5vw, 40px);
-  font-weight: 400;
+  font-weight: 600;
   letter-spacing: 1px;
   line-height: 1.1;
 }
@@ -70,7 +70,10 @@ body {
 }
 .essay .rule {
   border: 0; border-top: 1px solid #e0e0e0;
-  margin: 0 0 1.6em;
+  margin: 0 0 1em;
+}
+.essay .rule + .byline {
+  margin: 0 0 1.4em;
 }
 .essay .body p {
   margin: 0 0 1.15em;
@@ -90,7 +93,7 @@ body {
 </head>
 <body>
 <div class="shell">
-  <a class="back" href="locallist.html">← locallist</a>
+  <a class="back" href="locallist.html">← PLM List</a>
   <header class="header-box">
     <h1>The hamsters go brrrrr</h1>
     <p class="subheader">A year inside the Discord server where people spend their life savings to run a 27b model instead of paying Anthropic $20 dollars a month.</p>
@@ -103,8 +106,9 @@ body {
     </div>
     <p class="byline">Edited by Daniel Kiss</p>
     <hr class="rule">
+    <p class="byline">**all names are anonymized**</p>
     <div class="body">
-      <p>Ready or not, personal local language models (the smaller, more private, more efficient kind) are coming to the people.</p>
+      <p>Ready or not, personal language models (the smaller, more private, more efficient kind) are coming to the people.</p>
       <p>Should the frontier labs be worried? Not immediately. But the band of revolutionaries taking charge are coming from bedrooms all over the world, wiring 220-volt outlets by hand at 2am. Thousands of these makeshift GPU-burning data-centre enthusiasts have clustered in a Discord server named LocalLLM, where the collective wisdom is to not ask permission from OpenAI or Anthropic to access intelligence. This is their story: a year’s worth of chatter and banter, directly from those who turned their favorite hobby into a religion.</p>
       <h2>July 2025 — “It’s time to get serious”</h2>
       <p>“It’s time to get serious.” Six thumbs-up and one frowning face. This is how it all started almost a year ago on the 14th of July. What they meant by serious we will never know, but it foreshadows the storm that soon followed: the frantic new open-weight model releases, the benchmarks, and the rise of GPU prices. Serious it became…</p>
@@ -133,11 +137,18 @@ body {
       <p>Kimi K2 Thinking landing on the 7th of November kept the general channel buzzing for two weeks — the first trillion-parameter open-weight model ever released. The community fired back to the model’s widely shared $4.6 million training-cost claim: “Obviously that doesn’t include the cost of chips or building a datacenter. That’s their electricity bill for the training run.” Nevertheless, GLM 4.6 still held its ground for VRAM-constrained builds. The launch of Google Gemini 3 Pro turned attention to cloud models before a Cloudflare outage that same week vindicated self-hosting.</p>
       <p>ArliAI’s GLM-4.5-Air-Derestricted and gpt-oss-20b-Derestricted, using a “norm-preserving biprojected abliteration” method, also drew reactions. MellowCactus humorously commented “what a relief, I need to update my meth recipe.”</p>
       <h2>December 2025 — “shut up and give me all your money, also all your electricity”</h2>
-      <p>December started with another large model release. Mistral Large 3 with 675 billion parameters was released on the 2nd. At FP16, that meant 1.35TB of VRAM. Again, the scarce commodity was yearned for, but a real shortage started to form after November’s debacle. The conspiracy theories started: “it’s nvidia manipulating the market. They are throttling the inventories so they can keep an artificial high price.” Others blamed OpenAI’s wafer-buying instead. G.SKILL (a Taiwanese hardware manufacturer) put out price-hike notices which were forwarded around like earthquake warnings. The mood was summarized by a member: “shut up and give me all your money, also all your electricity.”</p>
+      <p>December started with another large model release. Mistral Large 3 with 675 billion parameters released on the 2nd. At FP16, that meant 1.35TB of VRAM. Again, the scarce commodity was yearned for, but a real shortage started to form after November’s debacle. The conspiracy theories started: “it’s nvidia manipulating the market. They are throttling the inventories so they can keep an artificial high price.” Others blamed OpenAI’s wafer-buying instead. G.SKILL (a Taiwanese hardware manufacturer) put out price-hike notices which were forwarded around like earthquake warnings. The mood was summarized by a member: “shut up and give me all your money, also all your electricity.”</p>
       <p>Next was the community’s favorite pastime, agonizing in public over what to buy. The DGX Spark vs. RTX 5090 vs. Strix Halo debates continued. LucidCactus announced he still had “$5832.14 left in my quarterly budget to burn through” and others spoke of their craigslist finds: “theres a guy local selling 4 of the 395 systems for $1600 each with 128gb vram each.”</p>
       <p>The money flowed but it didn’t mean once you had bought the hardware you actually had the chance to run the models. StaticMagnet, sitting on four RTX 6000 Blackwell cards, wrote “this is depressing, but I can’t get sglang or vllm to work with any models.” As models got bigger, hardware requirements increased and the software stack had a hard time cooperating whether it was vLLM’s config hell or litellm exploding the second it touched openai-agents-sdk.</p>
       <p>The server had started expanding, and so did its cast of new characters. A steady flow of curious people started using small models like Devstral-Small-2-24B and Qwen3 Coder as Claude substitutes. “Vibe coding” also started becoming ordinary labor. It was not without its critics. The chatter led a member to jab, “you don’t actually have a purpose for using the LLM other than telling people.” DeepSeek-V3.2 and Nemotron 3 Nano were also benchmarked to death on a made-up RuneScape puzzle and Devstral 2 was bullied for refusing to say bad words.</p>
       <p>Then everyone held their breath as GLM 4.7 was released on the 22nd. CoralAnchor, still exiled, ran the q8 on a Mac Studio: “Since I can’t say it on reddit, I’ll say it here: GLM 4.7 q8 is insanely good to me... there is something so inherently different about the quality.” A member credited it as the first local model to beat Claude Opus 4.1 and Gemini 2.5 Pro. It was the hot release before Nvidia’s $20b acquisition of Groq, “a clever architecture that scaled up like a toddler with Lincoln logs.” Bright days were ahead!</p>
+      <h2>January 2026 — “this feels like a war crime, ngl”</h2>
+      <p>Yann LeCun on his way out the door at Meta told a reporter on the 2nd that the Llama 4 benchmarks “were fudged a little bit.” This revelation served only to confirm the community’s existing suspicions, which naturally meant distrusting the big labs. CES 2026 also arrived a few days later on the 5th but Nvidia announced no new consumer GPU, no 50 Super refresh, nothing to replace the 5090. AMD used its CES slot to reveal a Strix Halo mini PC to rival Nvidia’s DGX Spark, and that was about it. VRAM and RAM would just have to keep getting rationed.</p>
+      <p>The hardware crunch pushed people to be more clever. On the 9th, one member wrote roughly 1,500 lines of custom NCCL networking code to cluster three DGX Sparks together, going beyond Nvidia’s official two-node limit, just to route around a triangle-mesh subnet problem the stock software couldn’t handle. This was the essence of homelabbing: you didn’t have to buy more, you just had to be scrappier. A member wrote “are you really homelabbing if it isn’t ultra janky?” The jokes extended to students crushing a 5090 into decade-old Xeon v4 servers. “This feels like a war crime, ngl,” one wrote, capturing the spirit of the extreme tinkerers who always found ways to make things work.</p>
+      <p>Then, GLM 4.7 Flash’s release on the 15th triggered a mountain of llama.cpp and vLLM breakages: repetition loops, VRAM blowups, a prefill regression that dumped prompt processing on the CPU of the Blackwell cards. One member wrote bluntly: “Even with all of the llama.cpp updates... and using Unsloth’s direct recommendations, GLM 4.7 Flash is just bad. Like really bad.” Ten days later, this same model was hailed as a breakthrough. Fixes and patches came in waves for the next few days, and a member even took it into their own hands to independently get quantized KV cache plus flash attention working for 131k context on a single 4090.</p>
+      <p>Local models also found ways to stay competitive on coding tasks. StaticHarbor ran a fifty-sample real-world harness and reported MiniMax 2.1 scoring nearly as well as Sonnet 4.5. Then later in the month Kimi K2.5 arrived and scored 76.8% on the SWE-bench Verified benchmark and was priced at a tenth of Opus for similar output. However, that still meant 240GB of RAM even when quantized to 1.8 bits… The community also accidentally created its own benchmark. A member one-shotted Flappy Bird with Qwen3 Coder and found the game apparently “hard-baked into its parameters,” which led to the “Flappy Bird Olympics.” GLM 4.7 Flash and MiniMax 2.1 suspiciously gave near-identical results which signaled overfitting rather than genuine coding skills.</p>
+      <p>The month closed with Yann LeCun, now fully departed from Meta, telling Davos that the best open-weights models were coming from China rather than the West. And it was only getting started.</p>
+      <p>to be continued . . .</p>
     </div>
   </article>
 </div>
