@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
 
-function readBody(req) {
+function readStream(req) {
   return new Promise((resolve, reject) => {
     const chunks = [];
     let size = 0;
@@ -24,6 +24,23 @@ function readBody(req) {
     });
     req.on('error', reject);
   });
+}
+
+async function readBody(req) {
+  // Vercel often pre-parses JSON into req.body; stream may already be empty.
+  if (req.body != null) {
+    if (typeof req.body === 'object' && !Buffer.isBuffer(req.body)) {
+      return req.body;
+    }
+    if (typeof req.body === 'string') {
+      return req.body ? JSON.parse(req.body) : {};
+    }
+    if (Buffer.isBuffer(req.body)) {
+      const raw = req.body.toString('utf8');
+      return raw ? JSON.parse(raw) : {};
+    }
+  }
+  return readStream(req);
 }
 
 function line(label, value) {
