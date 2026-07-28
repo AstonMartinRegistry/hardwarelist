@@ -2950,7 +2950,12 @@ function locallistCloseSubmit() {
       });
       let data = null;
       try { data = await res.json(); } catch (_) {}
-      if (!res.ok) throw new Error((data && data.error) || 'Submit failed');
+      if (!res.ok) {
+        const detail = data && Array.isArray(data.received) && data.received.length
+          ? ' (got: ' + data.received.join(', ') + ')'
+          : '';
+        throw new Error(((data && data.error) || 'Submit failed') + detail);
+      }
       form.reset();
       resetProvider();
       showStatus('done', 'Your setup was received, it will be up shortly.');

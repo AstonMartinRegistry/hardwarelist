@@ -1,5 +1,10 @@
 {
-  "buildCommand": "cp output/locallist.html output/index.html",
-  "outputDirectory": "output",
-  "cleanUrls": true
+  "buildCommand": "mkdir -p public && cp -R output/. public/ && cp public/locallist.html public/index.html",
+  "outputDirectory": "public",
+  "cleanUrls": true,
+  "functions": {
+    "api/submit.js": {
+      "maxDuration": 10
+    }
+  }
 }

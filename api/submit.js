@@ -1,46 +1,30 @@
 const nodemailer = require('nodemailer');
 
-function readStream(req) {
-  return new Promise((resolve, reject) => {
-    const chunks = [];
-    let size = 0;
-    const max = 100_000;
-    req.on('data', (chunk) => {
-      size += chunk.length;
-      if (size > max) {
-        reject(new Error('Payload too large'));
-        req.destroy();
-        return;
-      }
-      chunks.push(chunk);
-    });
-    req.on('end', () => {
-      try {
-        const raw = Buffer.concat(chunks).toString('utf8');
-        resolve(raw ? JSON.parse(raw) : {});
-      } catch (err) {
-        reject(new Error('Invalid JSON'));
-      }
-    });
-    req.on('error', reject);
-  });
+function asObject(value) {
+  if (value == null) return null;
+  if (Buffer.isBuffer(value)) {
+    const raw = value.toString('utf8').trim();
+    if (!raw) return null;
+    return JSON.parse(raw);
+  }
+  if (typeof value === 'string') {
+    const raw = value.trim();
+    if (!raw) return null;
+    return JSON.parse(raw);
+  }
+  if (typeof value === 'object') return value;
+  return null;
 }
 
-async function readBody(req) {
-  // Vercel often pre-parses JSON into req.body; stream may already be empty.
-  if (req.body != null) {
-    if (typeof req.body === 'object' && !Buffer.isBuffer(req.body)) {
-      return req.body;
-    }
-    if (typeof req.body === 'string') {
-      return req.body ? JSON.parse(req.body) : {};
-    }
-    if (Buffer.isBuffer(req.body)) {
-      const raw = req.body.toString('utf8');
-      return raw ? JSON.parse(raw) : {};
-    }
+function readBody(req) {
+  // Vercel Node functions expose a parsed body; streaming req.on('data') is unreliable.
+  try {
+    const fromBody = asObject(req.body);
+    if (fromBody && Object.keys(fromBody).length) return fromBody;
+  } catch (_) {
+    /* fall through */
   }
-  return readStream(req);
+  return {};
 }
 
 function line(label, value) {
@@ -69,10 +53,17 @@ function formatBody(payload) {
 }
 
 module.exports = async function handler(req, res) {
+  res.setHeader('Content-Type', 'application/json');
+
+  if (req.method === 'OPTIONS') {
+    res.statusCode = 204;
+    res.end();
+    return;
+  }
+
   if (req.method !== 'POST') {
     res.statusCode = 405;
     res.setHeader('Allow', 'POST');
-    res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify({ error: 'Method not allowed' }));
     return;
   }
@@ -83,32 +74,39 @@ module.exports = async function handler(req, res) {
 
   if (!user || !pass || !to) {
     res.statusCode = 500;
-    res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify({ error: 'Email is not configured' }));
     return;
   }
 
   let payload;
   try {
-    payload = await readBody(req);
+    payload = readBody(req);
   } catch (err) {
     res.statusCode = 400;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({ error: err.message || 'Bad request' }));
+    res.end(JSON.stringify({ error: err.message || 'Invalid JSON' }));
     return;
   }
 
-  const versionUrl = String(payload.version_url || '').trim();
-  const hardware = String(payload.hardware || '').trim();
-  const speed = String(payload.speed || '').trim();
-  const kvCtx = payload.kv_ctx;
+  const versionUrl = String(payload.version_url || payload.link || '').trim();
+  const hardware = String(payload.hardware || payload.specs || '').trim();
+  const speed = String(payload.speed || payload.decode || '').trim();
+  const kvCtx = payload.kv_ctx != null ? payload.kv_ctx : payload.context;
   const hasKvCtx = kvCtx != null && String(kvCtx).trim() !== '' && Number.isFinite(Number(kvCtx));
+
   if (!versionUrl || !hardware || !speed || !hasKvCtx) {
     res.statusCode = 400;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({ error: 'Link, hardware, decode speed, and context length are required' }));
+    res.end(JSON.stringify({
+      error: 'Link, hardware, decode speed, and context length are required',
+      received: Object.keys(payload || {}),
+    }));
     return;
   }
+
+  // Normalize onto expected keys for the email body.
+  payload.version_url = versionUrl;
+  payload.hardware = hardware;
+  payload.speed = speed;
+  payload.kv_ctx = Number(kvCtx);
 
   const submitter = String(payload.email || '').trim();
   const model = String(payload.model || '').trim() || 'setup';
@@ -131,12 +129,10 @@ module.exports = async function handler(req, res) {
     });
 
     res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify({ ok: true }));
   } catch (err) {
     console.error('submit mail failed', err);
     res.statusCode = 502;
-    res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify({ error: 'Failed to send email' }));
   }
 };
