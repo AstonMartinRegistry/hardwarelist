@@ -23,11 +23,13 @@ pip install -r requirements.txt
 python3 app.py   # serves public/ at http://localhost:5000
 ```
 
-`/api/submit` emails new setup submissions via Gmail SMTP. Set `SENDER_EMAIL`,
-`SENDER_PASSWORD` (a Gmail app password), and `RECEIVER_EMAIL` in `.env` (see
-`.env.example`). On Vercel the serverless entrypoint is `api/submit.py` (maps to
-`/api/submit` and imports the Flask app from `app.py`). `Procfile` runs gunicorn
-for non-Vercel hosts.
+`/api/submit` saves new setup submissions to a Supabase `setups` table.
+Set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in `.env` / Vercel env
+(see `.env.example`). Create the table with `supabase/setups.sql`.
+
+On Vercel the serverless entrypoint is `api/submit.py` (maps to `/api/submit`
+and imports the Flask app from `app.py`). `Procfile` runs gunicorn for
+non-Vercel hosts.
 
 Upstream Discord monthly exports and classifier category folders are still read from the sibling repo:
 

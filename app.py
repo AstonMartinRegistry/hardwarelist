@@ -1,12 +1,7 @@
 import json
 import os
-import re
-import smtplib
-import ssl
 import urllib.error
 import urllib.request
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 
 from flask import Flask, jsonify, request, send_from_directory
 
@@ -14,30 +9,6 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PUBLIC_DIR = os.path.join(BASE_DIR, 'public')
 
 app = Flask(__name__, static_folder=PUBLIC_DIR, static_url_path='')
-
-
-def line(label, value):
-    v = str(value).strip() if value is not None else ''
-    return f'{label}: {v}' if v else None
-
-
-def format_body(payload):
-    lines = [
-        line('Model', payload.get('model')),
-        line('Provider', payload.get('provider')),
-        line('Quant', payload.get('quant_bits')),
-        line('Version', payload.get('version_label')),
-        line('Link', payload.get('version_url')),
-        line('Context', payload.get('kv_ctx')),
-        line('Hardware', payload.get('hardware')),
-        line('Price', payload.get('price')),
-        line('Decode', payload.get('speed')),
-        line('Prefill', payload.get('pp')),
-        line('Info', payload.get('info')),
-        line('Email', payload.get('email')),
-    ]
-    lines = [l for l in lines if l]
-    return '\n'.join(lines) + '\n\n---\nJSON\n' + json.dumps(payload, indent=2) + '\n'
 
 
 def is_finite_number(value):
@@ -48,99 +19,46 @@ def is_finite_number(value):
         return False
 
 
-def send_with_gmail(user, password, to, submitter, subject, text):
-    msg = MIMEMultipart()
-    msg['From'] = f'PLM List <{user}>'
-    msg['To'] = to
-    msg['Subject'] = subject
-    if submitter:
-        msg['Reply-To'] = submitter
-    msg.attach(MIMEText(text, 'plain'))
-
-    ctx = ssl.create_default_context()
-    errors = []
-
-    try:
-        with smtplib.SMTP('smtp.gmail.com', 587, timeout=12) as server:
-            server.ehlo()
-            server.starttls(context=ctx)
-            server.ehlo()
-            server.login(user, password)
-            server.send_message(msg)
-            return
-    except Exception as err:
-        errors.append(f'587/starttls: {err!r}')
-
-    try:
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=12, context=ctx) as server:
-            server.login(user, password)
-            server.send_message(msg)
-            return
-    except Exception as err:
-        errors.append(f'465/ssl: {err!r}')
-
-    raise RuntimeError(' | '.join(errors))
+def supabase_config():
+    url = str(os.environ.get('SUPABASE_URL') or '').strip().rstrip('/')
+    key = str(
+        os.environ.get('SUPABASE_SERVICE_ROLE_KEY')
+        or os.environ.get('SUPABASE_ANON_KEY')
+        or ''
+    ).strip()
+    table = str(os.environ.get('SUPABASE_SETUPS_TABLE') or 'setups').strip() or 'setups'
+    return url, key, table
 
 
-def send_with_resend(api_key, from_addr, to, submitter, subject, text):
-    body = {
-        'from': from_addr,
-        'to': [to],
-        'subject': subject,
-        'text': text,
-    }
-    if submitter:
-        body['reply_to'] = submitter
+def insert_setup(row):
+    url, key, table = supabase_config()
+    if not url or not key:
+        raise RuntimeError('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required')
+
+    endpoint = f'{url}/rest/v1/{table}'
     req = urllib.request.Request(
-        'https://api.resend.com/emails',
-        data=json.dumps(body).encode('utf-8'),
+        endpoint,
+        data=json.dumps(row).encode('utf-8'),
         headers={
-            'Authorization': f'Bearer {api_key}',
+            'apikey': key,
+            'Authorization': f'Bearer {key}',
             'Content-Type': 'application/json',
-        },
-        method='POST',
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            resp.read()
-    except urllib.error.HTTPError as err:
-        detail = err.read().decode('utf-8', 'replace')
-        raise RuntimeError(f'Resend HTTP {err.code}: {detail}') from err
-
-
-def send_with_https_relay(to, submitter, subject, text):
-    """
-    HTTPS form relay (works on Vercel; Gmail SMTP often crashes serverless).
-    Delivers to `to`. First use may require clicking an activation email.
-    """
-    body = {
-        'name': 'PLM List',
-        'email': submitter or to,
-        '_subject': subject,
-        'message': text,
-    }
-    url = 'https://formsubmit.co/ajax/' + urllib.request.quote(to, safe='@')
-    req = urllib.request.Request(
-        url,
-        data=json.dumps(body).encode('utf-8'),
-        headers={
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
+            'Prefer': 'return=representation',
         },
         method='POST',
     )
     try:
         with urllib.request.urlopen(req, timeout=15) as resp:
             raw = resp.read().decode('utf-8', 'replace')
-            try:
-                data = json.loads(raw) if raw else {}
-            except json.JSONDecodeError:
-                data = {'raw': raw}
-            if isinstance(data, dict) and data.get('success') == 'false':
-                raise RuntimeError(data.get('message') or raw or 'relay rejected')
+            if not raw:
+                return None
+            data = json.loads(raw)
+            if isinstance(data, list) and data:
+                return data[0]
+            return data
     except urllib.error.HTTPError as err:
         detail = err.read().decode('utf-8', 'replace')
-        raise RuntimeError(f'Relay HTTP {err.code}: {detail}') from err
+        raise RuntimeError(f'Supabase HTTP {err.code}: {detail}') from err
 
 
 def handle_submit():
@@ -148,37 +66,22 @@ def handle_submit():
         if request.method == 'OPTIONS':
             return '', 204
 
-        user = str(os.environ.get('SENDER_EMAIL') or '').strip()
-        password = re.sub(r'\s+', '', str(os.environ.get('SENDER_PASSWORD') or ''))
-        to = str(os.environ.get('RECEIVER_EMAIL') or user).strip()
-        resend_key = str(os.environ.get('RESEND_API_KEY') or '').strip()
-        on_vercel = bool(os.environ.get('VERCEL'))
+        url, key, table = supabase_config()
 
         if request.method == 'GET':
-            configured = bool(to and (resend_key or ((user and password) and not on_vercel)))
-            transport = (
-                'resend' if resend_key
-                else ('needs-resend' if on_vercel else 'gmail-smtp')
-            )
             return jsonify({
                 'ok': True,
-                'configured': configured,
+                'configured': bool(url and key),
                 'path': request.path,
-                'transport': transport,
+                'transport': 'supabase',
+                'table': table,
             })
 
-        if not to:
-            return jsonify({'error': 'RECEIVER_EMAIL is not configured on the server'}), 500
-        if on_vercel and not resend_key:
+        if not url or not key:
             return jsonify({
-                'error': 'Email transport not configured for Vercel',
-                'detail': (
-                    'Add RESEND_API_KEY in Vercel project env vars and redeploy. '
-                    'Gmail SMTP crashes on this host (502).'
-                ),
+                'error': 'Supabase is not configured',
+                'detail': 'Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in env.',
             }), 500
-        if not on_vercel and not (user and password):
-            return jsonify({'error': 'Email is not configured on the server'}), 500
 
         payload = request.get_json(silent=True, force=True)
         if not isinstance(payload, dict):
@@ -196,38 +99,28 @@ def handle_submit():
                 'received': list(payload.keys()),
             }), 400
 
-        payload['version_url'] = version_url
-        payload['hardware'] = hardware
-        payload['speed'] = speed
-        payload['kv_ctx'] = float(kv_ctx)
-
-        submitter = str(payload.get('email') or '').strip()
-        model = str(payload.get('model') or '').strip() or 'setup'
-        subject = f'PLM List setup: {model} on {hardware}'
-        text = format_body(payload)
+        row = {
+            'model': str(payload.get('model') or '').strip() or None,
+            'provider': str(payload.get('provider') or '').strip() or None,
+            'quant_bits': str(payload.get('quant_bits') or '').strip() or None,
+            'version_label': str(payload.get('version_label') or '').strip() or None,
+            'version_url': version_url,
+            'kv_ctx': float(kv_ctx),
+            'hardware': hardware,
+            'price': str(payload.get('price') or '').strip() or None,
+            'speed': speed,
+            'pp': str(payload.get('pp') or '').strip() or None,
+            'info': str(payload.get('info') or '').strip() or None,
+            'email': str(payload.get('email') or '').strip() or None,
+            'payload': payload,
+        }
 
         try:
-            if resend_key:
-                from_addr = str(os.environ.get('RESEND_FROM') or user or 'onboarding@resend.dev').strip()
-                send_with_resend(resend_key, from_addr, to, submitter, subject, text)
-            elif on_vercel:
-                # Gmail SMTP (and some raw SSL outbound) crashes this Vercel+Cloudflare
-                # setup with a generic 502. Require Resend (HTTPS) in production.
-                return jsonify({
-                    'error': 'Email transport not configured for Vercel',
-                    'detail': (
-                        'Gmail SMTP does not work on this serverless host. '
-                        'Add RESEND_API_KEY (and optional RESEND_FROM) in Vercel env, '
-                        'then redeploy. Free at https://resend.com — set RECEIVER_EMAIL '
-                        'to your inbox.'
-                    ),
-                }), 500
-            else:
-                send_with_gmail(user, password, to, submitter, subject, text)
+            saved = insert_setup(row)
         except Exception as err:
-            return jsonify({'error': 'Failed to send email', 'detail': str(err)}), 502
+            return jsonify({'error': 'Failed to save setup', 'detail': str(err)}), 502
 
-        return jsonify({'ok': True})
+        return jsonify({'ok': True, 'id': (saved or {}).get('id')})
     except Exception as err:
         return jsonify({'error': 'Submit failed', 'detail': str(err)}), 500
 
