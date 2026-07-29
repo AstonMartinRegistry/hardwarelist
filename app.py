@@ -1,9 +1,22 @@
 import json
 import os
+import ssl
 import urllib.error
 import urllib.request
 
 from flask import Flask, jsonify, request, send_from_directory
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
+try:
+    import certifi
+    SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
+except ImportError:
+    SSL_CONTEXT = ssl.create_default_context()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PUBLIC_DIR = os.path.join(BASE_DIR, 'public')
@@ -28,6 +41,7 @@ def supabase_config():
     ).strip().rstrip('/')
     key = str(
         os.environ.get('SUPABASE_SERVICE_ROLE_KEY')
+        or os.environ.get('NEXT_PUBLIC_SUPABASE_ROLE_KEY')
         or os.environ.get('SUPABASE_ANON_KEY')
         or ''
     ).strip()
@@ -53,7 +67,7 @@ def insert_setup(row):
         method='POST',
     )
     try:
-        with urllib.request.urlopen(req, timeout=15) as resp:
+        with urllib.request.urlopen(req, timeout=15, context=SSL_CONTEXT) as resp:
             raw = resp.read().decode('utf-8', 'replace')
             if not raw:
                 return None
