@@ -1,5 +1,4 @@
--- Run in Supabase → SQL Editor
--- Table name: plmlist
+-- Run once in Supabase → SQL Editor
 
 create table if not exists public.plmlist (
   id uuid primary key default gen_random_uuid(),
@@ -24,4 +23,3 @@ create index if not exists plmlist_created_at_idx on public.plmlist (created_at 
 alter table public.plmlist enable row level security;
 
 -- Server uses SUPABASE_SERVICE_ROLE_KEY (bypasses RLS).
--- No public insert policies needed for /api/submit.

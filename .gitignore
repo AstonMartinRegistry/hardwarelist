@@ -1,7 +1,10 @@
-.ebay-profile/
+.env
+.env.local
+.env.*.local
 __pycache__/
 *.pyc
 .DS_Store
-.env
-.env.local
+.vercel/
 node_modules/
+.ebay-profile/
+.claude/

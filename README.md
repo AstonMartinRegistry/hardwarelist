@@ -1,58 +1,41 @@
-# hardwarelist
+# PLM List
 
-Crowdsourced local-LLM hardware setups (GPU + model + quant + speed) extracted from the LocalLLM Discord.
+Static site + one API route that inserts setup submissions into Supabase.
 
 ## Layout
 
 ```
 hardwarelist/
-  hardware_registry.txt      # GPU slug/alias registry
-  model_registry.txt
-  quantization_registry.txt
-  data/                      # Project outputs + classified hardware messages
-  public/                    # Static site served by app.py (index, hamsters, locallist, localllmsetuplist)
-  canvases/                  # Review canvases + liked picks
-  scripts/                   # Build / rollup / HTML generators
-  app.py                     # Flask server: serves public/ and POST /api/submit
+  public/           # site (index, locallist, hamsters)
+  api/submit.py     # Vercel serverless: POST /api/submit → Supabase
+  app.py            # local server (same behavior)
+  supabase/plmlist.sql
+  vercel.json
+  requirements.txt
+  .env.example
 ```
 
-## Running the server
+## Env vars (local `.env` and Vercel → Settings → Environment Variables)
+
+| Name | Required | Notes |
+|------|----------|--------|
+| `NEXT_PUBLIC_SUPABASE_URL` | yes | Project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | yes | **service_role** secret (not the publishable key) |
+| `SUPABASE_SETUPS_TABLE` | no | default `plmlist` |
+
+Create the table with `supabase/plmlist.sql` if needed.
+
+## Local
 
 ```bash
 pip install -r requirements.txt
-python3 app.py   # serves public/ at http://localhost:5000
+python3 app.py
+# http://127.0.0.1:5000
 ```
 
-`/api/submit` saves new setup submissions to a Supabase `plmlist` table.
-Set `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in `.env` / Vercel env
-(see `.env.example`). Create the table with `supabase/setups.sql`.
+## Vercel reconnect
 
-On Vercel the serverless entrypoint is `api/submit.py` (maps to `/api/submit`
-and imports the Flask app from `app.py`). `Procfile` runs gunicorn for
-non-Vercel hosts.
-
-Upstream Discord monthly exports and classifier category folders are still read from the sibling repo:
-
-`../discorddata/jsonstrimmed/localllmbymonth/`
-
-Override with `DISCORDDATA_ROOT=/path/to/discorddata` if needed.
-
-## Common commands
-
-```bash
-# Rebuild setups from Discord classifications
-python3 scripts/build_setup_lists.py
-
-# Roll up hardware mentions by GPU slug
-python3 scripts/build_hardware_rollup.py
-
-# Build HTML lists from liked canvas picks
-python3 scripts/build_locallist_html.py
-python3 scripts/build_localllm_setup_list_html.py
-
-# eBay recently-sold prices (Chrome profile under .ebay-profile/)
-# Sold comps usually require an eBay login first:
-python3 scripts/scrape_ebay_sold.py --login
-python3 scripts/scrape_ebay_sold.py
-python3 scripts/build_locallist_html.py   # refresh price fields from data/ebay-prices.json
-```
+1. Import this repo (Root Directory = repo root, Framework Preset = Other).
+2. Set the two env vars above for Production (and Preview if you want).
+3. Deploy. Confirm `GET https://your-domain/api/submit` returns `"configured": true`.
+4. Point the domain / Cloudflare at the new deployment.
