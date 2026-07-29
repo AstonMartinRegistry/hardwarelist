@@ -25,9 +25,9 @@ python3 app.py   # serves public/ at http://localhost:5000
 
 `/api/submit` emails new setup submissions via Gmail SMTP. Set `SENDER_EMAIL`,
 `SENDER_PASSWORD` (a Gmail app password), and `RECEIVER_EMAIL` in `.env` (see
-`.env.example`). Deployed on Vercel using its native Flask/WSGI support
-(`vercel.json` points at `app.py`); `Procfile` runs it under gunicorn for
-non-Vercel hosts.
+`.env.example`). On Vercel the serverless entrypoint is `api/submit.py` (maps to
+`/api/submit` and imports the Flask app from `app.py`). `Procfile` runs gunicorn
+for non-Vercel hosts.
 
 Upstream Discord monthly exports and classifier category folders are still read from the sibling repo:
 

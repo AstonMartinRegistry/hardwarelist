@@ -2,6 +2,7 @@ import json
 import os
 import re
 import smtplib
+import socket
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -54,21 +55,25 @@ def send_with_gmail(user, password, to, submitter, subject, text):
         msg['Reply-To'] = submitter
     msg.attach(MIMEText(text, 'plain'))
 
-    server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=10)
+    # Force IPv4 — Gmail SMTP often fails over IPv6 on serverless hosts.
+    old_getaddrinfo = socket.getaddrinfo
+
+    def ipv4_only(host, port, family=0, type=0, proto=0, flags=0):
+        return old_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
+
+    socket.getaddrinfo = ipv4_only
     try:
-        server.login(user, password)
-        server.send_message(msg)
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=10)
+        try:
+            server.login(user, password)
+            server.send_message(msg)
+        finally:
+            server.quit()
     finally:
-        server.quit()
+        socket.getaddrinfo = old_getaddrinfo
 
 
-@app.route('/')
-def index():
-    return send_from_directory(PUBLIC_DIR, 'index.html')
-
-
-@app.route('/api/submit', methods=['GET', 'POST', 'OPTIONS'])
-def submit():
+def handle_submit():
     if request.method == 'OPTIONS':
         return '', 204
 
@@ -78,7 +83,7 @@ def submit():
 
     if request.method == 'GET':
         configured = bool(user and password and to)
-        return jsonify({'ok': True, 'configured': configured})
+        return jsonify({'ok': True, 'configured': configured, 'path': request.path})
 
     if not user or not password or not to:
         return jsonify({'error': 'Email is not configured on the server'}), 500
@@ -114,6 +119,24 @@ def submit():
         return jsonify({'error': 'Failed to send email', 'detail': str(err)}), 502
 
     return jsonify({'ok': True})
+
+
+@app.route('/')
+def index():
+    return send_from_directory(PUBLIC_DIR, 'index.html')
+
+
+# Entrypoint on Vercel is api/submit.py → URL /api/submit.
+# Runtime may pass PATH as /api/submit or / — accept both for POST.
+@app.route('/api/submit', methods=['GET', 'POST', 'OPTIONS'])
+@app.route('/submit', methods=['GET', 'POST', 'OPTIONS'])
+def submit():
+    return handle_submit()
+
+
+@app.route('/', methods=['POST', 'OPTIONS'])
+def submit_at_root():
+    return handle_submit()
 
 
 if __name__ == '__main__':
