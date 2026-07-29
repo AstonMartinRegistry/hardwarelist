@@ -23,8 +23,8 @@ pip install -r requirements.txt
 python3 app.py   # serves public/ at http://localhost:5000
 ```
 
-`/api/submit` saves new setup submissions to a Supabase `setups` table.
-Set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in `.env` / Vercel env
+`/api/submit` saves new setup submissions to a Supabase `plmlist` table.
+Set `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in `.env` / Vercel env
 (see `.env.example`). Create the table with `supabase/setups.sql`.
 
 On Vercel the serverless entrypoint is `api/submit.py` (maps to `/api/submit`

@@ -1,5 +1,7 @@
 -- Run in Supabase → SQL Editor
-create table if not exists public.setups (
+-- Table name: plmlist
+
+create table if not exists public.plmlist (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
   model text,
@@ -17,9 +19,9 @@ create table if not exists public.setups (
   payload jsonb not null default '{}'::jsonb
 );
 
-create index if not exists setups_created_at_idx on public.setups (created_at desc);
+create index if not exists plmlist_created_at_idx on public.plmlist (created_at desc);
 
-alter table public.setups enable row level security;
+alter table public.plmlist enable row level security;
 
--- Server uses the service role key (bypasses RLS).
--- No public policies needed for inserts from /api/submit.
+-- Server uses SUPABASE_SERVICE_ROLE_KEY (bypasses RLS).
+-- No public insert policies needed for /api/submit.

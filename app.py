@@ -20,13 +20,18 @@ def is_finite_number(value):
 
 
 def supabase_config():
-    url = str(os.environ.get('SUPABASE_URL') or '').strip().rstrip('/')
+    url = str(
+        os.environ.get('NEXT_PUBLIC_SUPABASE_URL')
+        or os.environ.get('NEXT_PUBLIC_SUBABASE_URL')  # typo fallback
+        or os.environ.get('SUPABASE_URL')
+        or ''
+    ).strip().rstrip('/')
     key = str(
         os.environ.get('SUPABASE_SERVICE_ROLE_KEY')
         or os.environ.get('SUPABASE_ANON_KEY')
         or ''
     ).strip()
-    table = str(os.environ.get('SUPABASE_SETUPS_TABLE') or 'setups').strip() or 'setups'
+    table = str(os.environ.get('SUPABASE_SETUPS_TABLE') or 'plmlist').strip() or 'plmlist'
     return url, key, table
 
 
@@ -80,7 +85,7 @@ def handle_submit():
         if not url or not key:
             return jsonify({
                 'error': 'Supabase is not configured',
-                'detail': 'Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in env.',
+                'detail': 'Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in env.',
             }), 500
 
         payload = request.get_json(silent=True, force=True)
