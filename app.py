@@ -155,10 +155,10 @@ def handle_submit():
         on_vercel = bool(os.environ.get('VERCEL'))
 
         if request.method == 'GET':
-            configured = bool(to and (resend_key or (user and password) or on_vercel))
+            configured = bool(to and (resend_key or ((user and password) and not on_vercel)))
             transport = (
                 'resend' if resend_key
-                else ('https-relay' if on_vercel else 'gmail-smtp')
+                else ('needs-resend' if on_vercel else 'gmail-smtp')
             )
             return jsonify({
                 'ok': True,
@@ -169,7 +169,15 @@ def handle_submit():
 
         if not to:
             return jsonify({'error': 'RECEIVER_EMAIL is not configured on the server'}), 500
-        if not resend_key and not on_vercel and not (user and password):
+        if on_vercel and not resend_key:
+            return jsonify({
+                'error': 'Email transport not configured for Vercel',
+                'detail': (
+                    'Add RESEND_API_KEY in Vercel project env vars and redeploy. '
+                    'Gmail SMTP crashes on this host (502).'
+                ),
+            }), 500
+        if not on_vercel and not (user and password):
             return jsonify({'error': 'Email is not configured on the server'}), 500
 
         payload = request.get_json(silent=True, force=True)
@@ -203,8 +211,17 @@ def handle_submit():
                 from_addr = str(os.environ.get('RESEND_FROM') or user or 'onboarding@resend.dev').strip()
                 send_with_resend(resend_key, from_addr, to, submitter, subject, text)
             elif on_vercel:
-                # Vercel blocks/crashes many Gmail SMTP attempts; use HTTPS relay.
-                send_with_https_relay(to, submitter, subject, text)
+                # Gmail SMTP (and some raw SSL outbound) crashes this Vercel+Cloudflare
+                # setup with a generic 502. Require Resend (HTTPS) in production.
+                return jsonify({
+                    'error': 'Email transport not configured for Vercel',
+                    'detail': (
+                        'Gmail SMTP does not work on this serverless host. '
+                        'Add RESEND_API_KEY (and optional RESEND_FROM) in Vercel env, '
+                        'then redeploy. Free at https://resend.com — set RECEIVER_EMAIL '
+                        'to your inbox.'
+                    ),
+                }), 500
             else:
                 send_with_gmail(user, password, to, submitter, subject, text)
         except Exception as err:
