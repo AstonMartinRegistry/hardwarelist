@@ -1,4 +1,4 @@
-"""Local server: serves public/ and routes /api/submit to the same handler as Vercel."""
+"""Local server: static site + /api/submit (same handler as Vercel)."""
 from __future__ import annotations
 
 import importlib.util
@@ -9,8 +9,8 @@ from pathlib import Path
 from urllib.parse import unquote, urlparse
 
 BASE_DIR = Path(__file__).resolve().parent
-PUBLIC_DIR = BASE_DIR / 'public'
 API_FILE = BASE_DIR / 'api' / 'submit.py'
+STATIC_EXT = {'.html', '.css', '.js', '.jpg', '.jpeg', '.png', '.svg', '.ico', '.webp', '.txt', '.json'}
 
 spec = importlib.util.spec_from_file_location('plmlist_submit', API_FILE)
 submit_mod = importlib.util.module_from_spec(spec)
@@ -51,19 +51,21 @@ class LocalHandler(BaseHTTPRequestHandler):
         rel = unquote(parsed.path)
         if rel in ('', '/'):
             rel = '/index.html'
+        elif rel in ('/locallist', '/hamsters'):
+            rel = rel + '.html'
         rel = rel.lstrip('/')
-        if '..' in rel.split('/'):
+        if not rel or '..' in rel.split('/') or rel.startswith('.'):
             self.send_error(400, 'Bad path')
             return
 
-        target = (PUBLIC_DIR / rel).resolve()
+        target = (BASE_DIR / rel).resolve()
         try:
-            target.relative_to(PUBLIC_DIR.resolve())
+            target.relative_to(BASE_DIR.resolve())
         except ValueError:
             self.send_error(400, 'Bad path')
             return
 
-        if not target.is_file():
+        if target.suffix.lower() not in STATIC_EXT or not target.is_file():
             self.send_error(404, 'Not found')
             return
 
@@ -82,7 +84,7 @@ class LocalHandler(BaseHTTPRequestHandler):
 def main():
     port = int(os.environ.get('PORT', 5000))
     server = ThreadingHTTPServer(('0.0.0.0', port), LocalHandler)
-    print(f'Serving {PUBLIC_DIR} at http://127.0.0.1:{port}')
+    print(f'Serving site at http://127.0.0.1:{port}')
     print('POST /api/submit → Supabase plmlist')
     server.serve_forever()
 

@@ -6,9 +6,7 @@
     }
   },
   "rewrites": [
-    { "source": "/", "destination": "/public/index.html" },
-    { "source": "/locallist", "destination": "/public/locallist.html" },
-    { "source": "/hamsters", "destination": "/public/hamsters.html" },
-    { "source": "/((?!api/).*)", "destination": "/public/$1" }
+    { "source": "/locallist", "destination": "/locallist.html" },
+    { "source": "/hamsters", "destination": "/hamsters.html" }
   ]
 }
