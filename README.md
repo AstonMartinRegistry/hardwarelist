@@ -10,10 +10,24 @@ hardwarelist/
   model_registry.txt
   quantization_registry.txt
   data/                      # Project outputs + classified hardware messages
-  output/                    # HTML lists (locallist.html, localllmsetuplist.html)
+  public/                    # Static site served by app.py (index, hamsters, locallist, localllmsetuplist)
   canvases/                  # Review canvases + liked picks
   scripts/                   # Build / rollup / HTML generators
+  app.py                     # Flask server: serves public/ and POST /api/submit
 ```
+
+## Running the server
+
+```bash
+pip install -r requirements.txt
+python3 app.py   # serves public/ at http://localhost:5000
+```
+
+`/api/submit` emails new setup submissions via Gmail SMTP. Set `SENDER_EMAIL`,
+`SENDER_PASSWORD` (a Gmail app password), and `RECEIVER_EMAIL` in `.env` (see
+`.env.example`). Deployed on Vercel using its native Flask/WSGI support
+(`vercel.json` points at `app.py`); `Procfile` runs it under gunicorn for
+non-Vercel hosts.
 
 Upstream Discord monthly exports and classifier category folders are still read from the sibling repo:
 

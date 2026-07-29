@@ -8,9 +8,9 @@ from email.mime.text import MIMEText
 from flask import Flask, jsonify, request, send_from_directory
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-OUTPUT_DIR = os.path.join(BASE_DIR, 'output')
+PUBLIC_DIR = os.path.join(BASE_DIR, 'public')
 
-app = Flask(__name__, static_folder=OUTPUT_DIR, static_url_path='')
+app = Flask(__name__, static_folder=PUBLIC_DIR, static_url_path='')
 
 
 def line(label, value):
@@ -64,7 +64,7 @@ def send_with_gmail(user, password, to, submitter, subject, text):
 
 @app.route('/')
 def index():
-    return send_from_directory(OUTPUT_DIR, 'index.html')
+    return send_from_directory(PUBLIC_DIR, 'index.html')
 
 
 @app.route('/api/submit', methods=['GET', 'POST', 'OPTIONS'])
