@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PLM List — Stats</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #111;
+  --rich-ink: #141414;
+  --mute: #888;
+  --line: #ececec;
+  --panel: #fafafa;
+  --radius: 8px;
+  --page-inset: 14px;
+  --qwen: #2f6fed;
+  --glm: #7c3aed;
+  --gemma: #0f9d58;
+  --minimax: #e67e22;
+  --mistral: #e11d48;
+  --other: #b87333;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--ink); background: #fff; margin: 0;
+  padding: 28px 24px 60px;
+}
+a { color: inherit; }
+.back {
+  display: inline-block; font-size: 12px; color: var(--mute);
+  text-decoration: none; margin: 0 0 18px var(--page-inset);
+}
+.back:hover { color: var(--ink); }
+.header-box {
+  text-align: center;
+  padding: 0 var(--page-inset) 8px;
+  margin-bottom: 28px;
+}
+.header-box h1 {
+  margin: 0;
+  font-size: clamp(26px, 5.5vw, 40px);
+  font-weight: 600;
+  letter-spacing: 1px;
+  line-height: 1.1;
+}
+.status {
+  margin: 12px 0 0;
+  font-size: 12px; color: var(--mute);
+}
+.status.is-error { color: #b33; }
+.status.is-ok { color: #444; }
+
+.wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 var(--page-inset);
+  display: flex; flex-direction: column; gap: 22px;
+}
+
+/* Panels */
+.panel {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  overflow: hidden;
+}
+.panel-head {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+  gap: 8px 16px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+.panel-title {
+  margin: 0; font-size: 13px; font-weight: 600; letter-spacing: .02em;
+}
+.panel-sub {
+  margin: 0; font-size: 11px; color: var(--mute); max-width: 36rem;
+}
+.panel-body { padding: 14px 16px 16px; }
+
+/* Optimize controls */
+.controls {
+  display: flex; flex-direction: column; gap: 14px;
+}
+.ctrl-row {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px;
+}
+.ctrl-label {
+  font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--mute); min-width: 64px;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  font-family: inherit; font-size: 12px;
+  border: none; border-radius: 8px;
+  padding: 7px 12px; cursor: pointer;
+  background: #f0f0f0; color: #444;
+  transition: background .12s ease, color .12s ease;
+}
+.chip:hover { background: #e4e4e4; color: #111; }
+.chip.is-on {
+  background: var(--rich-ink); color: #fff;
+}
+.chip .muted { color: #999; font-variant-numeric: tabular-nums; }
+.chip.is-on .muted { color: #aaa; }
+.budget-wrap {
+  flex: 1; min-width: 220px;
+  display: flex; align-items: center; gap: 12px;
+}
+.budget-range {
+  position: relative;
+  flex: 1;
+  height: 28px;
+}
+.budget-range .budget-track {
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  height: 4px; margin-top: -2px;
+  border-radius: 2px;
+  background: #e6e6e6;
+  pointer-events: none;
+}
+.budget-range .budget-fill {
+  position: absolute;
+  top: 50%; height: 4px; margin-top: -2px;
+  border-radius: 2px;
+  background: var(--rich-ink);
+  pointer-events: none;
+}
+.budget-range input[type="range"] {
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  width: 100%; height: 28px; margin: 0;
+  appearance: none; background: none;
+  pointer-events: none;
+}
+.budget-range input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  pointer-events: auto;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--rich-ink);
+  box-shadow: 0 1px 3px rgba(0,0,0,.18);
+  cursor: pointer;
+}
+.budget-range input[type="range"]::-moz-range-thumb {
+  pointer-events: auto;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--rich-ink);
+  box-shadow: 0 1px 3px rgba(0,0,0,.18);
+  cursor: pointer;
+}
+.budget-range input[type="range"]::-moz-range-track {
+  background: transparent; border: none;
+}
+.budget-val {
+  font-size: 13px; font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  min-width: 9.5rem; text-align: right;
+  white-space: nowrap;
+}
+
+/* Overall podium */
+.podium-wrap {
+  margin: 4px 0 18px;
+  padding: 18px 12px 14px;
+  border-radius: var(--radius);
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+.podium-label {
+  text-align: center;
+  font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--mute); margin: 0 0 14px; font-weight: 500;
+}
+.podium {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 10px;
+  min-height: 200px;
+}
+.podium-slot {
+  flex: 1;
+  max-width: 210px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.podium-card {
+  text-align: center;
+  padding: 10px 10px 12px;
+  min-width: 0;
+}
+.podium-medal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  font-size: 12px; font-weight: 700;
+  margin-bottom: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.podium-slot.is-gold .podium-medal {
+  background: linear-gradient(145deg, #f5e6a8, #c9a227);
+  color: #3a2a00;
+  box-shadow: 0 0 0 2px #e8d48a;
+}
+.podium-slot.is-silver .podium-medal {
+  background: linear-gradient(145deg, #f0f0f0, #a8a8a8);
+  color: #222;
+  box-shadow: 0 0 0 2px #d8d8d8;
+}
+.podium-slot.is-bronze .podium-medal {
+  background: linear-gradient(145deg, #e8c4a0, #b87333);
+  color: #2a1608;
+  box-shadow: 0 0 0 2px #d4a574;
+}
+.podium-name {
+  font-size: 12px; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.podium-meta {
+  font-size: 11px; color: #666; margin-top: 4px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.podium-score {
+  font-size: 10px; color: var(--mute); margin-top: 6px;
+  letter-spacing: .04em;
+}
+.podium-block {
+  margin-top: 10px;
+  border-radius: 8px 8px 0 0;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding-bottom: 10px;
+  font-size: 18px; font-weight: 700;
+  color: rgba(0,0,0,.35);
+}
+.podium-slot.is-gold .podium-block {
+  height: 88px;
+  background: linear-gradient(180deg, #f3e3a0, #d4b24a);
+}
+.podium-slot.is-silver .podium-block {
+  height: 64px;
+  background: linear-gradient(180deg, #ececec, #c0c0c0);
+}
+.podium-slot.is-bronze .podium-block {
+  height: 48px;
+  background: linear-gradient(180deg, #e0b894, #c0844a);
+}
+.podium-empty {
+  text-align: center;
+  font-size: 12px; color: var(--mute);
+  padding: 28px 12px;
+}
+
+/* Top lists */
+.tops {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 4px;
+}
+.top-col h3 {
+  margin: 0 0 8px;
+  font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--mute); font-weight: 500;
+}
+.top-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.top-item {
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  gap: 8px;
+  align-items: start;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--panel);
+  border: 1px solid transparent;
+}
+.top-item.is-gold {
+  background: #fffdf5;
+  border-color: #e8d48a;
+  box-shadow: inset 3px 0 0 #c9a227;
+}
+.top-item.is-silver {
+  background: #fafafa;
+  border-color: #d0d0d0;
+  box-shadow: inset 3px 0 0 #a8a8a8;
+}
+.top-item.is-bronze {
+  background: #fffaf5;
+  border-color: #d4a574;
+  box-shadow: inset 3px 0 0 #b87333;
+}
+.top-n {
+  font-size: 11px; color: var(--mute);
+  font-variant-numeric: tabular-nums; padding-top: 2px;
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 16px;
+}
+.top-n.medal {
+  width: 18px; height: 18px; border-radius: 50%;
+  font-size: 10px; font-weight: 700; color: #222; padding: 0;
+}
+.top-n.medal.is-gold { background: linear-gradient(145deg, #f5e6a8, #c9a227); color: #3a2a00; }
+.top-n.medal.is-silver { background: linear-gradient(145deg, #f0f0f0, #a8a8a8); }
+.top-n.medal.is-bronze { background: linear-gradient(145deg, #e8c4a0, #b87333); color: #2a1608; }
+.top-main { min-width: 0; }
+.top-name {
+  font-size: 12px; font-weight: 600; color: #111;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.top-meta {
+  font-size: 11px; color: #666; margin-top: 3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.top-metric {
+  font-size: 12px; font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: #111; text-align: right; white-space: nowrap;
+}
+.top-empty {
+  font-size: 12px; color: var(--mute); padding: 12px;
+  background: var(--panel); border-radius: 8px;
+}
+
+/* Charts */
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.chart-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  overflow: hidden;
+  min-width: 0;
+}
+.chart-card.wide { grid-column: 1 / -1; }
+.chart-head {
+  padding: 12px 14px 8px;
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+.chart-title { margin: 0; font-size: 12px; font-weight: 600; }
+.chart-legend {
+  display: flex; flex-wrap: wrap; gap: 8px 12px;
+  font-size: 10px; color: #666;
+}
+.chart-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.swatch {
+  width: 8px; height: 8px; border-radius: 2px; display: inline-block;
+}
+.chart-svg-wrap {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  padding: 8px 4px 4px;
+}
+.chart-svg-wrap svg { width: 100%; height: 100%; display: block; }
+.chart-empty {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: var(--mute);
+}
+.axis-label { font-size: 10px; fill: #888; }
+.tick { font-size: 10px; fill: #999; font-variant-numeric: tabular-nums; }
+.grid-line { stroke: #f0f0f0; stroke-width: 1; }
+.frontier-line {
+  fill: none; stroke: var(--rich-ink); stroke-width: 1.6;
+  stroke-dasharray: 4 3; opacity: .75;
+}
+.dot {
+  stroke: #fff; stroke-width: 1.2; cursor: pointer;
+  transition: r .12s ease;
+}
+.dot.is-frontier { stroke: var(--rich-ink); stroke-width: 1.6; }
+.dot:hover, .dot.is-hot { r: 6; }
+
+.tooltip {
+  position: fixed; z-index: 50;
+  pointer-events: none;
+  background: var(--rich-ink); color: #eee;
+  border-radius: 8px; padding: 10px 12px;
+  font-size: 11px; line-height: 1.45;
+  max-width: 260px;
+  box-shadow: 0 12px 32px rgba(0,0,0,.28);
+  opacity: 0; transform: translateY(4px);
+  transition: opacity .12s ease, transform .12s ease;
+}
+.tooltip.is-on { opacity: 1; transform: translateY(0); }
+.tooltip b { color: #fff; font-weight: 600; }
+.tooltip .muted { color: #999; }
+
+/* Ladder + tables */
+.ladder {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+.ladder-cell {
+  background: var(--panel);
+  border-radius: 8px;
+  padding: 12px;
+  min-width: 0;
+}
+.ladder-budget {
+  font-size: 11px; color: var(--mute); margin-bottom: 8px;
+  letter-spacing: .04em;
+}
+.ladder-name {
+  font-size: 12px; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ladder-detail {
+  font-size: 11px; color: #666; margin-top: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.model-bar {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  margin-bottom: 12px;
+}
+.model-bar select {
+  font-family: inherit; font-size: 12px;
+  border: 1px solid #ddd; border-radius: 8px;
+  padding: 8px 10px; background: #fff; color: #111;
+  min-width: 220px;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 110px 1fr 48px;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+.bar-track {
+  height: 10px; border-radius: 5px; background: #f0f0f0; overflow: hidden;
+}
+.bar-fill {
+  height: 100%; border-radius: 5px;
+  background: var(--rich-ink);
+}
+.bar-n { text-align: right; font-variant-numeric: tabular-nums; color: #666; }
+
+@media (max-width: 900px) {
+  .tops { grid-template-columns: 1fr; }
+  .chart-grid { grid-template-columns: 1fr; }
+  .ladder { grid-template-columns: 1fr 1fr; }
+  .podium { flex-wrap: wrap; min-height: 0; }
+  .podium-slot { max-width: none; flex: 1 1 30%; }
+}
+@media (max-width: 520px) {
+  body { padding: 20px 14px 48px; }
+  .ladder { grid-template-columns: 1fr; }
+  .chart-svg-wrap { height: 280px; }
+  .podium { flex-direction: column; align-items: stretch; }
+  .podium-slot.is-gold { order: -1; }
+  .podium-block { height: 36px !important; border-radius: 8px; }
+}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← PLM List</a>
+<div class="header-box">
+  <h1>Stats</h1>
+  <p class="status" id="status">Loading setups…</p>
+</div>
+
+<div class="wrap" id="app" hidden>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2 class="panel-title">Optimize</h2>
+        <p class="panel-sub">Budget filter → overall podium from top 10 smart / fast / context, then the full lists below.</p>
+      </div>
+    </div>
+    <div class="panel-body controls">
+      <div class="ctrl-row">
+        <span class="ctrl-label">Budget</span>
+        <div class="budget-wrap">
+          <div class="budget-range" id="budget-range">
+            <div class="budget-track"></div>
+            <div class="budget-fill" id="budget-fill"></div>
+            <input type="range" id="budget-min" min="0" max="20000" step="50" value="0" aria-label="minimum budget">
+            <input type="range" id="budget-max" min="0" max="20000" step="50" value="2000" aria-label="maximum budget">
+          </div>
+          <span class="budget-val" id="budget-val">$0 – $2,000</span>
+        </div>
+      </div>
+      <div class="ctrl-row">
+        <span class="ctrl-label">Filter</span>
+        <div class="chips" id="provider-chips"></div>
+      </div>
+      <div id="podium"></div>
+      <div class="tops" id="tops"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2 class="panel-title">Pareto frontiers</h2>
+        <p class="panel-sub">Solid outline = on the frontier (cheaper can’t beat it on that axis). Hover a point for the setup.</p>
+      </div>
+      <div class="chart-legend" id="provider-legend"></div>
+    </div>
+    <div class="panel-body">
+      <div class="chart-grid" id="charts"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2 class="panel-title">Smartest under budget</h2>
+        <p class="panel-sub">Best open-weight rank in each price band.</p>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="ladder" id="ladder-smart"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2 class="panel-title">Fastest under budget</h2>
+        <p class="panel-sub">Best reported tok/s in each price band.</p>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="ladder" id="ladder-fast"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2 class="panel-title">Scale a model</h2>
+        <p class="panel-sub">Same model, different rigs — cost vs speed frontier for that title.</p>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="model-bar">
+        <label class="ctrl-label" for="model-pick">Model</label>
+        <select id="model-pick"></select>
+      </div>
+      <div class="chart-svg-wrap" id="model-chart" style="height:300px"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2 class="panel-title">Coverage</h2>
+        <p class="panel-sub">Where the list is dense — more setups → sharper graphs.</p>
+      </div>
+    </div>
+    <div class="panel-body" id="coverage"></div>
+  </section>
+
+</div>
+
+<div class="tooltip" id="tip" role="tooltip"></div>
+
+<script>
+(function () {
+  const PROVIDERS = [
+    { id: 'qwen', label: 'Qwen', color: '#2f6fed' },
+    { id: 'glm', label: 'GLM', color: '#7c3aed' },
+    { id: 'gemma', label: 'Gemma', color: '#0f9d58' },
+    { id: 'minimax', label: 'MiniMax', color: '#e67e22' },
+    { id: 'mistral', label: 'Mistral', color: '#e11d48' },
+    { id: 'other', label: 'Other', color: '#b87333' },
+  ];
+  const PROVIDER_MAP = Object.fromEntries(PROVIDERS.map((p) => [p.id, p]));
+  const BUCKETS = [
+    { lo: 0, hi: 500, label: '≤ $500' },
+    { lo: 500, hi: 1000, label: '$500–1k' },
+    { lo: 1000, hi: 2000, label: '$1–2k' },
+    { lo: 2000, hi: 5000, label: '$2–5k' },
+    { lo: 5000, hi: Infinity, label: '$5k+' },
+  ];
+
+  const state = {
+    setups: [],
+    providersOn: new Set(PROVIDERS.map((p) => p.id)),
+    budgetMin: 0,
+    budgetMax: 2000,
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const statusEl = $('status');
+  const tipEl = $('tip');
+
+  function fieldText(card, label) {
+    const rows = card.querySelectorAll('.rf');
+    for (const rf of rows) {
+      if (rf.querySelector('.rl')?.textContent?.trim() === label) {
+        const rv = rf.querySelector('.rv');
+        return (rv?.textContent || '').replace(/\s+/g, ' ').trim();
+      }
+    }
+    return '';
+  }
+
+  function parseSpeed(s) {
+    if (!s) return null;
+    // Prefer first tok/s before "pp" (generation), handle ranges "13-14t/s"
+    const gen = s.split(/·/)[0];
+    const range = gen.match(/([\d.]+)\s*[-–]\s*([\d.]+)\s*t\/?s/i);
+    if (range) return (Number(range[1]) + Number(range[2])) / 2;
+    const m = gen.match(/([\d.]+)\s*t\/?s/i);
+    return m ? Number(m[1]) : null;
+  }
+
+  function parseContext(s) {
+    if (!s) return null;
+    const k = s.match(/([\d.]+)\s*k/i);
+    if (k) return Math.round(Number(k[1]) * 1000);
+    const m = s.match(/([\d.]+)\s*m/i);
+    if (m) return Math.round(Number(m[1]) * 1e6);
+    const n = s.replace(/,/g, '').match(/([\d.]+)/);
+    return n ? Number(n[1]) : null;
+  }
+
+  function parseQuant(s) {
+    const m = (s || '').match(/([\d.]+)/);
+    return m ? Number(m[1]) : null;
+  }
+
+  function parseAA(card) {
+    const rows = card.querySelectorAll('.tip-row');
+    for (const row of rows) {
+      if (row.querySelector('.tip-k')?.textContent?.trim() === 'AA Index') {
+        const v = row.querySelector('.tip-v')?.textContent || '';
+        const m = v.match(/([\d.]+)/);
+        return m ? Number(m[1]) : null;
+      }
+    }
+    return null;
+  }
+
+  function parseMemUsed(card) {
+    const el = card.querySelector('.mem-used');
+    if (!el) return null;
+    const n = Number(el.textContent.trim());
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function parseMemTotal(card) {
+    const el = card.querySelector('.mem-total');
+    if (!el) return null;
+    const m = el.textContent.match(/([\d.]+)/);
+    return m ? Number(m[1]) : null;
+  }
+
+  function providerOf(card) {
+    const cat = card.closest('.cat');
+    if (!cat) return 'other';
+    for (const p of PROVIDERS) {
+      if (cat.classList.contains('cat-' + p.id) || cat.id === 'cat-' + p.id) return p.id;
+    }
+    return 'other';
+  }
+
+  function parseSetups(doc) {
+    return [...doc.querySelectorAll('.setup.setup-rich')].map((card, i) => {
+      const name = card.querySelector('.model-name')?.textContent?.trim() || 'unknown';
+      const price = Number(card.dataset.price);
+      const rankRaw = card.dataset.rank;
+      const rank = rankRaw != null && rankRaw !== '' ? Number(rankRaw) : null;
+      const quant = fieldText(card, 'quant');
+      const hardware = fieldText(card, 'hardware');
+      const speedRaw = fieldText(card, 'speed');
+      const contextRaw = fieldText(card, 'context');
+      const priceLabel = fieldText(card, 'price') || (Number.isFinite(price) ? '$' + price : '');
+      return {
+        id: i,
+        name,
+        provider: providerOf(card),
+        price: Number.isFinite(price) ? price : null,
+        priceLabel,
+        rank: Number.isFinite(rank) ? rank : null,
+        // higher = smarter for charts
+        smart: Number.isFinite(rank) ? 160 - rank : null,
+        aa: parseAA(card),
+        quant,
+        quantN: parseQuant(quant),
+        hardware,
+        speed: parseSpeed(speedRaw),
+        speedRaw,
+        context: parseContext(contextRaw),
+        contextRaw,
+        memUsed: parseMemUsed(card),
+        memTotal: parseMemTotal(card),
+        search: card.dataset.search || '',
+      };
+    }).filter((s) => s.price != null);
+  }
+
+  async function loadSetups() {
+    const sources = ['index.html', 'locallist.html', './'];
+    let lastErr = null;
+    for (const src of sources) {
+      try {
+        const res = await fetch(src, { cache: 'no-store' });
+        if (!res.ok) throw new Error(src + ' ' + res.status);
+        const html = await res.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const setups = parseSetups(doc);
+        if (setups.length) return { setups, src };
+      } catch (e) {
+        lastErr = e;
+      }
+    }
+    throw lastErr || new Error('Could not load setups');
+  }
+
+  function fmtMoney(n) {
+    if (n == null) return '—';
+    return '$' + Math.round(n).toLocaleString('en-US');
+  }
+  function fmtSpeed(n) {
+    if (n == null) return '—';
+    return (n % 1 ? n.toFixed(1) : String(n)) + ' t/s';
+  }
+  function fmtCtx(n) {
+    if (n == null) return '—';
+    if (n >= 1000) return (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + 'k';
+    return String(Math.round(n));
+  }
+  function fmtRank(n) {
+    return n == null ? '—' : '#' + n;
+  }
+
+  function filtered() {
+    return state.setups.filter((s) => state.providersOn.has(s.provider));
+  }
+
+  function inBudget(list, min, max) {
+    return list.filter((s) => s.price >= min && s.price <= max);
+  }
+
+  function budgetLabel() {
+    return fmtMoney(state.budgetMin) + ' – ' + fmtMoney(state.budgetMax);
+  }
+
+  function syncBudgetUI() {
+    const minEl = $('budget-min');
+    const maxEl = $('budget-max');
+    const lo = Number(minEl.min);
+    const hi = Number(minEl.max);
+    const span = Math.max(1, hi - lo);
+    const a = ((state.budgetMin - lo) / span) * 100;
+    const b = ((state.budgetMax - lo) / span) * 100;
+    const fill = $('budget-fill');
+    fill.style.left = a + '%';
+    fill.style.width = Math.max(0, b - a) + '%';
+    $('budget-val').textContent = budgetLabel();
+    // Keep max thumb on top when values are close so both stay grabable
+    minEl.style.zIndex = state.budgetMin > hi - (hi - lo) * 0.05 ? '5' : '3';
+    maxEl.style.zIndex = '4';
+  }
+
+  /** Pareto: minimize x, maximize y */
+  function paretoMinXMaxY(points, xKey, yKey) {
+    const usable = points.filter((p) => p[xKey] != null && p[yKey] != null)
+      .slice()
+      .sort((a, b) => a[xKey] - b[xKey] || b[yKey] - a[yKey]);
+    const front = [];
+    let bestY = -Infinity;
+    for (const p of usable) {
+      if (p[yKey] > bestY) {
+        front.push(p);
+        bestY = p[yKey];
+      }
+    }
+    return { all: usable, front, frontIds: new Set(front.map((p) => p.id)) };
+  }
+
+  function topN(list, scoreFn, n = 10) {
+    return list
+      .map((s) => ({ s, score: scoreFn(s) }))
+      .filter((x) => x.score != null && Number.isFinite(x.score))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, n)
+      .map((x) => x.s);
+  }
+
+  function bestInBucket(list, scoreFn) {
+    return BUCKETS.map((b) => {
+      const pool = list.filter((s) => s.price >= b.lo && s.price < b.hi);
+      const ranked = topN(pool, scoreFn, 1);
+      return { bucket: b, setup: ranked[0] || null };
+    });
+  }
+
+  /** Points from place in each top-10 (1st=10 … 10th=1); sum across smart/fast/context. */
+  function overallFromTops(smart, fast, ctx) {
+    const scores = new Map();
+    const add = (list) => {
+      list.forEach((s, i) => {
+        const cur = scores.get(s.id) || { setup: s, pts: 0, hits: 0 };
+        cur.pts += 10 - i;
+        cur.hits += 1;
+        scores.set(s.id, cur);
+      });
+    };
+    add(smart);
+    add(fast);
+    add(ctx);
+    const medals = ['gold', 'silver', 'bronze'];
+    return [...scores.values()]
+      .sort((a, b) => b.pts - a.pts || b.hits - a.hits || a.setup.price - b.setup.price)
+      .slice(0, 3)
+      .map((row, i) => ({ ...row, medal: medals[i] }));
+  }
+
+  function budgetPoolAllProviders() {
+    return inBudget(state.setups, state.budgetMin, state.budgetMax);
+  }
+
+  function renderProviderChips() {
+    const inRange = budgetPoolAllProviders();
+    const counts = Object.fromEntries(PROVIDERS.map((p) => [p.id, 0]));
+    for (const s of inRange) counts[s.provider] = (counts[s.provider] || 0) + 1;
+    const total = inRange.length;
+    const withAny = PROVIDERS.filter((p) => state.setups.some((s) => s.provider === p.id));
+    $('provider-chips').innerHTML = withAny.map((p) => {
+      const on = state.providersOn.has(p.id);
+      const n = counts[p.id] || 0;
+      return `<button type="button" class="chip ${on ? 'is-on' : ''}" data-provider="${p.id}" style="border-left:3px solid ${p.color}">${p.label} <span class="muted">${n}</span></button>`;
+    }).join('') + `<button type="button" class="chip" data-provider="all">All <span class="muted">${total}</span></button>`;
+
+    const legendCounts = Object.fromEntries(PROVIDERS.map((p) => [p.id, 0]));
+    for (const s of state.setups) legendCounts[s.provider] = (legendCounts[s.provider] || 0) + 1;
+    $('provider-legend').innerHTML = PROVIDERS.filter((p) => legendCounts[p.id]).map((p) =>
+      `<span><i class="swatch" style="background:${p.color}"></i>${p.label}</span>`
+    ).join('') + `<span><i class="swatch" style="background:#141414;outline:1px dashed #141414"></i>frontier</span>`;
+  }
+
+  function renderPodium(podium) {
+    const host = $('podium');
+    if (!podium.length) {
+      host.innerHTML = `<div class="podium-wrap"><p class="podium-label">Overall</p><div class="podium-empty">No setups in ${esc(budgetLabel())}</div></div>`;
+      return;
+    }
+    const byMedal = Object.fromEntries(podium.map((p) => [p.medal, p]));
+    const order = ['silver', 'gold', 'bronze'];
+    const labels = { gold: '1', silver: '2', bronze: '3' };
+    const slots = order.map((medal) => {
+      const row = byMedal[medal];
+      if (!row) {
+        return `<div class="podium-slot is-${medal}"><div class="podium-card"><div class="podium-medal">${labels[medal]}</div><div class="podium-meta">—</div></div><div class="podium-block">${labels[medal]}</div></div>`;
+      }
+      const s = row.setup;
+      return `<div class="podium-slot is-${medal}">
+        <div class="podium-card">
+          <div class="podium-medal" title="${medal}">${labels[medal]}</div>
+          <div class="podium-name">${esc(s.name)}</div>
+          <div class="podium-meta">${esc(s.hardware)}</div>
+          <div class="podium-meta">${fmtMoney(s.price)} · ${fmtRank(s.rank)} · ${fmtSpeed(s.speed)} · ${fmtCtx(s.context)}</div>
+          <div class="podium-score">${medal} · ${row.pts} pts · ${row.hits}/3 lists</div>
+        </div>
+        <div class="podium-block">${labels[medal]}</div>
+      </div>`;
+    }).join('');
+    host.innerHTML = `<div class="podium-wrap"><p class="podium-label">Overall</p><div class="podium">${slots}</div></div>`;
+  }
+
+  function renderTops() {
+    const pool = inBudget(filtered(), state.budgetMin, state.budgetMax);
+    const smart = topN(pool, (s) => (s.rank != null ? -s.rank : null), 10);
+    const fast = topN(pool, (s) => s.speed, 10);
+    const ctx = topN(pool, (s) => s.context, 10);
+    const podium = overallFromTops(smart, fast, ctx);
+    const medalById = Object.fromEntries(podium.map((p) => [p.setup.id, p.medal]));
+
+    renderPodium(podium);
+    renderProviderChips();
+
+    const cols = [
+      {
+        title: 'Smartest',
+        items: smart,
+        metric: (s) => fmtRank(s.rank),
+        meta: (s) => `${fmtMoney(s.price)} · ${fmtSpeed(s.speed)}`,
+      },
+      {
+        title: 'Fastest',
+        items: fast,
+        metric: (s) => fmtSpeed(s.speed),
+        meta: (s) => `${fmtMoney(s.price)} · ${fmtRank(s.rank)}`,
+      },
+      {
+        title: 'Largest context',
+        items: ctx,
+        metric: (s) => fmtCtx(s.context),
+        meta: (s) => `${fmtMoney(s.price)} · ${fmtSpeed(s.speed)}`,
+      },
+    ];
+
+    $('tops').innerHTML = cols.map((col) => {
+      if (!col.items.length) {
+        return `<div class="top-col"><h3>${col.title}</h3><div class="top-empty">No setups in ${esc(budgetLabel())}</div></div>`;
+      }
+      const lis = col.items.map((s, i) => {
+        const medal = medalById[s.id];
+        const medalCls = medal ? ` is-${medal}` : '';
+        const nHtml = medal
+          ? `<span class="top-n medal is-${medal}" title="${medal}">${medal === 'gold' ? '1' : medal === 'silver' ? '2' : '3'}</span>`
+          : `<span class="top-n">${i + 1}</span>`;
+        return `
+        <li class="top-item${medalCls}">
+          ${nHtml}
+          <div class="top-main">
+            <div class="top-name">${esc(s.name)}</div>
+            <div class="top-meta">${esc(s.hardware)} · ${esc(s.quant)}</div>
+            <div class="top-meta">${esc(col.meta(s))}</div>
+          </div>
+          <div class="top-metric">${esc(col.metric(s))}</div>
+        </li>`;
+      }).join('');
+      return `<div class="top-col"><h3>${col.title}</h3><ol class="top-list">${lis}</ol></div>`;
+    }).join('');
+  }
+
+  function esc(s) {
+    return String(s ?? '').replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    }[c]));
+  }
+
+  function niceTicks(min, max, count = 5) {
+    if (!(max > min)) return [min];
+    const span = max - min;
+    const step0 = span / Math.max(1, count - 1);
+    const pow = Math.pow(10, Math.floor(Math.log10(step0)));
+    const err = step0 / pow;
+    const step = pow * (err >= 5 ? 5 : err >= 2 ? 2 : 1);
+    const start = Math.ceil(min / step) * step;
+    const ticks = [];
+    for (let v = start; v <= max + step * 0.01; v += step) ticks.push(v);
+    if (!ticks.length) ticks.push(min, max);
+    return ticks;
+  }
+
+  function showTip(html, x, y) {
+    tipEl.innerHTML = html;
+    tipEl.classList.add('is-on');
+    const pad = 14;
+    const tw = tipEl.offsetWidth || 200;
+    const th = tipEl.offsetHeight || 80;
+    let left = x + pad;
+    let top = y + pad;
+    if (left + tw > window.innerWidth - 8) left = x - tw - pad;
+    if (top + th > window.innerHeight - 8) top = y - th - pad;
+    tipEl.style.left = left + 'px';
+    tipEl.style.top = top + 'px';
+  }
+  function hideTip() { tipEl.classList.remove('is-on'); }
+
+  function tipHtml(s) {
+    return `<b>${esc(s.name)}</b> · ${esc(s.quant)}<br>
+      <span class="muted">${esc(s.hardware)}</span><br>
+      ${fmtMoney(s.price)} · ${fmtRank(s.rank)} · ${fmtSpeed(s.speed)} · ctx ${fmtCtx(s.context)}
+      ${s.aa != null ? `<br><span class="muted">AA Index ${s.aa}</span>` : ''}`;
+  }
+
+  function drawScatter(container, points, opts) {
+    const { xKey, yKey, xLabel, yLabel, yFmt, xFmt, invertY } = opts;
+    const { all, frontIds } = paretoMinXMaxY(points, xKey, yKey);
+    container.innerHTML = '';
+    if (all.length < 2) {
+      container.innerHTML = '<div class="chart-empty">Need more setups with both axes</div>';
+      return;
+    }
+
+    const W = container.clientWidth || 480;
+    const H = container.clientHeight || 320;
+    const m = { l: 48, r: 16, t: 16, b: 36 };
+    const iw = Math.max(40, W - m.l - m.r);
+    const ih = Math.max(40, H - m.t - m.b);
+
+    let xs = all.map((p) => p[xKey]);
+    let ys = all.map((p) => p[yKey]);
+    let xmin = Math.min(...xs), xmax = Math.max(...xs);
+    let ymin = Math.min(...ys), ymax = Math.max(...ys);
+    if (xmin === xmax) { xmin *= 0.9; xmax *= 1.1; if (xmin === xmax) { xmin -= 1; xmax += 1; } }
+    if (ymin === ymax) { ymin *= 0.9; ymax *= 1.1; if (ymin === ymax) { ymin -= 1; ymax += 1; } }
+    // pad
+    const xpad = (xmax - xmin) * 0.06;
+    const ypad = (ymax - ymin) * 0.08;
+    xmin -= xpad; xmax += xpad; ymin -= ypad; ymax += ypad;
+
+    const xScale = (v) => m.l + ((v - xmin) / (xmax - xmin)) * iw;
+    const yScale = (v) => {
+      const t = (v - ymin) / (ymax - ymin);
+      return m.t + (invertY ? t : 1 - t) * ih;
+    };
+
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.setAttribute('preserveAspectRatio', 'none');
+
+    const add = (tag, attrs, text) => {
+      const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+      for (const [k, v] of Object.entries(attrs || {})) el.setAttribute(k, v);
+      if (text != null) el.textContent = text;
+      svg.appendChild(el);
+      return el;
+    };
+
+    // grid + ticks
+    for (const tx of niceTicks(xmin, xmax, 5)) {
+      const x = xScale(tx);
+      add('line', { x1: x, x2: x, y1: m.t, y2: m.t + ih, class: 'grid-line' });
+      add('text', { x, y: H - 10, class: 'tick', 'text-anchor': 'middle' }, (xFmt || String)(tx));
+    }
+    for (const ty of niceTicks(ymin, ymax, 5)) {
+      const y = yScale(ty);
+      add('line', { x1: m.l, x2: m.l + iw, y1: y, y2: y, class: 'grid-line' });
+      add('text', { x: m.l - 8, y: y + 3, class: 'tick', 'text-anchor': 'end' }, (yFmt || String)(ty));
+    }
+    add('text', { x: m.l + iw / 2, y: H - 2, class: 'axis-label', 'text-anchor': 'middle' }, xLabel);
+    add('text', {
+      x: 12, y: m.t + ih / 2, class: 'axis-label', 'text-anchor': 'middle',
+      transform: `rotate(-90 12 ${m.t + ih / 2})`,
+    }, yLabel);
+
+    // frontier path (sorted by x)
+    const front = all.filter((p) => frontIds.has(p.id)).sort((a, b) => a[xKey] - b[xKey]);
+    if (front.length >= 2) {
+      const d = front.map((p, i) => `${i ? 'L' : 'M'}${xScale(p[xKey]).toFixed(1)},${yScale(p[yKey]).toFixed(1)}`).join(' ');
+      add('path', { d, class: 'frontier-line' });
+    }
+
+    // points — non-frontier first so frontier draws on top
+    const ordered = all.slice().sort((a, b) => (frontIds.has(a.id) ? 1 : 0) - (frontIds.has(b.id) ? 1 : 0));
+    for (const p of ordered) {
+      const color = PROVIDER_MAP[p.provider]?.color || '#888';
+      const isF = frontIds.has(p.id);
+      const c = add('circle', {
+        cx: xScale(p[xKey]), cy: yScale(p[yKey]),
+        r: isF ? 5.2 : 4,
+        fill: color,
+        class: 'dot' + (isF ? ' is-frontier' : ''),
+        'data-id': String(p.id),
+      });
+      c.addEventListener('pointerenter', (e) => {
+        c.classList.add('is-hot');
+        showTip(tipHtml(p), e.clientX, e.clientY);
+      });
+      c.addEventListener('pointermove', (e) => showTip(tipHtml(p), e.clientX, e.clientY));
+      c.addEventListener('pointerleave', () => {
+        c.classList.remove('is-hot');
+        hideTip();
+      });
+    }
+
+    container.appendChild(svg);
+  }
+
+  function renderCharts() {
+    const list = filtered();
+    const specs = [
+      {
+        id: 'c-smart', title: 'Price → Smarts', sub: 'Y = open-weight rank inverted (higher = smarter)',
+        xKey: 'price', yKey: 'smart', xLabel: 'price ($)', yLabel: 'smarts (↑ better)',
+        xFmt: (v) => (v >= 1000 ? (v / 1000).toFixed(v % 1000 ? 1 : 0) + 'k' : String(Math.round(v))),
+        yFmt: (v) => String(Math.round(v)),
+      },
+      {
+        id: 'c-speed', title: 'Price → Speed', sub: 'tok/s generation',
+        xKey: 'price', yKey: 'speed', xLabel: 'price ($)', yLabel: 'tok/s',
+        xFmt: (v) => (v >= 1000 ? (v / 1000).toFixed(v % 1000 ? 1 : 0) + 'k' : String(Math.round(v))),
+        yFmt: (v) => String(Math.round(v)),
+      },
+      {
+        id: 'c-ss', title: 'Speed → Smarts', sub: 'is smarter slower? frontier = no free lunch',
+        xKey: 'speed', yKey: 'smart', xLabel: 'tok/s', yLabel: 'smarts (↑ better)',
+        xFmt: (v) => String(Math.round(v)),
+        yFmt: (v) => String(Math.round(v)),
+      },
+      {
+        id: 'c-aa', title: 'Price → AA Index', sub: 'when tip data is present',
+        xKey: 'price', yKey: 'aa', xLabel: 'price ($)', yLabel: 'AA Index',
+        xFmt: (v) => (v >= 1000 ? (v / 1000).toFixed(v % 1000 ? 1 : 0) + 'k' : String(Math.round(v))),
+        yFmt: (v) => v.toFixed(1),
+        wide: true,
+      },
+    ];
+
+    const host = $('charts');
+    host.innerHTML = specs.map((sp) => `
+      <div class="chart-card ${sp.wide ? 'wide' : ''}" data-chart="${sp.id}">
+        <div class="chart-head">
+          <h3 class="chart-title">${sp.title}</h3>
+          <span class="panel-sub">${sp.sub}</span>
+        </div>
+        <div class="chart-svg-wrap" id="${sp.id}"></div>
+      </div>`).join('');
+
+    for (const sp of specs) {
+      drawScatter($(sp.id), list, sp);
+    }
+  }
+
+  function renderLadder(elId, scoreFn, metricFn) {
+    const rows = bestInBucket(filtered(), scoreFn);
+    $(elId).innerHTML = rows.map(({ bucket, setup: s }) => {
+      if (!s) {
+        return `<div class="ladder-cell"><div class="ladder-budget">${bucket.label}</div><div class="ladder-detail">—</div></div>`;
+      }
+      return `<div class="ladder-cell">
+        <div class="ladder-budget">${bucket.label}</div>
+        <div class="ladder-name">${esc(s.name)}</div>
+        <div class="ladder-detail">${esc(metricFn(s))} · ${fmtMoney(s.price)}</div>
+        <div class="ladder-detail">${esc(s.hardware)}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderModelScale() {
+    const list = filtered();
+    const byModel = new Map();
+    for (const s of list) {
+      if (!byModel.has(s.name)) byModel.set(s.name, []);
+      byModel.get(s.name).push(s);
+    }
+    const multi = [...byModel.entries()]
+      .filter(([, arr]) => arr.length >= 2)
+      .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]));
+
+    const sel = $('model-pick');
+    const prev = sel.value;
+    sel.innerHTML = multi.length
+      ? multi.map(([name, arr]) => `<option value="${esc(name)}">${esc(name)} (${arr.length})</option>`).join('')
+      : '<option value="">Need 2+ setups of one model</option>';
+    if (prev && [...sel.options].some((o) => o.value === prev)) sel.value = prev;
+
+    const name = sel.value;
+    const points = name ? (byModel.get(name) || []) : [];
+    drawScatter($('model-chart'), points, {
+      xKey: 'price', yKey: 'speed',
+      xLabel: 'price ($)', yLabel: 'tok/s',
+      xFmt: (v) => (v >= 1000 ? (v / 1000).toFixed(v % 1000 ? 1 : 0) + 'k' : String(Math.round(v))),
+      yFmt: (v) => String(Math.round(v)),
+    });
+  }
+
+  function renderCoverage() {
+    const list = filtered();
+    const byP = PROVIDERS.map((p) => ({
+      label: p.label,
+      color: p.color,
+      n: list.filter((s) => s.provider === p.id).length,
+    })).filter((x) => x.n);
+    const byModel = new Map();
+    for (const s of list) byModel.set(s.name, (byModel.get(s.name) || 0) + 1);
+    const topModels = [...byModel.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
+    const maxP = Math.max(1, ...byP.map((x) => x.n));
+    const maxM = Math.max(1, ...topModels.map((x) => x[1]));
+
+    const missingCtx = list.filter((s) => s.context == null).length;
+    const missingRank = list.filter((s) => s.rank == null).length;
+
+    $('coverage').innerHTML = `
+      <div class="ctrl-label" style="margin-bottom:8px">By provider</div>
+      ${byP.map((x) => `
+        <div class="bar-row">
+          <div>${esc(x.label)}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(100 * x.n / maxP).toFixed(1)}%;background:${x.color}"></div></div>
+          <div class="bar-n">${x.n}</div>
+        </div>`).join('')}
+      <div class="ctrl-label" style="margin:18px 0 8px">Models with most setups</div>
+      ${topModels.map(([name, n]) => `
+        <div class="bar-row">
+          <div title="${esc(name)}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(name)}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(100 * n / maxM).toFixed(1)}%"></div></div>
+          <div class="bar-n">${n}</div>
+        </div>`).join('')}
+      <p class="panel-sub" style="margin:16px 0 0">
+        Data gaps in view: ${missingCtx} missing context · ${missingRank} missing rank ·
+        ${list.filter((s) => s.speed == null).length} missing speed
+      </p>`;
+  }
+
+  function renderAll() {
+    const list = filtered();
+    syncBudgetUI();
+    renderTops();
+    renderCharts();
+    renderLadder('ladder-smart', (s) => (s.rank != null ? -s.rank : null), (s) => fmtRank(s.rank) + ' · ' + fmtSpeed(s.speed));
+    renderLadder('ladder-fast', (s) => s.speed, (s) => fmtSpeed(s.speed) + ' · ' + fmtRank(s.rank));
+    renderModelScale();
+    renderCoverage();
+  }
+
+  function bind() {
+    const onBudget = (which) => (e) => {
+      let min = Number($('budget-min').value);
+      let max = Number($('budget-max').value);
+      if (which === 'min' && min > max) {
+        min = max;
+        $('budget-min').value = String(min);
+      }
+      if (which === 'max' && max < min) {
+        max = min;
+        $('budget-max').value = String(max);
+      }
+      state.budgetMin = min;
+      state.budgetMax = max;
+      syncBudgetUI();
+      renderTops();
+    };
+    $('budget-min').addEventListener('input', onBudget('min'));
+    $('budget-max').addEventListener('input', onBudget('max'));
+    $('provider-chips').addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-provider]');
+      if (!btn) return;
+      const id = btn.dataset.provider;
+      if (id === 'all') {
+        state.providersOn = new Set(PROVIDERS.map((p) => p.id));
+      } else if (state.providersOn.has(id) && state.providersOn.size > 1) {
+        state.providersOn.delete(id);
+      } else if (!state.providersOn.has(id)) {
+        state.providersOn.add(id);
+      } else {
+        // alone → restore all
+        state.providersOn = new Set(PROVIDERS.map((p) => p.id));
+      }
+      renderAll();
+    });
+    $('model-pick').addEventListener('change', renderModelScale);
+    let resizeT;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeT);
+      resizeT = setTimeout(() => {
+        renderCharts();
+        renderModelScale();
+      }, 120);
+    });
+  }
+
+  async function init() {
+    try {
+      const { setups, src } = await loadSetups();
+      state.setups = setups;
+      const maxP = Math.ceil(Math.max(...setups.map((s) => s.price)) / 100) * 100;
+      const minP = Math.floor(Math.min(...setups.map((s) => s.price)) / 50) * 50;
+      for (const id of ['budget-min', 'budget-max']) {
+        const el = $(id);
+        el.min = String(minP);
+        el.max = String(maxP);
+      }
+      state.budgetMin = minP;
+      state.budgetMax = maxP;
+      $('budget-min').value = String(state.budgetMin);
+      $('budget-max').value = String(state.budgetMax);
+
+      statusEl.textContent = `${setups.length} setups loaded from ${src}`;
+      statusEl.classList.add('is-ok');
+      $('app').hidden = false;
+      bind();
+      renderAll();
+    } catch (err) {
+      console.error(err);
+      statusEl.textContent = 'Could not load setups. Serve over HTTP (not file://) so stats can read index.html.';
+      statusEl.classList.add('is-error');
+    }
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
