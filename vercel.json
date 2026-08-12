@@ -1,3 +1,14 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json"
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/cron-ingest-reddit",
+      "schedule": "0 */2 * * *"
+    }
+  ],
+  "functions": {
+    "api/cron-ingest-reddit.js": {
+      "maxDuration": 60
+    }
+  }
 }

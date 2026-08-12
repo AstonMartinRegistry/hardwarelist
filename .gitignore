@@ -1,6 +1,11 @@
+reddit/output/
+reddit/node_modules/
+reddit/.wrangler/
+reddit/.dev.vars
 .env
 .env.local
 .DS_Store
 .vercel/
 node_modules/
 .claude/
+scripts/__pycache__/

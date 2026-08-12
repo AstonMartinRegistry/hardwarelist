@@ -1,0 +1,20 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "benchmarklist-reddit-scraper",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-13",
+  "compatibility_flags": ["nodejs_compat"],
+  "secrets": {
+    "required": ["RUN_TOKEN"]
+  },
+  "vars": {
+    "SUBREDDIT": "LocalLLM",
+    "USER_AGENT": "benchmarklist-reddit-scraper/0.2 (+https://benchmarklist.com)"
+  },
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "head_sampling_rate": 1
+    }
+  }
+}

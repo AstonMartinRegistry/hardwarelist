@@ -1,0 +1,23 @@
+{
+  "name": "@plmlist/reddit-scraper-legacy",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Unused Cloudflare Worker copy — PLM List scrapes via api/_reddit_scrape.js",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "echo 'Do not deploy — use Vercel api/cron-ingest-reddit.js' && exit 1",
+    "types": "wrangler types",
+    "typecheck": "wrangler types && tsc --noEmit",
+    "test": "vitest run",
+    "bundle": "wrangler deploy --dry-run --secrets-file .dev.vars.example",
+    "check": "npm run typecheck && npm test && npm run bundle"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "latest",
+    "@types/node": "^26.1.1",
+    "typescript": "latest",
+    "vitest": "latest",
+    "wrangler": "latest"
+  }
+}
