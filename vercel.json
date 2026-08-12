@@ -4,10 +4,17 @@
     {
       "path": "/api/cron-ingest-reddit",
       "schedule": "0 */2 * * *"
+    },
+    {
+      "path": "/api/cron-classify",
+      "schedule": "5 */2 * * *"
     }
   ],
   "functions": {
     "api/cron-ingest-reddit.js": {
+      "maxDuration": 60
+    },
+    "api/cron-classify.js": {
       "maxDuration": 60
     }
   }
