@@ -221,6 +221,29 @@
   }
 
   async function loadAndMount(apiUrl) {
+    const boot = typeof document !== 'undefined'
+      ? document.getElementById('plm-setups-bootstrap')
+      : null;
+    if (boot && boot.textContent) {
+      try {
+        const data = JSON.parse(boot.textContent);
+        if (data && Array.isArray(data.setups)) {
+          const mounted = mountSetups(data.setups);
+          // Refresh in background so long-lived tabs stay current
+          if (apiUrl !== false) {
+            fetch(apiUrl || '/api/setups', { cache: 'no-store' })
+              .then((r) => (r.ok ? r.json() : null))
+              .then((fresh) => {
+                if (fresh && fresh.ok && Array.isArray(fresh.setups)) mountSetups(fresh.setups);
+              })
+              .catch(() => {});
+          }
+          return mounted;
+        }
+      } catch (_) {
+        /* fall through to network */
+      }
+    }
     const url = apiUrl || '/api/setups';
     const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) throw new Error(`setups ${res.status}`);

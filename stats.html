@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PLM List — Stats</title>
+<title>PLM List Stats – Personal Language Model hardware Pareto</title>
+<meta name="description" content="Stats for PLM List: price vs speed Pareto frontiers for personal language models and local LLM hardware setups.">
+<link rel="canonical" href="https://plmlist.com/stats.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -347,7 +349,9 @@ a { color: inherit; }
   overflow: hidden;
   min-width: 0;
 }
-.chart-card.wide { grid-column: 1 / -1; }
+.chart-card.is-fit {
+  overflow: visible;
+}
 .chart-head {
   padding: 12px 14px 8px;
   display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px;
@@ -369,6 +373,22 @@ a { color: inherit; }
   height: 320px;
   padding: 8px 4px 4px;
 }
+.chart-svg-wrap.is-tall { height: 380px; overflow: visible; }
+.chart-svg-wrap.is-tall svg { overflow: visible; }
+.quant-legend {
+  display: flex; flex-wrap: wrap; gap: 10px 14px;
+  align-items: center;
+  font-size: 10px; color: #666;
+}
+.quant-legend .ql-item {
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.quant-legend .ql-dot {
+  display: inline-block; border-radius: 50%;
+  background: var(--qwen);
+  border: 1.5px solid #111;
+  box-sizing: border-box;
+}
 .chart-svg-wrap svg { width: 100%; height: 100%; display: block; }
 .chart-empty {
   position: absolute; inset: 0;
@@ -384,10 +404,9 @@ a { color: inherit; }
 }
 .dot {
   stroke: #fff; stroke-width: 1.2; cursor: pointer;
-  transition: r .12s ease;
 }
 .dot.is-frontier { stroke: var(--rich-ink); stroke-width: 1.6; }
-.dot:hover, .dot.is-hot { r: 6; }
+.dot:hover, .dot.is-hot { stroke-width: 2.2; filter: brightness(1.08); }
 
 .tooltip {
   position: fixed; z-index: 50;
@@ -404,40 +423,17 @@ a { color: inherit; }
 .tooltip b { color: #fff; font-weight: 600; }
 .tooltip .muted { color: #999; }
 
-/* Ladder + tables */
-.ladder {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
+/* Model Pareto controls */
+.model-pareto-controls {
+  display: flex; flex-wrap: wrap; gap: 10px 14px;
+  align-items: center;
+  justify-content: flex-end;
 }
-.ladder-cell {
-  background: var(--panel);
-  border-radius: 8px;
-  padding: 12px;
-  min-width: 0;
-}
-.ladder-budget {
-  font-size: 11px; color: var(--mute); margin-bottom: 8px;
-  letter-spacing: .04em;
-}
-.ladder-name {
-  font-size: 12px; font-weight: 600;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.ladder-detail {
-  font-size: 11px; color: #666; margin-top: 4px;
-  font-variant-numeric: tabular-nums;
-}
-
-.model-bar {
-  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
-  margin-bottom: 12px;
-}
-.model-bar select {
+.model-pareto-controls select {
   font-family: inherit; font-size: 12px;
   border: 1px solid #ddd; border-radius: 8px;
   padding: 8px 10px; background: #fff; color: #111;
-  min-width: 220px;
+  min-width: 200px; max-width: min(360px, 100%);
 }
 
 .bar-row {
@@ -460,13 +456,11 @@ a { color: inherit; }
 @media (max-width: 900px) {
   .tops { grid-template-columns: 1fr; }
   .chart-grid { grid-template-columns: 1fr; }
-  .ladder { grid-template-columns: 1fr 1fr; }
   .podium { flex-wrap: wrap; min-height: 0; }
   .podium-slot { max-width: none; flex: 1 1 30%; }
 }
 @media (max-width: 520px) {
   body { padding: 20px 14px 48px; }
-  .ladder { grid-template-columns: 1fr; }
   .chart-svg-wrap { height: 280px; }
   .podium { flex-direction: column; align-items: stretch; }
   .podium-slot.is-gold { order: -1; }
@@ -482,6 +476,25 @@ a { color: inherit; }
 </div>
 
 <div class="wrap" id="app" hidden>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2 class="panel-title">Model Pareto</h2>
+        <p class="panel-sub">Price → speed for one model. Dot size = quant bits. Solid outline = on the frontier.</p>
+      </div>
+      <div class="model-pareto-controls">
+        <label class="ctrl-label" for="model-pareto-pick">Model</label>
+        <select id="model-pareto-pick" aria-label="Model for Pareto chart"></select>
+        <div class="quant-legend" id="model-quant-legend"></div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="chart-card is-fit">
+        <div class="chart-svg-wrap is-tall" id="model-pareto-chart"></div>
+      </div>
+    </div>
+  </section>
 
   <section class="panel">
     <div class="panel-head">
@@ -528,46 +541,6 @@ a { color: inherit; }
   <section class="panel">
     <div class="panel-head">
       <div>
-        <h2 class="panel-title">Smartest under budget</h2>
-        <p class="panel-sub">Best open-weight rank in each price band.</p>
-      </div>
-    </div>
-    <div class="panel-body">
-      <div class="ladder" id="ladder-smart"></div>
-    </div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-head">
-      <div>
-        <h2 class="panel-title">Fastest under budget</h2>
-        <p class="panel-sub">Best reported tok/s in each price band.</p>
-      </div>
-    </div>
-    <div class="panel-body">
-      <div class="ladder" id="ladder-fast"></div>
-    </div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-head">
-      <div>
-        <h2 class="panel-title">Scale a model</h2>
-        <p class="panel-sub">Same model, different rigs — cost vs speed frontier for that title.</p>
-      </div>
-    </div>
-    <div class="panel-body">
-      <div class="model-bar">
-        <label class="ctrl-label" for="model-pick">Model</label>
-        <select id="model-pick"></select>
-      </div>
-      <div class="chart-svg-wrap" id="model-chart" style="height:300px"></div>
-    </div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-head">
-      <div>
         <h2 class="panel-title">Coverage</h2>
         <p class="panel-sub">Where the list is dense — more setups → sharper graphs.</p>
       </div>
@@ -590,19 +563,12 @@ a { color: inherit; }
     { id: 'other', label: 'Other', color: '#b87333' },
   ];
   const PROVIDER_MAP = Object.fromEntries(PROVIDERS.map((p) => [p.id, p]));
-  const BUCKETS = [
-    { lo: 0, hi: 500, label: '≤ $500' },
-    { lo: 500, hi: 1000, label: '$500–1k' },
-    { lo: 1000, hi: 2000, label: '$1–2k' },
-    { lo: 2000, hi: 5000, label: '$2–5k' },
-    { lo: 5000, hi: Infinity, label: '$5k+' },
-  ];
-
   const state = {
     setups: [],
     providersOn: new Set(PROVIDERS.map((p) => p.id)),
     budgetMin: 0,
     budgetMax: 2000,
+    modelPareto: 'qwen3.8-27b',
   };
 
   const $ = (id) => document.getElementById(id);
@@ -831,14 +797,6 @@ a { color: inherit; }
       .map((x) => x.s);
   }
 
-  function bestInBucket(list, scoreFn) {
-    return BUCKETS.map((b) => {
-      const pool = list.filter((s) => s.price >= b.lo && s.price < b.hi);
-      const ranked = topN(pool, scoreFn, 1);
-      return { bucket: b, setup: ranked[0] || null };
-    });
-  }
-
   /** Points from place in each top-10 (1st=10 … 10th=1); sum across smart/fast/context. */
   function overallFromTops(smart, fast, ctx) {
     const scores = new Map();
@@ -1011,8 +969,18 @@ a { color: inherit; }
       ${s.aa != null ? `<br><span class="muted">AA Index ${s.aa}</span>` : ''}`;
   }
 
+  function sizeRadius(p, all, sizeKey, isFrontier) {
+    if (!sizeKey) return isFrontier ? 5.2 : 4;
+    const vals = all.map((x) => x[sizeKey]).filter((v) => Number.isFinite(v));
+    if (!vals.length || !Number.isFinite(p[sizeKey])) return isFrontier ? 5.2 : 4;
+    const lo = Math.min(...vals);
+    const hi = Math.max(...vals);
+    const t = hi === lo ? 0.5 : (p[sizeKey] - lo) / (hi - lo);
+    return 4 + t * 8; // 4…12 by quant bits
+  }
+
   function drawScatter(container, points, opts) {
-    const { xKey, yKey, xLabel, yLabel, yFmt, xFmt, invertY } = opts;
+    const { xKey, yKey, xLabel, yLabel, yFmt, xFmt, invertY, sizeKey } = opts;
     const { all, frontIds } = paretoMinXMaxY(points, xKey, yKey);
     container.innerHTML = '';
     if (all.length < 2) {
@@ -1020,9 +988,15 @@ a { color: inherit; }
       return;
     }
 
-    const W = container.clientWidth || 480;
-    const H = container.clientHeight || 320;
-    const m = { l: 48, r: 16, t: 16, b: 36 };
+    const W = Math.max(280, container.clientWidth || 480);
+    const H = Math.max(220, container.clientHeight || 320);
+    // Extra inset when dots are sized by quant so radii stay inside the box
+    const maxR = sizeKey
+      ? Math.max(...all.map((p) => sizeRadius(p, all, sizeKey, frontIds.has(p.id))), 4)
+      : 5.2;
+    const m = sizeKey
+      ? { l: 56, r: 20 + maxR, t: 16 + maxR, b: 44 + maxR }
+      : { l: 48, r: 16, t: 16, b: 36 };
     const iw = Math.max(40, W - m.l - m.r);
     const ih = Math.max(40, H - m.t - m.b);
 
@@ -1032,9 +1006,9 @@ a { color: inherit; }
     let ymin = Math.min(...ys), ymax = Math.max(...ys);
     if (xmin === xmax) { xmin *= 0.9; xmax *= 1.1; if (xmin === xmax) { xmin -= 1; xmax += 1; } }
     if (ymin === ymax) { ymin *= 0.9; ymax *= 1.1; if (ymin === ymax) { ymin -= 1; ymax += 1; } }
-    // pad
-    const xpad = (xmax - xmin) * 0.06;
-    const ypad = (ymax - ymin) * 0.08;
+    // pad — more room when dots are large so edges aren't clipped
+    const xpad = (xmax - xmin) * (sizeKey ? 0.12 : 0.06);
+    const ypad = (ymax - ymin) * (sizeKey ? 0.14 : 0.08);
     xmin -= xpad; xmax += xpad; ymin -= ypad; ymax += ypad;
 
     const xScale = (v) => m.l + ((v - xmin) / (xmax - xmin)) * iw;
@@ -1045,7 +1019,8 @@ a { color: inherit; }
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-    svg.setAttribute('preserveAspectRatio', 'none');
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    svg.style.overflow = 'visible';
 
     const add = (tag, attrs, text) => {
       const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -1059,7 +1034,7 @@ a { color: inherit; }
     for (const tx of niceTicks(xmin, xmax, 5)) {
       const x = xScale(tx);
       add('line', { x1: x, x2: x, y1: m.t, y2: m.t + ih, class: 'grid-line' });
-      add('text', { x, y: H - 10, class: 'tick', 'text-anchor': 'middle' }, (xFmt || String)(tx));
+      add('text', { x, y: H - 12, class: 'tick', 'text-anchor': 'middle' }, (xFmt || String)(tx));
     }
     for (const ty of niceTicks(ymin, ymax, 5)) {
       const y = yScale(ty);
@@ -1068,8 +1043,8 @@ a { color: inherit; }
     }
     add('text', { x: m.l + iw / 2, y: H - 2, class: 'axis-label', 'text-anchor': 'middle' }, xLabel);
     add('text', {
-      x: 12, y: m.t + ih / 2, class: 'axis-label', 'text-anchor': 'middle',
-      transform: `rotate(-90 12 ${m.t + ih / 2})`,
+      x: 14, y: m.t + ih / 2, class: 'axis-label', 'text-anchor': 'middle',
+      transform: `rotate(-90 14 ${m.t + ih / 2})`,
     }, yLabel);
 
     // frontier path (sorted by x)
@@ -1086,7 +1061,7 @@ a { color: inherit; }
       const isF = frontIds.has(p.id);
       const c = add('circle', {
         cx: xScale(p[xKey]), cy: yScale(p[yKey]),
-        r: isF ? 5.2 : 4,
+        r: sizeRadius(p, all, sizeKey, isF),
         fill: color,
         class: 'dot' + (isF ? ' is-frontier' : ''),
         'data-id': String(p.id),
@@ -1103,6 +1078,65 @@ a { color: inherit; }
     }
 
     container.appendChild(svg);
+  }
+
+  function modelsWithPriceSpeed() {
+    const byModel = new Map();
+    for (const s of state.setups) {
+      if (s.price == null || s.speed == null) continue;
+      if (!byModel.has(s.name)) byModel.set(s.name, []);
+      byModel.get(s.name).push(s);
+    }
+    return [...byModel.entries()]
+      .filter(([, arr]) => arr.length >= 2)
+      .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]));
+  }
+
+  function renderModelPareto() {
+    const multi = modelsWithPriceSpeed();
+    const sel = $('model-pareto-pick');
+    const host = $('model-pareto-chart');
+    const legend = $('model-quant-legend');
+    if (!host || !sel) return;
+
+    const prev = state.modelPareto || sel.value;
+    sel.innerHTML = multi.length
+      ? multi.map(([name, arr]) => `<option value="${esc(name)}">${esc(name)} (${arr.length})</option>`).join('')
+      : '<option value="">Need 2+ setups with price + speed</option>';
+    if (prev && [...sel.options].some((o) => o.value === prev)) {
+      sel.value = prev;
+      state.modelPareto = prev;
+    } else if (multi.length) {
+      state.modelPareto = multi[0][0];
+      sel.value = state.modelPareto;
+    } else {
+      state.modelPareto = '';
+    }
+
+    const points = state.modelPareto
+      ? (multi.find(([n]) => n === state.modelPareto)?.[1] || [])
+      : [];
+
+    const quants = [...new Set(points.map((p) => p.quantN).filter(Number.isFinite))].sort((a, b) => a - b);
+    if (legend) {
+      const lo = quants[0];
+      const hi = quants[quants.length - 1];
+      legend.innerHTML = quants.map((q) => {
+        const t = !Number.isFinite(lo) || hi === lo ? 0.5 : (q - lo) / (hi - lo);
+        const r = 4 + t * 8;
+        return `<span class="ql-item"><span class="ql-dot" style="width:${r * 2}px;height:${r * 2}px"></span>${q}bit</span>`;
+      }).join('') || '';
+    }
+
+    drawScatter(host, points, {
+      xKey: 'price',
+      yKey: 'speed',
+      sizeKey: 'quantN',
+      xLabel: 'price ($)',
+      yLabel: 'tok/s',
+      xFmt: (v) => (v >= 1000 ? (v / 1000).toFixed(v % 1000 ? 1 : 0) + 'k' : String(Math.round(v))),
+      yFmt: (v) => String(Math.round(v)),
+    });
   }
 
   function renderCharts() {
@@ -1126,18 +1160,11 @@ a { color: inherit; }
         xFmt: (v) => String(Math.round(v)),
         yFmt: (v) => String(Math.round(v)),
       },
-      {
-        id: 'c-aa', title: 'Price → AA Index', sub: 'when tip data is present',
-        xKey: 'price', yKey: 'aa', xLabel: 'price ($)', yLabel: 'AA Index',
-        xFmt: (v) => (v >= 1000 ? (v / 1000).toFixed(v % 1000 ? 1 : 0) + 'k' : String(Math.round(v))),
-        yFmt: (v) => v.toFixed(1),
-        wide: true,
-      },
     ];
 
     const host = $('charts');
     host.innerHTML = specs.map((sp) => `
-      <div class="chart-card ${sp.wide ? 'wide' : ''}" data-chart="${sp.id}">
+      <div class="chart-card" data-chart="${sp.id}">
         <div class="chart-head">
           <h3 class="chart-title">${sp.title}</h3>
           <span class="panel-sub">${sp.sub}</span>
@@ -1148,49 +1175,6 @@ a { color: inherit; }
     for (const sp of specs) {
       drawScatter($(sp.id), list, sp);
     }
-  }
-
-  function renderLadder(elId, scoreFn, metricFn) {
-    const rows = bestInBucket(filtered(), scoreFn);
-    $(elId).innerHTML = rows.map(({ bucket, setup: s }) => {
-      if (!s) {
-        return `<div class="ladder-cell"><div class="ladder-budget">${bucket.label}</div><div class="ladder-detail">—</div></div>`;
-      }
-      return `<div class="ladder-cell">
-        <div class="ladder-budget">${bucket.label}</div>
-        <div class="ladder-name">${esc(s.name)}</div>
-        <div class="ladder-detail">${esc(metricFn(s))} · ${fmtMoney(s.price)}</div>
-        <div class="ladder-detail">${esc(s.hardware)}</div>
-      </div>`;
-    }).join('');
-  }
-
-  function renderModelScale() {
-    const list = filtered();
-    const byModel = new Map();
-    for (const s of list) {
-      if (!byModel.has(s.name)) byModel.set(s.name, []);
-      byModel.get(s.name).push(s);
-    }
-    const multi = [...byModel.entries()]
-      .filter(([, arr]) => arr.length >= 2)
-      .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]));
-
-    const sel = $('model-pick');
-    const prev = sel.value;
-    sel.innerHTML = multi.length
-      ? multi.map(([name, arr]) => `<option value="${esc(name)}">${esc(name)} (${arr.length})</option>`).join('')
-      : '<option value="">Need 2+ setups of one model</option>';
-    if (prev && [...sel.options].some((o) => o.value === prev)) sel.value = prev;
-
-    const name = sel.value;
-    const points = name ? (byModel.get(name) || []) : [];
-    drawScatter($('model-chart'), points, {
-      xKey: 'price', yKey: 'speed',
-      xLabel: 'price ($)', yLabel: 'tok/s',
-      xFmt: (v) => (v >= 1000 ? (v / 1000).toFixed(v % 1000 ? 1 : 0) + 'k' : String(Math.round(v))),
-      yFmt: (v) => String(Math.round(v)),
-    });
   }
 
   function renderCoverage() {
@@ -1231,13 +1215,10 @@ a { color: inherit; }
   }
 
   function renderAll() {
-    const list = filtered();
     syncBudgetUI();
+    renderModelPareto();
     renderTops();
     renderCharts();
-    renderLadder('ladder-smart', (s) => (s.rank != null ? -s.rank : null), (s) => fmtRank(s.rank) + ' · ' + fmtSpeed(s.speed));
-    renderLadder('ladder-fast', (s) => s.speed, (s) => fmtSpeed(s.speed) + ' · ' + fmtRank(s.rank));
-    renderModelScale();
     renderCoverage();
   }
 
@@ -1276,13 +1257,16 @@ a { color: inherit; }
       }
       renderAll();
     });
-    $('model-pick').addEventListener('change', renderModelScale);
+    $('model-pareto-pick').addEventListener('change', () => {
+      state.modelPareto = $('model-pareto-pick').value;
+      renderModelPareto();
+    });
     let resizeT;
     window.addEventListener('resize', () => {
       clearTimeout(resizeT);
       resizeT = setTimeout(() => {
+        renderModelPareto();
         renderCharts();
-        renderModelScale();
       }, 120);
     });
   }

@@ -147,6 +147,22 @@ const server = http.createServer(async (req, res) => {
     }
 
     const file = safeStatic(u.pathname);
+    // SSR embed for main list pages (same as Vercel rewrites)
+    if (
+      (u.pathname === '/' || u.pathname === '/index.html' || u.pathname === '/locallist.html') &&
+      u.searchParams.get('raw') !== '1'
+    ) {
+      const apiName = u.pathname === '/locallist.html' ? 'ssr-locallist' : 'ssr-home';
+      const apiFile = path.join(ROOT, 'api', `${apiName}.js`);
+      delete require.cache[require.resolve(apiFile)];
+      const handler = require(apiFile);
+      await handler(
+        { method: req.method, headers: req.headers, query: {}, url: req.url },
+        wrapRes(res),
+      );
+      return;
+    }
+
     if (!file) return send(res, 404, 'Not found', { 'Content-Type': 'text/plain' });
     const ext = path.extname(file).toLowerCase();
     send(res, 200, fs.readFileSync(file), {

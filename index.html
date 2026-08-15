@@ -3,7 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PLM List</title>
+<title>PLM List – Personal Language Models & Local LLM Hardware</title>
+<meta name="description" content="PLM List — directory of Personal Language Models and local LLM hardware setups: VRAM, GGUF quants, llama.cpp / vLLM speeds (tokens/sec), and community rigs.">
+<meta name="keywords" content="personal language model, PLM, local LLM, llama.cpp, vLLM, Ollama, GGUF, VRAM, RTX, local AI hardware">
+<link rel="canonical" href="https://plmlist.com/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://plmlist.com/">
+<meta property="og:title" content="PLM List – Personal Language Models & Local LLM Hardware">
+<meta property="og:description" content="Browse community hardware setups, VRAM needs, and tokens/sec for personal language models and local AI.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PLM List – Personal Language Models & Local LLM Hardware">
+<meta name="twitter:description" content="Community directory of local LLM hardware setups and benchmarks.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -982,7 +992,10 @@ body.submit-open .tip-rich { display: none !important; }
 <div class="header-box">
 <div class="header-copy">
 <h1>PLM List</h1>
-<p class="header-sub">personal language model list</p>
+<p class="header-sub">Personal Language Models — local LLM hardware directory</p>
+<p class="header-seo" style="margin:8px 0 0;font-size:12px;line-height:1.5;color:#666;max-width:42em;margin-left:auto;margin-right:auto">
+Community setups for running personal language models locally: GGUF quants, VRAM fit, llama.cpp / vLLM / Ollama speeds (tokens/sec), and real rigs from RTX to Mac.
+</p>
 <div class="tagline-row">
 <a class="tagline" href="hamsters.html">“The hamsters go brrrrr”</a>
 <div class="header-actions">
@@ -1823,6 +1836,7 @@ window.addEventListener('resize', () => refreshInfoButtons());
 </script>
 
 <script src="setups-client.js"></script>
+<!--plm:embed-->
 <script>
 (async function () {
   const status = document.createElement('p');
@@ -1830,19 +1844,26 @@ window.addEventListener('resize', () => refreshInfoButtons());
   status.style.cssText = 'padding:24px 8px;color:#888;font-size:14px';
   status.textContent = 'Loading setups…';
   const cats = document.querySelector('.cats');
-  if (cats) cats.prepend(status);
+  const already = cats && cats.querySelector('.setup');
+  if (cats && !already) cats.prepend(status);
+  else status.remove();
   try {
     const result = await window.PLMSetups.loadAndMount('/api/setups');
-    status.remove();
-    if (!result.count) {
+    if (status.parentNode) status.remove();
+    if (!result.count && cats && !cats.querySelector('.setup')) {
       const empty = document.createElement('p');
       empty.style.cssText = 'padding:24px 8px;color:#888;font-size:14px';
       empty.textContent = 'No setups in the database yet.';
       cats.prepend(empty);
     }
   } catch (err) {
+    if (already) {
+      if (status.parentNode) status.remove();
+      return;
+    }
     status.textContent = 'Could not load setups from API. ' + (err && err.message ? err.message : '');
     status.style.color = '#c07070';
+    if (cats && !status.parentNode) cats.prepend(status);
   }
 })();
 </script>

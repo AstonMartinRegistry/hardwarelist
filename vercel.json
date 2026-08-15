@@ -1,5 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    { "source": "/", "destination": "/api/ssr-home" },
+    { "source": "/index.html", "destination": "/api/ssr-home" },
+    { "source": "/locallist.html", "destination": "/api/ssr-locallist" }
+  ],
   "crons": [
     {
       "path": "/api/cron-ingest-reddit",
@@ -16,6 +21,12 @@
     },
     "api/cron-classify.js": {
       "maxDuration": 120
+    },
+    "api/ssr-home.js": {
+      "maxDuration": 30
+    },
+    "api/ssr-locallist.js": {
+      "maxDuration": 30
     }
   }
 }
