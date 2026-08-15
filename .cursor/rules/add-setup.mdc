@@ -1,0 +1,73 @@
+---
+description: How to add or complete a curated setup in public.setups (PLM List)
+alwaysApply: true
+---
+
+# Adding a setup to `public.setups`
+
+Listings are **DB-only** (site loads via `GET /api/setups`). Never hardcode cards in HTML.
+
+When the user asks to add/update a setup (Reddit comment, HF link, WhatsApp, etc.):
+
+## 1. Do not write a half-empty row
+
+Collect a full card. **Ask the user** for anything not clearly stated. Prefer questions over inventing.
+
+## 2. Required / strongly expected fields
+
+| Field | Notes |
+|---|---|
+| `provider` | `qwen`, `glm`, `gemma`, `minimax`, `mistral`, `other` |
+| `model` | slug e.g. `qwen3.8-27b` — confirm exact name |
+| `quant` | bit label used on site: `4bit`, `3bit`, … (not raw `NVFP4` alone) |
+| `version_label` | link text: `{ModelName}-{Quant}` matching peers, e.g. `Qwen3.8-27B-UD-IQ3_XXS`, `GLM-4.5-IQ3_XXS`, `Qwen3-Coder-Next-Q4_K_M` — never bare `UD-IQ3_XXS` |
+| `version_url` | full HF (or other) link |
+| `hardware` | match existing style e.g. `RTX 5090 32GB` |
+| `price_usd` | **copy from similar hardware already in `setups`** when user doesn't know; confirm with user |
+| `speed_raw` / `speed_tps` | primary gen speed on the card |
+| `info` | short prose: **engine** (vLLM / llama.cpp / …), notable caveats |
+| `memory_used` | weights GB — from HF **Files and versions** total size when possible |
+| `memory_total` | VRAM / system budget shown on card (e.g. 32 for 5090) |
+| `memory_kv` | **Exact** from HF config when ctx + cache type known (see below). If ctx unknown → leave `null` (do **not** invent 20%). |
+
+## KV cache formula (required when ctx is known)
+
+From `scripts/kv_cache.js` / HF `text_config`:
+
+```
+KV (bytes) = 2 × L × N_kv × d_head × N_ctx × B_element
+```
+
+- `L` = count of `full_attention` layers in `layer_types` (hybrid Qwen: not all layers)
+- `N_kv` = `num_key_value_heads`
+- `d_head` = `head_dim`
+- `N_ctx` = context tokens for this setup
+- `B_element` = bytes per KV elem: f16/bf16=`2`, q8_0=`1`, q4≈`0.5` (from `--cache-type-k/v` / reported KV quant)
+
+Store GiB: `bytes / 1024**3`. Config for Qwen3.8-27B: `hf-configs/qwen3.8-27b-config.json`.
+
+Only if ctx/cache type truly unknown may you fall back to `kv_pct_of_weights: 20` — and say so in the ask.
+
+## 3. Optional — ask, don't invent
+
+- `context` / `context_tokens` — leave null if unknown
+- `pp_tps` — only if stated
+- `rank` — BenchmarkList open-weight # if known
+- KV cache type (f16 vs q8) if not stated
+
+Put MTP / speculative decoding / “without MTP = X” **in `info`**, not as the main `speed_raw` (main speed = headline t/s).
+
+## 4. Enrichment steps
+
+1. If HF URL given → open **Files and versions** for total GB → `memory_used`.
+2. Query existing `setups` for same GPU class → propose `price_usd` + hardware wording.
+3. Confirm draft table with the user, then `PATCH`/`INSERT` via Supabase service role.
+4. Site updates on refresh; no HTML edit.
+
+## 5. Example ask list
+
+Model name? Quant bits? HF link? Hardware string? Price OK at $X (from peers)? Context? Engines? Headline t/s vs extras for info? Memory from HF OK?
+
+## 6. Local preview
+
+`npm run dev` → http://localhost:3000 (no Vercel CLI required).

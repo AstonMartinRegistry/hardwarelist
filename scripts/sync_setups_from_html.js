@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 /**
- * Parse index.html setup cards → upsert into public.setups
+ * LEGACY one-shot: parse old static HTML cards → upsert public.setups.
+ *
+ * The site now reads setups from Supabase via GET /api/setups. Prefer editing
+ * rows in the DB (or WhatsApp publish) instead of HTML.
  *
  *   node scripts/sync_setups_from_html.js
  *   node scripts/sync_setups_from_html.js index.html

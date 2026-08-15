@@ -1,17 +1,17 @@
 # PLM List
 
-Static site + Supabase. Reddit ingest runs **on Vercel** (no Cloudflare).
+Static shell + **live setups from Supabase**. Reddit ingest / classify / WhatsApp on Vercel.
 
 ```
-index.html / locallist.html / stats.html
-api/submit.js                 ← form → plmlist
-api/cron-ingest-reddit.js     ← every 2h: scrape r/LocalLLM → Supabase
-api/cron-classify.js          ← +5m: Cerebras gpt-oss-120b triage
-api/candidates.js             ← list / edit candidates (WhatsApp later)
-api/_reddit_scrape.js         ← old.reddit.com HTML scraper (cheerio)
-api/_classify.js              ← classifier prompt + DB updates
-supabase/plmlist.sql
-supabase/ingest.sql
+index.html / locallist.html   ← shell; cards from GET /api/setups
+setups-client.js              ← renders .setup-rich boxes in the browser
+stats.html                    ← charts from /api/setups
+api/setups.js                 ← public list of curated setups
+api/submit.js                 ← form → plmlist (submissions queue)
+api/cron-ingest-reddit.js     ← every 2h: scrape → ingest_*
+api/cron-classify.js          ← +5m: gpt-oss-120b + WhatsApp alerts
+api/whatsapp.js               ← Meta webhook ↔ zai-glm-4.7 chat / publish
+supabase/setups.sql           ← curated listing rows (source of truth)
 ```
 
 BenchmarkList links on cards are only a **rank data source** for open-weight
@@ -21,58 +21,37 @@ scores — this project is not affiliated with BenchmarkList.
 
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
-- `CRON_SECRET` — random secret; Vercel cron sends it as `Authorization: Bearer …`
-- `CEREBRAS_API_KEY` — classifier (+ later chat). Models: `gpt-oss-120b` classify, `zai-glm-4.7` chat
-
-That’s it for Reddit. No `REDDIT_SCRAPER_URL` / Worker token.
+- `CRON_SECRET`
+- `CEREBRAS_API_KEY` — `gpt-oss-120b` classify, `zai-glm-4.7` WhatsApp chat
+- WhatsApp Cloud API (optional until chat is live):
+  - `WHATSAPP_ACCESS_TOKEN`
+  - `WHATSAPP_PHONE_NUMBER_ID`
+  - `WHATSAPP_TO_NUMBER`
+  - `WHATSAPP_VERIFY_TOKEN`
+  - `WHATSAPP_APP_SECRET`
 
 ## SQL (once)
 
-Run in Supabase SQL editor:
-
 1. `supabase/plmlist.sql`
 2. `supabase/ingest.sql`
-3. `supabase/setups.sql` ← listing cards (model, t/s, price, …)
+3. `supabase/setups.sql`
 
-Import current HTML cards into `setups`:
+Curated list lives only in **`public.setups`**. The site loads boxes dynamically — do not hardcode cards in HTML.
 
-```bash
-node scripts/sync_setups_from_html.js
-```
+## Cron pipeline
 
-## Cron
-
-`0 */2 * * *` → `GET /api/cron-ingest-reddit`  
-Scrapes `r/LocalLLM` **new**, upserts `ingest_posts` + pending `ingest_candidates`.
-
-`5 */2 * * *` → `GET /api/cron-classify`  
-Classifies pending candidates with Cerebras **gpt-oss-120b** → `classified` (interesting) or `skipped` (noise). Draft extract fields are hints for the later GLM 4.7 / WhatsApp chat step.
+`0 */2 * * *` → ingest Reddit → `pending`  
+`5 */2 * * *` → classify → WhatsApp alert → chat → `publish` writes `setups` → site updates on next load
 
 ## Local
 
+No Vercel CLI needed:
+
 ```bash
 npm install
-npx vercel dev
+npm run dev
 ```
 
-Manual ingest (uses .env Supabase keys):
+Opens **http://localhost:3000** (static site + `/api/*`). Needs `.env` Supabase keys for `/api/setups`.
 
-```bash
-node scripts/ingest_reddit_json.js reddit/output/localllm-10-bodies.json
-```
-
-Classify pending (uses `.env` Cerebras + Supabase):
-
-```bash
-node scripts/classify_pending.js --limit 5
-```
-
-Or hit the cron routes locally:
-
-```bash
-curl -X POST "http://localhost:3000/api/cron-ingest-reddit?limit=5&comments=0" \
-  -H "Authorization: Bearer $CRON_SECRET"
-
-curl -X POST "http://localhost:3000/api/cron-classify?limit=5" \
-  -H "Authorization: Bearer $CRON_SECRET"
-```
+Optional: `npx vercel dev` still works if you prefer it.

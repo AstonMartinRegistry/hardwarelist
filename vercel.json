@@ -15,7 +15,7 @@
       "maxDuration": 60
     },
     "api/cron-classify.js": {
-      "maxDuration": 60
+      "maxDuration": 120
     }
   }
 }

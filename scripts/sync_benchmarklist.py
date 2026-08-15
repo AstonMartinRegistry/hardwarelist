@@ -296,7 +296,10 @@ def match_model(
 
 def parse_tip_metrics(model_html: str) -> dict[str, tuple[str, str]]:
     """Map tip label -> (score_text, #rank/total)."""
-    # aria-label comparisons embed: "<bench> vs X: ... model 37.05 (#91/464) vs ..."
+    # Current BenchmarkList aria-labels look like:
+    #   "GPQA Diamond · 84.2% · rank 88 of 448 · 81st percentile"
+    # Legacy format (still accepted):
+    #   "GPQA Diamond vs X: ... 37.05 (#91/464) vs ..."
     aria = re.findall(r'aria-label="([^"]+)"', model_html)
     found: dict[str, tuple[str, str]] = {}
     for label, names, suffix in TIP_METRICS:
@@ -304,19 +307,34 @@ def parse_tip_metrics(model_html: str) -> dict[str, tuple[str, str]]:
             continue
         for aria_text in aria:
             for name in names:
-                if not aria_text.startswith(name + " vs "):
+                if not (
+                    aria_text.startswith(name + " · ")
+                    or aria_text.startswith(name + " vs ")
+                ):
                     continue
-                # first model score + rank in the label
-                m = re.search(
-                    r"\b(\d+(?:\.\d+)?)\s*(%|pts)?\s*\(#(\d+)/(\d+)\)",
+
+                # New format: Name · SCORE · rank N of T · …
+                m_new = re.search(
+                    r"·\s*([\d,]+(?:\.\d+)?)\s*(%|pts)?\s*·\s*rank\s+(\d+)\s+of\s+(\d+)",
                     aria_text,
+                    flags=re.I,
                 )
-                if not m:
-                    continue
-                val = m.group(1)
-                unit = m.group(2) or ""
-                rank = f"#{m.group(3)}/{m.group(4)}"
-                # Format similar to existing tip rows
+                if m_new:
+                    val = m_new.group(1).replace(",", "")
+                    unit = (m_new.group(2) or "").strip()
+                    rank = f"#{m_new.group(3)}/{m_new.group(4)}"
+                else:
+                    # Legacy comparison aria-label
+                    m = re.search(
+                        r"\b(\d+(?:\.\d+)?)\s*(%|pts)?\s*\(#(\d+)/(\d+)\)",
+                        aria_text,
+                    )
+                    if not m:
+                        continue
+                    val = m.group(1)
+                    unit = m.group(2) or ""
+                    rank = f"#{m.group(3)}/{m.group(4)}"
+
                 if suffix == "pts":
                     try:
                         score = f"{float(val):.1f} pts"
@@ -329,12 +347,10 @@ def parse_tip_metrics(model_html: str) -> dict[str, tuple[str, str]]:
                     except ValueError:
                         score = f"{val}%"
                 else:
-                    # AA-LCR / MMMU-Pro often shown without unit
                     try:
                         f = float(val)
                         score = f"{f:.0f}" if f.is_integer() else f"{f:.1f}"
                         if unit == "%":
-                            # keep bare number to match existing tip style for these keys
                             pass
                     except ValueError:
                         score = val
