@@ -1,0 +1,9 @@
+{
+  "id": "inception-jais-13b",
+  "name": "Jais-13B",
+  "provider": "Inception",
+  "hf_repo": "inceptionai/jais-13b",
+  "hf_url": "https://huggingface.co/inceptionai/jais-13b/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Jais-13B. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

@@ -1,0 +1,40 @@
+{
+  "id": "meta-galactica-120b",
+  "name": "Galactica 120B",
+  "provider": "Meta",
+  "hf_repo": "facebook/Galactica-120B",
+  "hf_url": "https://huggingface.co/facebook/Galactica-120B/blob/main/config.json",
+  "config": {
+    "_name_or_path": "huge",
+    "_remove_final_layer_norm": false,
+    "activation_dropout": 0.0,
+    "activation_function": "gelu",
+    "architectures": [
+      "OPTForCausalLM"
+    ],
+    "attention_dropout": 0.1,
+    "enable_bias": true,
+    "bos_token_id": 0,
+    "do_layer_norm_before": true,
+    "dropout": 0.1,
+    "eos_token_id": 2,
+    "ffn_dim": 40960,
+    "hidden_size": 10240,
+    "init_std": 0.02,
+    "layer_norm_elementwise_affine": true,
+    "layerdrop": 0.0,
+    "learned_embeddings": true,
+    "max_position_embeddings": 2048,
+    "model_type": "opt",
+    "num_attention_heads": 80,
+    "num_hidden_layers": 96,
+    "pad_token_id": 1,
+    "scale_embeddings": false,
+    "torch_dtype": "float16",
+    "transformers_version": "4.21.0.dev0",
+    "use_cache": true,
+    "vocab_size": 50000,
+    "word_embed_proj_dim": 10240
+  },
+  "description": "Here is how to read the Galactica 120B config.json. The architecture class is OPTForCausalLM, which is the transformers (or equivalent) module that wires embeddings, attention, the MLP, and the language-modelling head that turns hidden states into next-token logits.\n\nhidden_size is 10,240: that is the width of every residual stream vector. The embedding matrix is therefore 50,000 \u00d7 10,240: each token id owns a vector of that width.\n\nnum_attention_heads is 80, so each head sees 128 dimensions (10,240 / 80). The ratio test is hidden_size / num_attention_heads = 10240 / 80 = 128. 128 is a multiple of 32 (NVIDIA warp-friendly), and a multiple of 16 (Huawei cube-friendly), and a power of two (Triton / FlashAttention-friendly). From this number alone you cannot name the training chip.\n\nnum_hidden_layers is 96: the stack is that many transformer blocks deep.\n\nintermediate_size is 40,960. In a SwiGLU MLP this is the high-dimensional workspace: the 10,240-wide stream is projected up, activated, then projected back. Labs usually round this width to a multiple of 128 or 256 so it tiles on the chip.\n\nmax_position_embeddings is 2,048 tokens \u2014 the context window in the config. There is no rope_scaling entry, so the rotary positions are used as-is.\n\nvocab_size is 50,000. bos/eos ids, when present, are just two special rows in that table; the padded vocab is often larger than the tokenizer\u2019s real inventory.\n\ntorch_dtype is float16.\n\nThe copy of config.json is from https://huggingface.co/facebook/Galactica-120B/blob/main/config.json."
+}

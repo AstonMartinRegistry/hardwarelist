@@ -1,0 +1,9 @@
+{
+  "id": "mistralai-mistral-medium-3",
+  "name": "Mistral: Mistral Medium 3",
+  "provider": "Mistral",
+  "hf_repo": "mistralai/Mistral-Medium-3.5-128B-EAGLE",
+  "hf_url": "https://huggingface.co/mistralai/Mistral-Medium-3.5-128B-EAGLE/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Mistral: Mistral Medium 3. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

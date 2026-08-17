@@ -1,0 +1,9 @@
+{
+  "id": "meta-codellama-7b",
+  "name": "Code Llama",
+  "provider": "Meta",
+  "hf_repo": "meta-llama/CodeLlama-7b-hf",
+  "hf_url": "https://huggingface.co/meta-llama/CodeLlama-7b-hf/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Code Llama. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

@@ -1,0 +1,9 @@
+{
+  "id": "nvidia-llama-3.3-nemotron-super-49b-v1.5",
+  "name": "Llama 3.3 Nemotron Super 49B V1.5",
+  "provider": "NVIDIA",
+  "hf_repo": "lolout1/manim_llama-3.3-nemotron-super-49B-v1.5",
+  "hf_url": "https://huggingface.co/lolout1/manim_llama-3.3-nemotron-super-49B-v1.5/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Llama 3.3 Nemotron Super 49B V1.5. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

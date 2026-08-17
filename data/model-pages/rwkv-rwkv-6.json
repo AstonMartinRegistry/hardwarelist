@@ -1,0 +1,9 @@
+{
+  "id": "rwkv-rwkv-6",
+  "name": "RWKV 6",
+  "provider": "RWKV",
+  "hf_repo": "BlinkDL/rwkv-6-world",
+  "hf_url": "https://huggingface.co/BlinkDL/rwkv-6-world/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for RWKV 6. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

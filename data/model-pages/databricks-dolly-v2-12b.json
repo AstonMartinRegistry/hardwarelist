@@ -1,0 +1,9 @@
+{
+  "id": "databricks-dolly-v2-12b",
+  "name": "Dolly",
+  "provider": "Databricks",
+  "hf_repo": "databricks/dolly-v2-12b",
+  "hf_url": "https://huggingface.co/databricks/dolly-v2-12b/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Dolly. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

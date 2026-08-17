@@ -1,0 +1,9 @@
+{
+  "id": "mosaicml-mpt-7b",
+  "name": "MPT-7B",
+  "provider": "Databricks",
+  "hf_repo": "mosaicml/mpt-7b",
+  "hf_url": "https://huggingface.co/mosaicml/mpt-7b/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for MPT-7B. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

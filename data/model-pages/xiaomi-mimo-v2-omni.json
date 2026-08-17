@@ -1,0 +1,9 @@
+{
+  "id": "xiaomi-mimo-v2-omni",
+  "name": "MiMo-V2-Omni",
+  "provider": "Xiaomi",
+  "hf_repo": null,
+  "hf_url": null,
+  "config": null,
+  "description": "No public Hugging Face config.json was found for MiMo-V2-Omni. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

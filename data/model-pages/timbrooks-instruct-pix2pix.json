@@ -1,0 +1,9 @@
+{
+  "id": "timbrooks-instruct-pix2pix",
+  "name": "InstructPix2Pix",
+  "provider": "Tim Brooks",
+  "hf_repo": "webui/instruct-pix2pix",
+  "hf_url": "https://huggingface.co/webui/instruct-pix2pix/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for InstructPix2Pix. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

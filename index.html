@@ -987,25 +987,61 @@ body.filter-open .tip-rich { display: none !important; }
 body.submit-open { overflow: hidden; }
 body.submit-open .tip-rich { display: none !important; }
 </style>
+<link rel="stylesheet" href="shell.css">
 </head>
-<body>
-<div class="header-box">
-<div class="header-copy">
-<h1>PLM List</h1>
-<p class="header-sub">Personal Language Models — local LLM hardware directory</p>
-<p class="header-seo" style="margin:8px 0 0;font-size:12px;line-height:1.5;color:#666;max-width:42em;margin-left:auto;margin-right:auto">
-Community setups for running personal language models locally: GGUF quants, VRAM fit, llama.cpp / vLLM / Ollama speeds (tokens/sec), and real rigs from RTX to Mac.
-</p>
-<div class="tagline-row">
-<a class="tagline" href="hamsters.html">“The hamsters go brrrrr”</a>
-<div class="header-actions">
-<a id="stats" href="stats.html">Stats</a>
-<button id="submit" type="button" onclick="locallistSubmit()">Submit your setup</button>
-</div>
-</div>
-</div>
-</div>
-<div class="chrome"><div class="navlinks"><a class="navlink nav-qwen" href="#cat-qwen"><span class="nav-label">Qwen</span><span class="navn"><span class="navn-num">0</span></span></a><a class="navlink nav-glm" href="#cat-glm"><span class="nav-label">GLM</span><span class="navn"><span class="navn-num">0</span></span></a><a class="navlink nav-gemma" href="#cat-gemma"><span class="nav-label">Gemma</span><span class="navn"><span class="navn-num">0</span></span></a><a class="navlink nav-minimax" href="#cat-minimax"><span class="nav-label">MiniMax</span><span class="navn"><span class="navn-num">0</span></span></a><a class="navlink nav-mistral" href="#cat-mistral"><span class="nav-label">Mistral</span><span class="navn"><span class="navn-num">0</span></span></a><a class="navlink nav-other" href="#cat-other"><span class="nav-label">Other</span><span class="navn"><span class="navn-num">0</span></span></a><button type="button" class="nav-clear" id="nav-clear" aria-label="deselect all providers" title="deselect all">×</button></div><div class="chrome-tools"><div class="filter-menu"><button type="button" id="filter-btn" class="filter-btn" aria-haspopup="true" aria-expanded="false" aria-label="sort setups"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3.2h12L9.4 8.3v4.9l-2.8 1.4V8.3L2 3.2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/></svg></button><div class="filter-dropdown" id="filter-dropdown" role="menu" hidden><div class="filter-group">Price</div><button type="button" class="filter-option" data-sort="price-asc" role="menuitem">Ascending</button><button type="button" class="filter-option" data-sort="price-desc" role="menuitem">Descending</button><div class="filter-group">Model rank</div><button type="button" class="filter-option" data-sort="rank-asc" role="menuitem">Ascending</button><button type="button" class="filter-option" data-sort="rank-desc" role="menuitem">Descending</button><hr class="filter-rule"><button type="button" class="filter-option is-selected" data-sort="" role="menuitem">Default order</button></div></div><div class="search-shell"><svg class="search-ico" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.25" stroke="currentColor" stroke-width="1.3"/><path d="M10.2 10.2L13.5 13.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><input id="model-search" type="search" placeholder="search" aria-label="search setups"><button type="button" class="search-clear" aria-label="clear search">×</button></div></div></div>
+<body class="plm-shell" data-plm-page="index">
+<header class="plm-top"><h1><a href="index.html#setups">PLM List</a></h1></header>
+<div class="plm-frame">
+<nav class="plm-nav" aria-label="Site">
+  <ul>
+    <li><a href="index.html#setups" data-view="setups">Setups</a></li>
+    <li><a href="index.html#registry" data-view="registry">Open source registry</a></li>
+    <li class="plm-nav-item" data-nav="research">
+      <button type="button" class="plm-nav-btn" data-view="research" aria-expanded="false">Research</button>
+      <ul class="plm-nav-sub">
+        <li><a href="stats.html" data-research="stats">Stats</a></li>
+        <li><a href="hamsters.html" data-research="hamsters">The hamsters go brrrrr</a></li>
+        <li><a href="chinese-oss.html" data-research="chinese-oss">The Chinese Open Source Model Registry</a></li>
+      </ul>
+    </li>
+    <li><a href="index.html#history" data-view="history">History</a></li>
+    <li><a href="index.html#manifesto" data-view="manifesto">Manifesto</a></li>
+  </ul>
+</nav>
+<main class="plm-main">
+<section class="plm-view plm-about" id="view-history" hidden>
+  <h2>History</h2>
+  <p>In April 1968, J. C. R. Licklider and Robert W. Taylor published <a href="https://internetat50.com/references/Licklider_Taylor_The-Computer-As-A-Communications-Device.pdf">“The Computer as a Communication Device.”</a> They opened with a claim that still reads like a manifesto:</p>
+  <blockquote>In a few years, men will be able to communicate more effectively through a machine than face to face.</blockquote>
+  <p>They were not talking about a telephone with extra buttons. A communications engineer, they wrote, thinks of communicating as moving information from one point to another in codes and signals. That is not enough. Two tape recorders playing into each other do not communicate. Communicators have to do something nontrivial with what they send and receive. The point is the jointly constructive part — “the part that transcends ‘now we both know a fact that only one of us knew before.’” When minds interact, new ideas emerge.</p>
+  <p>Creative, interactive communication, they argued, needs a plastic medium that can be modeled, a dynamic medium in which premises flow into consequences, and a common medium that everyone can contribute to and experiment with. “Such a medium is at hand — the programmed digital computer.” It would change communication more than the printing press or the picture tube, because a well-programmed computer gives access not only to information but to the <em>processes</em> for using it.</p>
+  <p>They named that process cooperative modeling. Face to face, people externalize their mental models — a diagram, an outline — so they know they are talking about the same thing. Without a shared model they merely make speeches at each other. With a manipulable model they point, sketch, nod, or object. The computer is that shared model, not a switch that patches lines together. “We are stressing the modeling function, not the switching function.”</p>
+  <p>They had already seen it in a room: Doug Engelbart’s project meeting, everyone looking at the same files on television monitors, any participant moving a mouse so the others could follow. They imagined on-line communities “not of common location, but of common interest,” and a personal program — an OLIVER — that would sit in the network and act on your behalf. The danger they named is still the one that matters: if being on-line is a privilege instead of a right, the network only widens the gap.</p>
+  <p>A personal language model on your own hardware is that medium without the privilege of someone else’s datacenter. Open weights made the modeling function copyable: T5 in 2019, GPT-NeoX and BLOOM in 2022, then LLaMA 2, Mistral, Mixtral, Gemma, and DeepSeek. By 2023 people were instruction-tuning Dolly, MPT, and Falcon on commodity GPUs. By 2025 a Discord of tinkerers was wiring extra circuits so a 27B could live on a desk. PLM List is a record of those setups — which weights, which quant, which card, how many tokens per second — the externalized model of how this actually runs.</p>
+</section>
+<section class="plm-view plm-about" id="view-manifesto" hidden>
+  <h2>Manifesto</h2>
+  <p>One day everyone in the world will have their personal language model that will run on their own hardware.</p>
+  <p>PLM List is a community directory of Personal Language Models — local LLMs you run yourself. PLM here means Personal Language Model, not Product Lifecycle Management.</p>
+  <p>Each setup is a real rig: model, quantization, hardware, VRAM, context, price, and reported tokens/sec on llama.cpp, vLLM, Ollama, and similar engines.</p>
+  <p>Use <strong>Setups</strong> for the hardware cards, <strong>Open source registry</strong> to browse open-source models, and <strong>Research</strong> for stats and writing.</p>
+</section>
+<section class="plm-view" id="view-registry" hidden>
+  <div class="registry-toolbar">
+    <p class="registry-count" id="registry-count"></p>
+    <input id="registry-search" type="search" placeholder="search" aria-label="search models and providers">
+  </div>
+  <div class="registry-split">
+    <div id="registry-list" class="registry-list"></div>
+    <div class="registry-pane">
+      <div id="registry-models" class="registry-models-pane"></div>
+      <div id="registry-detail" class="registry-detail" hidden></div>
+    </div>
+  </div>
+</section>
+<section class="plm-view" id="view-setups">
+<div class="chrome"><div class="navlinks"><a class="navlink nav-qwen" href="#cat-qwen"><span class="nav-label">Qwen</span><span class="navn"><span class="navn-num">0</span></span></a><a class="navlink nav-glm" href="#cat-glm"><span class="nav-label">GLM</span><span class="navn"><span class="navn-num">0</span></span></a><a class="navlink nav-gemma" href="#cat-gemma"><span class="nav-label">Gemma</span><span class="navn"><span class="navn-num">0</span></span></a><a class="navlink nav-minimax" href="#cat-minimax"><span class="nav-label">MiniMax</span><span class="navn"><span class="navn-num">0</span></span></a><a class="navlink nav-mistral" href="#cat-mistral"><span class="nav-label">Mistral</span><span class="navn"><span class="navn-num">0</span></span></a><a class="navlink nav-other" href="#cat-other"><span class="nav-label">Other</span><span class="navn"><span class="navn-num">0</span></span></a><button type="button" class="nav-clear" id="nav-clear" aria-label="deselect all providers" title="deselect all">×</button></div><div class="chrome-tools"><div class="filter-menu"><button type="button" id="filter-btn" class="filter-btn" aria-haspopup="true" aria-expanded="false" aria-label="sort setups"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3.2h12L9.4 8.3v4.9l-2.8 1.4V8.3L2 3.2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/></svg></button><div class="filter-dropdown" id="filter-dropdown" role="menu" hidden><div class="filter-group">Price</div><button type="button" class="filter-option" data-sort="price-asc" role="menuitem">Ascending</button><button type="button" class="filter-option" data-sort="price-desc" role="menuitem">Descending</button><div class="filter-group">Model rank</div><button type="button" class="filter-option" data-sort="rank-asc" role="menuitem">Ascending</button><button type="button" class="filter-option" data-sort="rank-desc" role="menuitem">Descending</button><hr class="filter-rule"><button type="button" class="filter-option is-selected" data-sort="" role="menuitem">Default order</button></div></div><button id="submit" type="button" onclick="locallistSubmit()">Submit</button>
+<div class="search-shell"><svg class="search-ico" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.25" stroke="currentColor" stroke-width="1.3"/><path d="M10.2 10.2L13.5 13.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><input id="model-search" type="search" placeholder="search" aria-label="search setups"><button type="button" class="search-clear" aria-label="clear search">×</button></div></div></div>
 <div class="cats">
 <section class="cat cat-qwen" id="cat-qwen"><div class="cat-results"><div class="grid"></div></div></section>
 <section class="cat cat-glm" id="cat-glm"><div class="cat-results"><div class="grid"></div></div></section>
@@ -1016,6 +1052,119 @@ Community setups for running personal language models locally: GGUF quants, VRAM
 <section class="cat cat-sorted" id="cat-sorted" style="display:none" aria-label="sorted setups">
 <div class="cat-results"><div class="grid"></div></div>
 </section>
+</div>
+
+</section>
+</main>
+</div>
+<div id="submit-modal" class="submit-modal" hidden>
+  <div class="submit-backdrop" data-close-submit></div>
+  <div class="submit-panel" role="dialog" aria-modal="true" aria-labelledby="submit-title">
+    <div class="submit-head">
+      <h2 id="submit-title">Submit your setup</h2>
+      <button type="button" class="submit-x" data-close-submit aria-label="close">×</button>
+    </div>
+    <form id="submit-form" class="submit-form">
+      <div class="submit-group">Model</div>
+      <div class="submit-field">
+        <span class="submit-label">Provider</span>
+        <div class="submit-provider" id="submit-provider">
+          <button type="button" class="submit-provider-btn" id="submit-provider-btn"
+            aria-haspopup="listbox" aria-expanded="false">
+            <span class="submit-provider-text">Select family</span>
+          </button>
+          <div class="submit-provider-menu" id="submit-provider-menu" role="listbox" hidden>
+            <button type="button" class="submit-provider-opt" role="option" data-value="qwen" data-label="Qwen" style="--cat:#2f6fed">
+              <span class="submit-provider-swatch" aria-hidden="true"></span><span>Qwen</span>
+            </button>
+            <button type="button" class="submit-provider-opt" role="option" data-value="glm" data-label="GLM" style="--cat:#7c3aed">
+              <span class="submit-provider-swatch" aria-hidden="true"></span><span>GLM</span>
+            </button>
+            <button type="button" class="submit-provider-opt" role="option" data-value="gemma" data-label="Gemma" style="--cat:#0f9d58">
+              <span class="submit-provider-swatch" aria-hidden="true"></span><span>Gemma</span>
+            </button>
+            <button type="button" class="submit-provider-opt" role="option" data-value="minimax" data-label="MiniMax" style="--cat:#e67e22">
+              <span class="submit-provider-swatch" aria-hidden="true"></span><span>MiniMax</span>
+            </button>
+            <button type="button" class="submit-provider-opt" role="option" data-value="mistral" data-label="Mistral" style="--cat:#e11d48">
+              <span class="submit-provider-swatch" aria-hidden="true"></span><span>Mistral</span>
+            </button>
+            <button type="button" class="submit-provider-opt" role="option" data-value="other" data-label="Other" style="--cat:#b87333">
+              <span class="submit-provider-swatch" aria-hidden="true"></span><span>Other</span>
+            </button>
+          </div>
+          <input type="hidden" name="provider" id="submit-provider-value" value="">
+          <input class="submit-provider-other" name="provider_other" id="submit-provider-other"
+            autocomplete="off" placeholder="Family name" hidden>
+        </div>
+      </div>
+      <label class="submit-field">
+        <span class="submit-label">Name</span>
+        <input name="model" autocomplete="off" placeholder="qwen3.6-35b-a3b">
+      </label>
+      <label class="submit-field">
+        <span class="submit-label">Quantization</span>
+        <input name="quant" autocomplete="off" placeholder="4bit">
+      </label>
+      <label class="submit-field">
+        <span class="submit-label">Version</span>
+        <input name="version" autocomplete="off" placeholder="Qwen3.6-35B-A3B-UD-Q6_K_XL">
+      </label>
+      <label class="submit-field">
+        <span class="submit-label">Context length<span class="submit-req" aria-hidden="true">*</span></span>
+        <input name="kv_ctx" inputmode="numeric" required autocomplete="off" placeholder="65536">
+        <p class="submit-hint">Tokens you actually run — used for the +kv bar</p>
+      </label>
+      <label class="submit-field">
+        <span class="submit-label">Link<span class="submit-req" aria-hidden="true">*</span></span>
+        <input name="version_url" type="url" required autocomplete="off" placeholder="https://huggingface.co/…">
+      </label>
+
+      <div class="submit-group">Hardware</div>
+      <label class="submit-field">
+        <span class="submit-label">Specs<span class="submit-req" aria-hidden="true">*</span></span>
+        <input name="hardware" required autocomplete="off" placeholder="2× RTX 3090 24GB">
+      </label>
+      <label class="submit-field">
+        <span class="submit-label">Price</span>
+        <input name="price" autocomplete="off" placeholder="1400">
+      </label>
+
+      <div class="submit-group">Speed</div>
+      <div class="submit-row">
+        <label class="submit-field">
+          <span class="submit-label">Decode (t/s)<span class="submit-req" aria-hidden="true">*</span></span>
+          <input name="speed" required autocomplete="off" placeholder="35">
+        </label>
+        <label class="submit-field">
+          <span class="submit-label">Prefill (t/s)</span>
+          <input name="pp" autocomplete="off" placeholder="200">
+        </label>
+      </div>
+
+      <div class="submit-group">Info</div>
+      <label class="submit-field">
+        <span class="submit-label">How you run it</span>
+        <textarea name="info" placeholder="Engine, flags, offload, concurrency, anything extreme…"></textarea>
+      </label>
+      <label class="submit-field">
+        <span class="submit-label">Email</span>
+        <input name="email" type="email" autocomplete="email" placeholder="you@example.com">
+        <p class="submit-hint">Helpful for benchmark purposes</p>
+      </label>
+
+      <div class="submit-actions">
+        <p class="submit-form-error" id="submit-form-error" role="alert"></p>
+        <button type="submit" class="submit-go">Submit</button>
+      </div>
+    </form>
+    <div class="submit-status" id="submit-status" aria-live="polite">
+      <div class="submit-spinner" id="submit-status-spinner" hidden></div>
+      <p class="submit-status-msg" id="submit-status-msg"></p>
+      <button type="button" class="submit-go" id="submit-status-done" hidden data-close-submit>Done</button>
+      <button type="button" class="submit-go" id="submit-status-retry" hidden>Try again</button>
+    </div>
+  </div>
 </div>
 <script>
 function locallistSubmit() {
@@ -1835,6 +1984,8 @@ window.addEventListener('resize', () => refreshInfoButtons());
 })();
 </script>
 
+<script src="shell.js"></script>
+<script src="registry-client.js"></script>
 <script src="setups-client.js"></script>
 <!--plm:embed-->
 <script>

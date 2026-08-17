@@ -1,0 +1,9 @@
+{
+  "id": "deepseek-deepseek-v4-flash",
+  "name": "DeepSeek V4 Flash Preview",
+  "provider": "DeepSeek",
+  "hf_repo": "xiangchensong/jacobian-lens-deepseek-v4-flash-preview",
+  "hf_url": "https://huggingface.co/xiangchensong/jacobian-lens-deepseek-v4-flash-preview/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for DeepSeek V4 Flash Preview. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

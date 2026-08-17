@@ -1,0 +1,33 @@
+{
+  "id": "eleutherai-gpt-neox-20b",
+  "name": "GPT-NeoX-20B",
+  "provider": "EleutherAI",
+  "hf_repo": "EleutherAI/GPT-NeoX-20B",
+  "hf_url": "https://huggingface.co/EleutherAI/GPT-NeoX-20B/blob/main/config.json",
+  "config": {
+    "architectures": [
+      "GPTNeoXForCausalLM"
+    ],
+    "attention_probs_dropout_prob": 0,
+    "bos_token_id": 0,
+    "eos_token_id": 0,
+    "hidden_act": "gelu_fast",
+    "hidden_dropout_prob": 0,
+    "hidden_size": 6144,
+    "initializer_range": 0.02,
+    "intermediate_size": 24576,
+    "layer_norm_eps": 1e-05,
+    "max_position_embeddings": 2048,
+    "model_type": "gpt_neox",
+    "num_attention_heads": 64,
+    "num_hidden_layers": 44,
+    "rotary_emb_base": 10000,
+    "rotary_pct": 0.25,
+    "tie_word_embeddings": false,
+    "torch_dtype": "float16",
+    "transformers_version": "4.19.0.dev0",
+    "use_cache": true,
+    "vocab_size": 50432
+  },
+  "description": "Here is how to read the GPT-NeoX-20B config.json. The architecture class is GPTNeoXForCausalLM, which is the transformers (or equivalent) module that wires embeddings, attention, the MLP, and the language-modelling head that turns hidden states into next-token logits.\n\nhidden_size is 6,144: that is the width of every residual stream vector. The embedding matrix is therefore 50,432 \u00d7 6,144: each token id owns a vector of that width.\n\nnum_attention_heads is 64, so each head sees 96 dimensions (6,144 / 64). The ratio test is hidden_size / num_attention_heads = 6144 / 64 = 96. 96 is a multiple of 32 (NVIDIA warp-friendly), and a multiple of 16 (Huawei cube-friendly). From this number alone you cannot name the training chip.\n\nnum_hidden_layers is 44: the stack is that many transformer blocks deep.\n\nintermediate_size is 24,576. In a SwiGLU MLP this is the high-dimensional workspace: the 6,144-wide stream is projected up, activated with gelu_fast, then projected back. Labs usually round this width to a multiple of 128 or 256 so it tiles on the chip.\n\nmax_position_embeddings is 2,048 tokens \u2014 the context window in the config. There is no rope_scaling entry, so the rotary positions are used as-is.\n\nvocab_size is 50,432. 50,432 is divisible by 256, the usual vocab-tiling grain. bos/eos ids, when present, are just two special rows in that table; the padded vocab is often larger than the tokenizer\u2019s real inventory.\n\ntie_word_embeddings is false, so the input embedding matrix and the output LM head are separate learned matrices rather than a shared transpose.\n\ntorch_dtype is float16.\n\nThe copy of config.json is from https://huggingface.co/EleutherAI/GPT-NeoX-20B/blob/main/config.json."
+}

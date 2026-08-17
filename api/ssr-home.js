@@ -3,6 +3,10 @@
  * Rewritten from / and /index.html via vercel.json (and local dev server).
  */
 const path = require('path');
+
+// Bust require cache so local edits to embed helpers apply without restart
+const embedPath = require.resolve('./_embed_html');
+delete require.cache[embedPath];
 const { embedSetupsIntoHtml } = require('./_embed_html');
 
 module.exports = async function handler(req, res) {

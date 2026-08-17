@@ -1,0 +1,70 @@
+{
+  "id": "qwen-qwen3-vl-8b-instruct",
+  "name": "Qwen3 VL 8B Instruct",
+  "provider": "Qwen",
+  "hf_repo": "Qwen/Qwen3-VL-8B-Instruct",
+  "hf_url": "https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct/blob/main/config.json",
+  "config": {
+    "architectures": [
+      "Qwen3VLForConditionalGeneration"
+    ],
+    "image_token_id": 151655,
+    "model_type": "qwen3_vl",
+    "text_config": {
+      "attention_bias": false,
+      "attention_dropout": 0.0,
+      "bos_token_id": 151643,
+      "dtype": "bfloat16",
+      "eos_token_id": 151645,
+      "head_dim": 128,
+      "hidden_act": "silu",
+      "hidden_size": 4096,
+      "initializer_range": 0.02,
+      "intermediate_size": 12288,
+      "max_position_embeddings": 262144,
+      "model_type": "qwen3_vl_text",
+      "num_attention_heads": 32,
+      "num_hidden_layers": 36,
+      "num_key_value_heads": 8,
+      "rms_norm_eps": 1e-06,
+      "rope_scaling": {
+        "mrope_interleaved": true,
+        "mrope_section": [
+          24,
+          20,
+          20
+        ],
+        "rope_type": "default"
+      },
+      "rope_theta": 5000000,
+      "use_cache": true,
+      "vocab_size": 151936
+    },
+    "tie_word_embeddings": false,
+    "transformers_version": "4.57.0.dev0",
+    "video_token_id": 151656,
+    "vision_config": {
+      "deepstack_visual_indexes": [
+        8,
+        16,
+        24
+      ],
+      "depth": 27,
+      "hidden_act": "gelu_pytorch_tanh",
+      "hidden_size": 1152,
+      "in_channels": 3,
+      "initializer_range": 0.02,
+      "intermediate_size": 4304,
+      "model_type": "qwen3_vl",
+      "num_heads": 16,
+      "num_position_embeddings": 2304,
+      "out_hidden_size": 4096,
+      "patch_size": 16,
+      "spatial_merge_size": 2,
+      "temporal_patch_size": 2
+    },
+    "vision_end_token_id": 151653,
+    "vision_start_token_id": 151652
+  },
+  "description": "Here is how to read the Qwen3 VL 8B Instruct config.json. The architecture class is Qwen3VLForConditionalGeneration, which is the transformers (or equivalent) module that wires embeddings, attention, the MLP, and the language-modelling head that turns hidden states into next-token logits.\n\nhidden_size is 4,096: that is the width of every residual stream vector. The embedding matrix is therefore 151,936 \u00d7 4,096: each token id owns a vector of that width.\n\nnum_attention_heads is 32, so each head sees 128 dimensions (4,096 / 32). The ratio test is hidden_size / num_attention_heads = 4096 / 32 = 128. 128 is a multiple of 32 (NVIDIA warp-friendly), and a multiple of 16 (Huawei cube-friendly), and a power of two (Triton / FlashAttention-friendly). From this number alone you cannot name the training chip.\n\nnum_key_value_heads is 8, so this is grouped-query attention (GQA): 32 query heads share 8 key/value groups, so the KV cache is about 4\u00d7 smaller than full MHA.\n\nnum_hidden_layers is 36: the stack is that many transformer blocks deep.\n\nintermediate_size is 12,288. In a SwiGLU MLP this is the high-dimensional workspace: the 4,096-wide stream is projected up, activated with silu, then projected back. Labs usually round this width to a multiple of 128 or 256 so it tiles on the chip.\n\nmax_position_embeddings is 262,144 tokens \u2014 the context window in the config. rope_scaling is present ({\"mrope_interleaved\": true, \"mrope_section\": [24, 20, 20], \"rope_type\": \"default\"}). rope_theta is 5000000: that is the wavelength of the rotary embedding. A larger theta keeps distant tokens from aliasing after a full rotation.\n\nvocab_size is 151,936. 151,936 is divisible by 128. bos/eos ids, when present, are just two special rows in that table; the padded vocab is often larger than the tokenizer\u2019s real inventory.\n\ntie_word_embeddings is false, so the input embedding matrix and the output LM head are separate learned matrices rather than a shared transpose.\n\ntorch_dtype is bfloat16. Brain floating point keeps FP32\u2019s exponent range with less mantissa, which avoids the overflow/underflow of a tiny exponent at the cost of noisier decimals \u2014 and it halves the on-chip footprint versus FP32. NVIDIA A100s were the first NVIDIA chips with native BF16; Huawei Ascend 910-class parts also prefer BF16/FP16 on the cube.\n\nThe copy of config.json is from https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct/blob/main/config.json."
+}

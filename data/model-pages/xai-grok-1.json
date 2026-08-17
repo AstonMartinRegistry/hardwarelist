@@ -1,0 +1,9 @@
+{
+  "id": "xai-grok-1",
+  "name": "Grok-1",
+  "provider": "xAI",
+  "hf_repo": "xai-org/grok-1",
+  "hf_url": "https://huggingface.co/xai-org/grok-1/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Grok-1. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

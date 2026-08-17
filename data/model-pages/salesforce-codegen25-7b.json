@@ -1,0 +1,31 @@
+{
+  "id": "salesforce-codegen25-7b",
+  "name": "CodeGen2.5",
+  "provider": "Salesforce",
+  "hf_repo": "Salesforce/codegen25-7b-multi",
+  "hf_url": "https://huggingface.co/Salesforce/codegen25-7b-multi/blob/main/config.json",
+  "config": {
+    "architectures": [
+      "LlamaForCausalLM"
+    ],
+    "bos_token_id": 50256,
+    "eos_token_id": 50256,
+    "hidden_act": "silu",
+    "hidden_size": 4096,
+    "initializer_range": 0.02,
+    "intermediate_size": 11008,
+    "max_position_embeddings": 2048,
+    "model_type": "llama",
+    "num_attention_heads": 32,
+    "num_key_value_heads": 32,
+    "num_hidden_layers": 32,
+    "pad_token_id": 0,
+    "rms_norm_eps": 1e-06,
+    "tie_word_embeddings": false,
+    "torch_dtype": "float32",
+    "transformers_version": "4.29.2",
+    "use_cache": true,
+    "vocab_size": 51200
+  },
+  "description": "Here is how to read the CodeGen2.5 config.json. The architecture class is LlamaForCausalLM, which is the transformers (or equivalent) module that wires embeddings, attention, the MLP, and the language-modelling head that turns hidden states into next-token logits.\n\nhidden_size is 4,096: that is the width of every residual stream vector. The embedding matrix is therefore 51,200 \u00d7 4,096: each token id owns a vector of that width.\n\nnum_attention_heads is 32, so each head sees 128 dimensions (4,096 / 32). The ratio test is hidden_size / num_attention_heads = 4096 / 32 = 128. 128 is a multiple of 32 (NVIDIA warp-friendly), and a multiple of 16 (Huawei cube-friendly), and a power of two (Triton / FlashAttention-friendly). From this number alone you cannot name the training chip.\n\nnum_key_value_heads is 32, so this is multi-head attention (MHA): every query head keeps its own key/value.\n\nnum_hidden_layers is 32: the stack is that many transformer blocks deep.\n\nintermediate_size is 11,008. In a SwiGLU MLP this is the high-dimensional workspace: the 4,096-wide stream is projected up, activated with silu, then projected back. Labs usually round this width to a multiple of 128 or 256 so it tiles on the chip.\n\nmax_position_embeddings is 2,048 tokens \u2014 the context window in the config. There is no rope_scaling entry, so the rotary positions are used as-is.\n\nvocab_size is 51,200. 51,200 is divisible by 256, the usual vocab-tiling grain. bos/eos ids, when present, are just two special rows in that table; the padded vocab is often larger than the tokenizer\u2019s real inventory.\n\ntie_word_embeddings is false, so the input embedding matrix and the output LM head are separate learned matrices rather than a shared transpose.\n\ntorch_dtype is float32.\n\nThe copy of config.json is from https://huggingface.co/Salesforce/codegen25-7b-multi/blob/main/config.json."
+}

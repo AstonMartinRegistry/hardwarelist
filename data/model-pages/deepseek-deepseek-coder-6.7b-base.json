@@ -1,0 +1,36 @@
+{
+  "id": "deepseek-deepseek-coder-6.7b-base",
+  "name": "DeepSeek-Coder 6.7B",
+  "provider": "DeepSeek",
+  "hf_repo": "deepseek-ai/deepseek-coder-6.7b-base",
+  "hf_url": "https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-base/blob/main/config.json",
+  "config": {
+    "architectures": [
+      "LlamaForCausalLM"
+    ],
+    "bos_token_id": 32013,
+    "eos_token_id": 32014,
+    "hidden_act": "silu",
+    "hidden_size": 4096,
+    "initializer_range": 0.02,
+    "intermediate_size": 11008,
+    "max_position_embeddings": 16384,
+    "model_type": "llama",
+    "num_attention_heads": 32,
+    "num_hidden_layers": 32,
+    "num_key_value_heads": 32,
+    "pretraining_tp": 1,
+    "rms_norm_eps": 1e-06,
+    "rope_scaling": {
+      "factor": 4.0,
+      "type": "linear"
+    },
+    "rope_theta": 100000,
+    "tie_word_embeddings": false,
+    "torch_dtype": "bfloat16",
+    "transformers_version": "4.34.1",
+    "use_cache": true,
+    "vocab_size": 32256
+  },
+  "description": "The first open source model to come out of DeepSeek was DeepSeek-Coder. They mention in the paper that \u201cOur experiments utilize clusters outfitted with NVIDIA A100 and H800 GPUs.\u201d\n\nFirst, let us dissect what all of this means. To start, the LlamaForCausalLM class comes from the transformers library that puts together the logic behind the llama model. It is the heart of the llama architecture that handles the embeddings, attention mechanisms, the hidden states, and the language modelling head that returns the predicted tokens. The bos_token_id and the eos_token_id relate to the vocab size. In the model\u2019s tokenizer.json there are 32021 token ids, and those attributes are just the ids of the bos (beginning of sequence) and eos (end of sequence) tokens. So then why is the vocab_size 32256? Due to tiling and to keep it divisible by 256. To contrast, the original Llama 2-7b base model of DeepSeek coder had a vocab size of 32000. Next, the hidden_size is the dimension of the vectors that each token is embedded into. So the embedding matrix has a size of 32256 \u00d7 4096, the vocab size paired with the hidden size. To put it plainly each id of the vocab gets its own vector. The intermediate_size is the step that projects the 4096 dimension vectors to 11008 dimensions to execute the SwiGLU activation function. It acts as a high dimensional workspace where stored weights are compared to other tokens to extract richer contextual patterns before being reduced back to 4096 dimensions. Next, the num_attention_heads is important because it cuts up the 4096 dimension vectors into 32 separate heads, each working with 128 dimensions. 128 is both divisible by 16 and by 32 and can be converted to a base 2 number, so from this information alone you cannot conclude exactly which hardware was used to train it. num_key_value_heads is also 32, meaning each head gets its own key value. This means the model uses multi-head attention (MHA) instead of grouped query attention (GQA) or multi-query attention (MQA). The max_position_embeddings is also related to the rope_scaling. The max_position_embeddings is the context window of the model. However, during training, the original Llama 2 model only ever saw input text that was at most 4096 tokens long, so the question is how did DeepSeek manage to get the model to understand beyond this 4096 space? DeepSeek found that you can increase the context window by just scaling down an inflated context window. Real position just gets compressed back into 4096 positions. That is why rope_scaling is being scaled by a factor of 4.0. The larger context window is also the reason why rope_theta was increased from the original 10k in Llama 2 to 100k. RoPE dictates how much each token is rotated. A full rotation would happen in Llama 2\u2019s case after 10k tokens. If a token becomes fully rotated, it would look identical to the start token, meaning the model loses its ability to distinguish how far tokens are from each other.\n\ntie_word_embeddings: false means the input embedding matrix and the output language model head are separate learned matrices. pretraining_tp: 1 is a default setting regarding tensor-parallelism used during pretraining. A value of 1 means no tensor-parallel sharding was applied. Lastly, bfloat16 (brain floating point) was developed at Google Brain in 2019 to keep the same exponent range as floating point 32 with less precision. For deep learning, not having the exponent range leads to underflows and overflows that produce infinities or zeros, which produce more issues than imprecise decimals. This saves on-chip memory. A100s were the first chips from NVIDIA that natively supported bfloat16, which aligns with what DeepSeek published: that A100s were used for training."
+}

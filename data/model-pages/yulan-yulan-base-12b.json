@@ -1,0 +1,42 @@
+{
+  "id": "yulan-yulan-base-12b",
+  "name": "YuLan-Base 12B",
+  "provider": "YuLan",
+  "hf_repo": "yulan-team/YuLan-Base-12b",
+  "hf_url": "https://huggingface.co/yulan-team/YuLan-Base-12b/blob/main/config.json",
+  "config": {
+    "_name_or_path": "yulan-team/YuLan-Base-12b",
+    "architectures": [
+      "LlamaForCausalLM"
+    ],
+    "attention_bias": false,
+    "attention_dropout": 0.0,
+    "bos_token_id": 1,
+    "eos_token_id": 2,
+    "hidden_act": "silu",
+    "hidden_size": 4864,
+    "initializer_range": 0.02,
+    "intermediate_size": 13056,
+    "max_position_embeddings": 4096,
+    "mlp_bias": false,
+    "model_type": "llama",
+    "num_attention_heads": 38,
+    "num_hidden_layers": 40,
+    "num_key_value_heads": 38,
+    "pad_token_id": 0,
+    "pretraining_tp": 1,
+    "rms_norm_eps": 1e-06,
+    "rope_scaling": null,
+    "rope_theta": 10000.0,
+    "tie_word_embeddings": false,
+    "torch_dtype": "bfloat16",
+    "transformers_version": "4.41.1",
+    "use_cache": true,
+    "vocab_size": 51190
+  },
+  "description": "YuLan is a 12B open-source LLM from Renmin University of China, described in Zhu et al., \u201cYuLan: An Open-source Large Language Model\u201d (arXiv:2406.19853). The base model is pretrained from scratch on about 1.7T English, Chinese, and multilingual tokens with a three-stage curriculum; the chat model then takes instruction-tuning and human alignment. Training finished in January 2024. Paper: https://arxiv.org/abs/2406.19853\n\nHere is how to read the YuLan-Base 12B config.json. The architecture class is LlamaForCausalLM, which is the transformers (or equivalent) module that wires embeddings, attention, the MLP, and the language-modelling head that turns hidden states into next-token logits.\n\nhidden_size is 4,864: that is the width of every residual stream vector. The embedding matrix is therefore 51,190 \u00d7 4,864: each token id owns a vector of that width.\n\nnum_attention_heads is 38, so each head sees 128 dimensions (4,864 / 38). The ratio test is hidden_size / num_attention_heads = 4864 / 38 = 128. 128 is a multiple of 32 (NVIDIA warp-friendly), and a multiple of 16 (Huawei cube-friendly), and a power of two (Triton / FlashAttention-friendly). From this number alone you cannot name the training chip.\n\nnum_key_value_heads is 38, so this is multi-head attention (MHA): every query head keeps its own key/value.\n\nnum_hidden_layers is 40: the stack is that many transformer blocks deep.\n\nintermediate_size is 13,056. In a SwiGLU MLP this is the high-dimensional workspace: the 4,864-wide stream is projected up, activated with silu, then projected back. Labs usually round this width to a multiple of 128 or 256 so it tiles on the chip.\n\nmax_position_embeddings is 4,096 tokens \u2014 the context window in the config. There is no rope_scaling entry, so the rotary positions are used as-is. rope_theta is 10000.0: that is the wavelength of the rotary embedding. A larger theta keeps distant tokens from aliasing after a full rotation.\n\nvocab_size is 51,190. bos/eos ids, when present, are just two special rows in that table; the padded vocab is often larger than the tokenizer\u2019s real inventory.\n\ntie_word_embeddings is false, so the input embedding matrix and the output LM head are separate learned matrices rather than a shared transpose.\n\ntorch_dtype is bfloat16. Brain floating point keeps FP32\u2019s exponent range with less mantissa, which avoids the overflow/underflow of a tiny exponent at the cost of noisier decimals \u2014 and it halves the on-chip footprint versus FP32. NVIDIA A100s were the first NVIDIA chips with native BF16; Huawei Ascend 910-class parts also prefer BF16/FP16 on the cube.\n\nThe copy of config.json is from https://huggingface.co/yulan-team/YuLan-Base-12b/blob/main/config.json.",
+  "paper": {
+    "title": "YuLan: An Open-source Large Language Model (arXiv:2406.19853)",
+    "url": "https://arxiv.org/abs/2406.19853"
+  }
+}

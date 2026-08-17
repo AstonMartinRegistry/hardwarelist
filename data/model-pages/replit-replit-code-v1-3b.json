@@ -1,0 +1,61 @@
+{
+  "id": "replit-replit-code-v1-3b",
+  "name": "Replit Code",
+  "provider": "Replit",
+  "hf_repo": "replit/replit-code-v1-3b",
+  "hf_url": "https://huggingface.co/replit/replit-code-v1-3b/blob/main/config.json",
+  "config": {
+    "architectures": [
+      "MPTForCausalLM"
+    ],
+    "attn_config": {
+      "alibi": true,
+      "alibi_bias_max": 8,
+      "attn_impl": "torch",
+      "attn_pdrop": 0,
+      "attn_type": "multihead_attention",
+      "attn_uses_sequence_id": false,
+      "clip_qkv": null,
+      "prefix_lm": false,
+      "qk_ln": false,
+      "softmax_scale": null
+    },
+    "auto_map": {
+      "AutoConfig": "configuration_mpt.MPTConfig",
+      "AutoModelForCausalLM": "modeling_mpt.MPTForCausalLM"
+    },
+    "d_model": 2560,
+    "emb_pdrop": 0,
+    "embedding_fraction": 1.0,
+    "expansion_ratio": 4,
+    "init_config": {
+      "emb_init_std": null,
+      "emb_init_uniform_lim": null,
+      "fan_mode": "fan_in",
+      "init_div_is_residual": true,
+      "init_gain": 0,
+      "init_nonlinearity": "relu",
+      "init_std": 0.02,
+      "name": "kaiming_normal_",
+      "verbose": 0
+    },
+    "init_device": "cpu",
+    "learned_pos_emb": true,
+    "logit_scale": null,
+    "max_seq_len": 2048,
+    "model_type": "mpt",
+    "n_heads": 32,
+    "n_layers": 32,
+    "no_bias": true,
+    "norm_type": "low_precision_layernorm",
+    "resid_pdrop": 0,
+    "tokenizer_name": "replit/replit-code-v1-3b",
+    "torch_dtype": "float32",
+    "transformers_version": "4.28.1",
+    "use_cache": true,
+    "verbose": 0,
+    "vocab_size": 32768,
+    "eos_token_id": 1
+  },
+  "description": "Here is how to read the Replit Code config.json. The architecture class is MPTForCausalLM, which is the transformers (or equivalent) module that wires embeddings, attention, the MLP, and the language-modelling head that turns hidden states into next-token logits.\n\nhidden_size is 2,560: that is the width of every residual stream vector. The embedding matrix is therefore 32,768 \u00d7 2,560: each token id owns a vector of that width.\n\nmax_position_embeddings is 2,048 tokens \u2014 the context window in the config. There is no rope_scaling entry, so the rotary positions are used as-is.\n\nvocab_size is 32,768. 32,768 is divisible by 256, the usual vocab-tiling grain. bos/eos ids, when present, are just two special rows in that table; the padded vocab is often larger than the tokenizer\u2019s real inventory.\n\ntorch_dtype is float32.\n\nThe copy of config.json is from https://huggingface.co/replit/replit-code-v1-3b/blob/main/config.json."
+}

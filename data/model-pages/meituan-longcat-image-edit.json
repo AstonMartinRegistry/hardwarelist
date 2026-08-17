@@ -1,0 +1,11 @@
+{
+  "id": "meituan-longcat-image-edit",
+  "name": "LongCat-Image-Edit",
+  "provider": "Meituan",
+  "hf_repo": "meituan-longcat/LongCat-Image-Edit",
+  "hf_url": "https://huggingface.co/meituan-longcat/LongCat-Image-Edit/blob/main/config.json",
+  "config": {
+    "model_name": "LongCat-Image-Edit"
+  },
+  "description": "Here is how to read the LongCat-Image-Edit config.json. The architecture class is unknown, which is the transformers (or equivalent) module that wires embeddings, attention, the MLP, and the language-modelling head that turns hidden states into next-token logits.\n\nThe copy of config.json is from https://huggingface.co/meituan-longcat/LongCat-Image-Edit/blob/main/config.json."
+}

@@ -90,10 +90,29 @@ body {
   .hero { margin: 22px 0 20px; }
 }
 </style>
+<link rel="stylesheet" href="shell.css">
 </head>
-<body>
+<body class="plm-shell" data-plm-page="hamsters">
+<header class="plm-top"><h1><a href="index.html#setups">PLM List</a></h1></header>
+<div class="plm-frame">
+<nav class="plm-nav" aria-label="Site">
+  <ul>
+    <li><a href="index.html#setups" data-view="setups">Setups</a></li>
+    <li><a href="index.html#registry" data-view="registry">Open source registry</a></li>
+    <li class="plm-nav-item" data-nav="research">
+      <button type="button" class="plm-nav-btn" data-view="research" aria-expanded="false">Research</button>
+      <ul class="plm-nav-sub">
+        <li><a href="stats.html" data-research="stats">Stats</a></li>
+        <li><a href="hamsters.html" data-research="hamsters">The hamsters go brrrrr</a></li>
+        <li><a href="chinese-oss.html" data-research="chinese-oss">The Chinese Open Source Model Registry</a></li>
+      </ul>
+    </li>
+    <li><a href="index.html#history" data-view="history">History</a></li>
+    <li><a href="index.html#manifesto" data-view="manifesto">Manifesto</a></li>
+  </ul>
+</nav>
+<main class="plm-main">
 <div class="shell">
-  <a class="back" href="locallist.html">← PLM List</a>
   <header class="header-box">
     <h1>The hamsters go brrrrr</h1>
     <p class="subheader">A year inside the Discord server where people spend their life savings to run a 27b model instead of paying Anthropic $20 dollars a month.</p>
@@ -152,5 +171,8 @@ body {
     </div>
   </article>
 </div>
+</main>
+</div>
+<script src="shell.js"></script>
 </body>
 </html>

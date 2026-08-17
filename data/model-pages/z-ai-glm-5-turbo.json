@@ -1,0 +1,9 @@
+{
+  "id": "z-ai-glm-5-turbo",
+  "name": "GLM 5 Turbo",
+  "provider": "Z.ai",
+  "hf_repo": null,
+  "hf_url": null,
+  "config": null,
+  "description": "No public Hugging Face config.json was found for GLM 5 Turbo. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

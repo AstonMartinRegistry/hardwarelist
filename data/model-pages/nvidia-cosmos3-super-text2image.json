@@ -1,0 +1,266 @@
+{
+  "id": "nvidia-cosmos3-super-text2image",
+  "name": "Cosmos3-Super-Text2Image",
+  "provider": "NVIDIA",
+  "hf_repo": "nvidia/Cosmos3-Super-Text2Image",
+  "hf_url": "https://huggingface.co/nvidia/Cosmos3-Super-Text2Image/blob/main/config.json",
+  "config": {
+    "allow_patterns_overrides": [
+      "*/*.safetensors"
+    ],
+    "architectures": [
+      "Cosmos3ForConditionalGeneration"
+    ],
+    "image_token_id": 151655,
+    "model": {
+      "_recursive_": false,
+      "_target": "omni_mot_model",
+      "config": {
+        "_type": "omni_mot_model_config",
+        "action_gen": false,
+        "activation_checkpointing": {
+          "_type": "activation_checkpointing_config",
+          "determinism_check": "default",
+          "mode": "full",
+          "preserve_rng_state": true,
+          "save_ops_regex": [
+            "fmha"
+          ]
+        },
+        "causal_training_strategy": "none",
+        "compile": {
+          "_type": "compile_config",
+          "compile_dynamic": true,
+          "compiled_region": "language",
+          "coordinate_descent_tuning": false,
+          "enabled": true,
+          "max_autotune_pointwise": false,
+          "use_cuda_graphs": false
+        },
+        "diffusion_expert_config": {
+          "_type": "diffusion_expert_config",
+          "base_fps": 24,
+          "enable_fps_modulation": true,
+          "load_weights_from_pretrained": false,
+          "max_vae_latent_side_after_patchify": 20,
+          "patch_spatial": 2,
+          "position_embedding_type": "unified_3d_mrope",
+          "rope_h_extrapolation_ratio": 1.0,
+          "rope_t_extrapolation_ratio": 1.0,
+          "rope_w_extrapolation_ratio": 1.0,
+          "timestep_range": 1.0,
+          "unified_3d_mrope_reset_spatial_ids": true,
+          "unified_3d_mrope_temporal_modality_margin": 15000
+        },
+        "ema": {
+          "_type": "ema_config",
+          "enabled": false,
+          "iteration_shift": 0,
+          "rate": 0.1
+        },
+        "fixed_step_sampler_config": null,
+        "input_caption_key": "ai_caption",
+        "input_image_key": "images",
+        "input_video_key": "video",
+        "joint_attn_implementation": "two_way",
+        "latent_downsample_factor": 16,
+        "lbl": {
+          "_type": "lbl_config",
+          "coeff_gen": null,
+          "coeff_und": null,
+          "method": "local"
+        },
+        "log_enc_time_every_n": 100,
+        "lora_alpha": 32,
+        "lora_enabled": false,
+        "lora_rank": 16,
+        "lora_target_modules": "q_proj_moe_gen,k_proj_moe_gen,v_proj_moe_gen,o_proj_moe_gen",
+        "max_action_dim": 32,
+        "max_num_tokens_after_packing": 69632,
+        "natten_parameter_list": null,
+        "net": null,
+        "num_embodiment_domains": 32,
+        "parallelism": {
+          "_type": "parallelism_config",
+          "cfg_parallel_shard_degree": 1,
+          "context_parallel_shard_degree": 1,
+          "data_parallel_replicate_degree": 1,
+          "data_parallel_shard_degree": 16,
+          "enable_inference_mode": false,
+          "fsdp_master_dtype": "float32"
+        },
+        "precision": "bfloat16",
+        "rectified_flow_inference_config": {
+          "_type": "rectified_flow_inference_config",
+          "num_train_timesteps": 1000,
+          "scheduler_type": "unipc",
+          "shift": 3,
+          "use_dynamic_shifting": false
+        },
+        "rectified_flow_training_config": {
+          "_type": "rectified_flow_training_config",
+          "action_loss_weight": 10.0,
+          "high_sigma_ratio": 0.05,
+          "high_sigma_timesteps_max": 1000,
+          "high_sigma_timesteps_min": 995,
+          "image_loss_scale": null,
+          "independent_action_schedule": false,
+          "independent_sound_schedule": false,
+          "loss_scale": 10.0,
+          "normalize_loss_by_active": false,
+          "shift": {
+            "720": 5,
+            "768": 5
+          },
+          "shift_action": null,
+          "shift_sound": null,
+          "sound_loss_scale": 2.0,
+          "train_time_action_distribution": "logitnormal",
+          "train_time_image_distribution": "logitnormal",
+          "train_time_sound_distribution": "logitnormal",
+          "train_time_video_distribution": "waver",
+          "train_time_weight": "uniform",
+          "use_discrete_rf": false,
+          "use_dynamic_shift": false,
+          "use_high_sigma_strategy": false,
+          "use_high_sigma_strategy_action": false,
+          "use_high_sigma_strategy_sound": false
+        },
+        "resolution": "768",
+        "sound_dim": 64,
+        "sound_gen": true,
+        "sound_latent_fps": 25,
+        "sound_tokenizer": {
+          "_target": "avae_interface",
+          "audio_channels": 2,
+          "avae_config_path": "",
+          "avae_path": "pretrained/tokenizers/audio/avae/avae_48k_noncausal_25hz_64ch.ckpt",
+          "bucket_name": "bucket",
+          "hop_size": 1920,
+          "io_channels": 64,
+          "latent_mean": null,
+          "latent_std": null,
+          "normalization_type": "none",
+          "normalize_latents": false,
+          "object_store_credential_path_pretrained": "credentials/gcp_training.secret",
+          "sample_rate": 48000,
+          "tanh_clamp": 0.995,
+          "tanh_input_scale": 1.5,
+          "tanh_output_scale": 3.5
+        },
+        "state_ch": 48,
+        "state_t": 300,
+        "tokenizer": {
+          "_target": "wan2pt2_vae_interface",
+          "bucket_name": "bucket",
+          "causal": true,
+          "chunk_duration": 93,
+          "encode_bucket_multiple": null,
+          "encode_chunk_frames": {
+            "720": 12,
+            "768": 12
+          },
+          "encode_exact_durations": null,
+          "keep_decoder_cache": false,
+          "object_store_credential_path_pretrained": "credentials/gcp_training.secret",
+          "spatial_compression_factor": 16,
+          "temporal_compression_factor": 4,
+          "temporal_window": null,
+          "use_streaming_encode": false,
+          "vae_path": "pretrained/tokenizers/video/wan2pt2/Wan2.2_VAE.pth"
+        },
+        "video_temporal_causal": false,
+        "vision_gen": true,
+        "vlm_config": {
+          "_type": "vlm_config",
+          "layer_module": null,
+          "model_instance": {
+            "_target": "qwen3_vl_text_for_causal_lm",
+            "config": {
+              "_target": "create_vlm_config",
+              "base_config": {
+                "_target": "qwen3_vl_mot_config_from_json_file",
+                "json_file": "cosmos3://vfm/models/vlm/qwen3_vl/configs/Qwen3-VL-32B-Instruct.json"
+              },
+              "qk_norm_for_text": true
+            }
+          },
+          "model_name": "nvidia/Cosmos3-Super-Reasoner",
+          "pretrained_weights": {
+            "_type": "pretrained_weights_config",
+            "backbone_path": "s3://bucket/cosmos3/pretrained/huggingface/Cosmos-Reason/Cosmos3-Super-Reasoner-b6df0d1/",
+            "checkpoint_format": null,
+            "credentials_path": "credentials/gcp_checkpoint.secret",
+            "enable_gcs_patch_in_boto3": true,
+            "enabled": false
+          },
+          "qk_norm": false,
+          "tie_word_embeddings": false,
+          "tokenizer": {
+            "_target": "create_qwen2_tokenizer_with_download",
+            "config_variant": "gcp",
+            "pretrained_model_name": "Qwen/Qwen3-VL-32B-Instruct"
+          },
+          "use_system_prompt": false
+        }
+      }
+    },
+    "model_type": "cosmos3_omni",
+    "text_config": {
+      "attention_bias": false,
+      "attention_dropout": 0.0,
+      "bos_token_id": 151643,
+      "dtype": "bfloat16",
+      "eos_token_id": 151645,
+      "head_dim": 128,
+      "hidden_act": "silu",
+      "hidden_size": 5120,
+      "initializer_range": 0.02,
+      "intermediate_size": 25600,
+      "max_position_embeddings": 262144,
+      "model_type": "qwen3_vl_text",
+      "num_attention_heads": 64,
+      "num_hidden_layers": 64,
+      "num_key_value_heads": 8,
+      "rms_norm_eps": 1e-06,
+      "rope_scaling": {
+        "mrope_interleaved": true,
+        "mrope_section": [
+          24,
+          20,
+          20
+        ],
+        "rope_type": "default"
+      },
+      "rope_theta": 5000000,
+      "use_cache": true,
+      "vocab_size": 151936
+    },
+    "tie_word_embeddings": false,
+    "transformers_version": "4.57.0.dev0",
+    "video_token_id": 151656,
+    "vision_config": {
+      "deepstack_visual_indexes": [
+        8,
+        16,
+        24
+      ],
+      "depth": 27,
+      "hidden_act": "gelu_pytorch_tanh",
+      "hidden_size": 1152,
+      "in_channels": 3,
+      "initializer_range": 0.02,
+      "intermediate_size": 4304,
+      "model_type": "qwen3_vl",
+      "num_heads": 16,
+      "num_position_embeddings": 2304,
+      "out_hidden_size": 5120,
+      "patch_size": 16,
+      "spatial_merge_size": 2,
+      "temporal_patch_size": 2
+    },
+    "vision_end_token_id": 151653,
+    "vision_start_token_id": 151652
+  },
+  "description": "Here is how to read the Cosmos3-Super-Text2Image config.json. The architecture class is Cosmos3ForConditionalGeneration, which is the transformers (or equivalent) module that wires embeddings, attention, the MLP, and the language-modelling head that turns hidden states into next-token logits.\n\nhidden_size is 5,120: that is the width of every residual stream vector. The embedding matrix is therefore 151,936 \u00d7 5,120: each token id owns a vector of that width.\n\nnum_attention_heads is 64, so each head sees 128 dimensions (5,120 / 64). The ratio test is hidden_size / num_attention_heads = 5120 / 64 = 128. 128 is a multiple of 32 (NVIDIA warp-friendly), and a multiple of 16 (Huawei cube-friendly), and a power of two (Triton / FlashAttention-friendly). From this number alone you cannot name the training chip.\n\nnum_key_value_heads is 8, so this is grouped-query attention (GQA): 64 query heads share 8 key/value groups, so the KV cache is about 8\u00d7 smaller than full MHA.\n\nnum_hidden_layers is 64: the stack is that many transformer blocks deep.\n\nintermediate_size is 25,600. In a SwiGLU MLP this is the high-dimensional workspace: the 5,120-wide stream is projected up, activated with silu, then projected back. Labs usually round this width to a multiple of 128 or 256 so it tiles on the chip.\n\nmax_position_embeddings is 262,144 tokens \u2014 the context window in the config. rope_scaling is present ({\"mrope_interleaved\": true, \"mrope_section\": [24, 20, 20], \"rope_type\": \"default\"}). rope_theta is 5000000: that is the wavelength of the rotary embedding. A larger theta keeps distant tokens from aliasing after a full rotation.\n\nvocab_size is 151,936. 151,936 is divisible by 128. bos/eos ids, when present, are just two special rows in that table; the padded vocab is often larger than the tokenizer\u2019s real inventory.\n\ntie_word_embeddings is false, so the input embedding matrix and the output LM head are separate learned matrices rather than a shared transpose.\n\ntorch_dtype is bfloat16. Brain floating point keeps FP32\u2019s exponent range with less mantissa, which avoids the overflow/underflow of a tiny exponent at the cost of noisier decimals \u2014 and it halves the on-chip footprint versus FP32. NVIDIA A100s were the first NVIDIA chips with native BF16; Huawei Ascend 910-class parts also prefer BF16/FP16 on the cube.\n\nThe copy of config.json is from https://huggingface.co/nvidia/Cosmos3-Super-Text2Image/blob/main/config.json."
+}

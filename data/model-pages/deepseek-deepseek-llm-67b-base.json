@@ -1,0 +1,33 @@
+{
+  "id": "deepseek-deepseek-llm-67b-base",
+  "name": "DeepSeek LLM 67B",
+  "provider": "DeepSeek",
+  "hf_repo": "deepseek-ai/deepseek-llm-67b-base",
+  "hf_url": "https://huggingface.co/deepseek-ai/deepseek-llm-67b-base/blob/main/config.json",
+  "config": {
+    "architectures": [
+      "LlamaForCausalLM"
+    ],
+    "bos_token_id": 1,
+    "eos_token_id": 2,
+    "hidden_act": "silu",
+    "hidden_size": 8192,
+    "initializer_range": 0.02,
+    "intermediate_size": 22016,
+    "max_position_embeddings": 4096,
+    "model_type": "llama",
+    "num_attention_heads": 64,
+    "num_hidden_layers": 95,
+    "num_key_value_heads": 8,
+    "pretraining_tp": 1,
+    "rms_norm_eps": 1e-06,
+    "rope_scaling": null,
+    "rope_theta": 10000.0,
+    "tie_word_embeddings": false,
+    "torch_dtype": "bfloat16",
+    "transformers_version": "4.33.1",
+    "use_cache": true,
+    "vocab_size": 102400
+  },
+  "description": "DeepSeek\u2019s LLM came in both 7B and 67B variants. First, let us perform the ratio test: total hidden_size is 8192 and num_attention_heads is 64. Divide both and we get again 128. While this is not conclusive as to which chip was used for training, we know NVIDIA chips were used from the repo\u2019s README, which says \u201cfor DeepSeek LLM 7B, we utilize 1 NVIDIA A100-PCIE-40GB GPU for inference,\u201d and the 67B used 8. Notice hidden_size increased to 8192. The context window was left at 4096, meaning there is no rope_scaling needed. num_key_value_heads decreasing down to 8 means the model uses grouped-query attention (GQA) instead of MHA. Storing a full KV pair per attention head for each token becomes huge; by reducing the stored KV sets from 64 to 8, you shrink the cache by 8\u00d7, making the model much faster to run.\n\nThe formula used to come up with intermediate_size is 8/3 \u00d7 hidden_size, then scaled up to a hardware-friendly number. 8192 \u00d7 8/3 = 21,845.33, then rounded up to the nearest multiple of 128 would be 21888 (128 \u00d7 171), but 22016 was chosen instead (128 \u00d7 172). That rounding goes back to Llama 2\u2019s FFN class, where SwiGLU hidden size is forced to a multiple of 256.\n\nVocab size increased from 32256 to 102400. DeepSeek used a custom-trained tokenizer: \u201cwe set the number of conventional tokens in the vocabulary at 100000\u2026 we augmented the final vocabulary with 15 special tokens, bringing the total size to 100015\u2026 we configured the model\u2019s vocabulary size to 102400 for training.\u201d 102400 is 256 \u00d7 400. With 8 A100s used to inference the 67B, 102400 / 8 = 12800, and 12800 / 256 = 50, so the vocab still tiles after being split across the eight GPUs."
+}

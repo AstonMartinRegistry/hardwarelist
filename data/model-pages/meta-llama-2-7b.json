@@ -1,0 +1,9 @@
+{
+  "id": "meta-llama-2-7b",
+  "name": "Llama 2",
+  "provider": "Meta",
+  "hf_repo": "meta-llama/Llama-2-7b-hf",
+  "hf_url": "https://huggingface.co/meta-llama/Llama-2-7b-hf/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Llama 2. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

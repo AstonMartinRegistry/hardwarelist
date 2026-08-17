@@ -1,0 +1,9 @@
+{
+  "id": "fujitsu-fugaku-llm-13b",
+  "name": "Fugaku-LLM",
+  "provider": "Fujitsu",
+  "hf_repo": "Fugaku-LLM/Fugaku-LLM-13B",
+  "hf_url": "https://huggingface.co/Fugaku-LLM/Fugaku-LLM-13B/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Fugaku-LLM. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

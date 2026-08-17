@@ -1,0 +1,9 @@
+{
+  "id": "google-gemma-7b",
+  "name": "Gemma 7B",
+  "provider": "Google",
+  "hf_repo": "google/gemma-7b",
+  "hf_url": "https://huggingface.co/google/gemma-7b/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Gemma 7B. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

@@ -1,0 +1,9 @@
+{
+  "id": "mistralai-mistral-saba",
+  "name": "Mistral: Saba",
+  "provider": "Mistral",
+  "hf_repo": "sabamedia/saba",
+  "hf_url": "https://huggingface.co/sabamedia/saba/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Mistral: Saba. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

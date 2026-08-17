@@ -1,0 +1,35 @@
+{
+  "id": "qwen-qwen-2.5-7b-instruct",
+  "name": "Qwen2.5 7B Instruct",
+  "provider": "Qwen",
+  "hf_repo": "Qwen/Qwen2.5-7B-Instruct",
+  "hf_url": "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/config.json",
+  "config": {
+    "architectures": [
+      "Qwen2ForCausalLM"
+    ],
+    "attention_dropout": 0.0,
+    "bos_token_id": 151643,
+    "eos_token_id": 151645,
+    "hidden_act": "silu",
+    "hidden_size": 3584,
+    "initializer_range": 0.02,
+    "intermediate_size": 18944,
+    "max_position_embeddings": 32768,
+    "max_window_layers": 28,
+    "model_type": "qwen2",
+    "num_attention_heads": 28,
+    "num_hidden_layers": 28,
+    "num_key_value_heads": 4,
+    "rms_norm_eps": 1e-06,
+    "rope_theta": 1000000.0,
+    "sliding_window": 131072,
+    "tie_word_embeddings": false,
+    "torch_dtype": "bfloat16",
+    "transformers_version": "4.43.1",
+    "use_cache": true,
+    "use_sliding_window": false,
+    "vocab_size": 152064
+  },
+  "description": "Here is how to read the Qwen2.5 7B Instruct config.json. The architecture class is Qwen2ForCausalLM, which is the transformers (or equivalent) module that wires embeddings, attention, the MLP, and the language-modelling head that turns hidden states into next-token logits.\n\nhidden_size is 3,584: that is the width of every residual stream vector. The embedding matrix is therefore 152,064 \u00d7 3,584: each token id owns a vector of that width.\n\nnum_attention_heads is 28, so each head sees 128 dimensions (3,584 / 28). The ratio test is hidden_size / num_attention_heads = 3584 / 28 = 128. 128 is a multiple of 32 (NVIDIA warp-friendly), and a multiple of 16 (Huawei cube-friendly), and a power of two (Triton / FlashAttention-friendly). From this number alone you cannot name the training chip.\n\nnum_key_value_heads is 4, so this is grouped-query attention (GQA): 28 query heads share 4 key/value groups, so the KV cache is about 7\u00d7 smaller than full MHA.\n\nnum_hidden_layers is 28: the stack is that many transformer blocks deep.\n\nintermediate_size is 18,944. In a SwiGLU MLP this is the high-dimensional workspace: the 3,584-wide stream is projected up, activated with silu, then projected back. Labs usually round this width to a multiple of 128 or 256 so it tiles on the chip.\n\nmax_position_embeddings is 32,768 tokens \u2014 the context window in the config. There is no rope_scaling entry, so the rotary positions are used as-is. rope_theta is 1000000.0: that is the wavelength of the rotary embedding. A larger theta keeps distant tokens from aliasing after a full rotation.\n\nvocab_size is 152,064. 152,064 is divisible by 256, the usual vocab-tiling grain. bos/eos ids, when present, are just two special rows in that table; the padded vocab is often larger than the tokenizer\u2019s real inventory.\n\ntie_word_embeddings is false, so the input embedding matrix and the output LM head are separate learned matrices rather than a shared transpose.\n\ntorch_dtype is bfloat16. Brain floating point keeps FP32\u2019s exponent range with less mantissa, which avoids the overflow/underflow of a tiny exponent at the cost of noisier decimals \u2014 and it halves the on-chip footprint versus FP32. NVIDIA A100s were the first NVIDIA chips with native BF16; Huawei Ascend 910-class parts also prefer BF16/FP16 on the cube.\n\nThe copy of config.json is from https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/config.json."
+}

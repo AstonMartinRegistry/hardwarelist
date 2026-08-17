@@ -1,0 +1,9 @@
+{
+  "id": "bsc-flor-6.3b",
+  "name": "FLOR",
+  "provider": "BSC",
+  "hf_repo": "projecte-aina/FLOR-6.3B",
+  "hf_url": "https://huggingface.co/projecte-aina/FLOR-6.3B/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for FLOR. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

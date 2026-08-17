@@ -1,0 +1,9 @@
+{
+  "id": "mistralai-pixtral-large-2411",
+  "name": "Mistral: Pixtral Large 2411",
+  "provider": "Mistral",
+  "hf_repo": "mistralai/Pixtral-Large-Instruct-2411",
+  "hf_url": "https://huggingface.co/mistralai/Pixtral-Large-Instruct-2411/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Mistral: Pixtral Large 2411. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

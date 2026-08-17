@@ -1,0 +1,41 @@
+{
+  "id": "tii-falcon-40b",
+  "name": "Falcon",
+  "provider": "TII",
+  "hf_repo": "tiiuae/falcon-40b",
+  "hf_url": "https://huggingface.co/tiiuae/falcon-40b/blob/main/config.json",
+  "config": {
+    "alibi": false,
+    "apply_residual_connection_post_layernorm": false,
+    "architectures": [
+      "FalconForCausalLM"
+    ],
+    "attention_dropout": 0.0,
+    "auto_map": {
+      "AutoConfig": "configuration_falcon.FalconConfig",
+      "AutoModel": "modeling_falcon.FalconModel",
+      "AutoModelForSequenceClassification": "modeling_falcon.FalconForSequenceClassification",
+      "AutoModelForTokenClassification": "modeling_falcon.FalconForTokenClassification",
+      "AutoModelForQuestionAnswering": "modeling_falcon.FalconForQuestionAnswering",
+      "AutoModelForCausalLM": "modeling_falcon.FalconForCausalLM"
+    },
+    "bias": false,
+    "bos_token_id": 11,
+    "eos_token_id": 11,
+    "hidden_dropout": 0.0,
+    "hidden_size": 8192,
+    "initializer_range": 0.02,
+    "layer_norm_epsilon": 1e-05,
+    "model_type": "falcon",
+    "new_decoder_architecture": true,
+    "num_attention_heads": 128,
+    "num_hidden_layers": 60,
+    "num_kv_heads": 8,
+    "parallel_attn": true,
+    "torch_dtype": "bfloat16",
+    "transformers_version": "4.27.4",
+    "use_cache": true,
+    "vocab_size": 65024
+  },
+  "description": "Here is how to read the Falcon config.json. The architecture class is FalconForCausalLM, which is the transformers (or equivalent) module that wires embeddings, attention, the MLP, and the language-modelling head that turns hidden states into next-token logits.\n\nhidden_size is 8,192: that is the width of every residual stream vector. The embedding matrix is therefore 65,024 \u00d7 8,192: each token id owns a vector of that width.\n\nnum_attention_heads is 128, so each head sees 64 dimensions (8,192 / 128). The ratio test is hidden_size / num_attention_heads = 8192 / 128 = 64. 64 is a multiple of 32 (NVIDIA warp-friendly), and a multiple of 16 (Huawei cube-friendly), and a power of two (Triton / FlashAttention-friendly). From this number alone you cannot name the training chip.\n\nnum_key_value_heads is 8, so this is grouped-query attention (GQA): 128 query heads share 8 key/value groups, so the KV cache is about 16\u00d7 smaller than full MHA.\n\nnum_hidden_layers is 60: the stack is that many transformer blocks deep.\n\nvocab_size is 65,024. 65,024 is divisible by 256, the usual vocab-tiling grain. bos/eos ids, when present, are just two special rows in that table; the padded vocab is often larger than the tokenizer\u2019s real inventory.\n\ntorch_dtype is bfloat16. Brain floating point keeps FP32\u2019s exponent range with less mantissa, which avoids the overflow/underflow of a tiny exponent at the cost of noisier decimals \u2014 and it halves the on-chip footprint versus FP32. NVIDIA A100s were the first NVIDIA chips with native BF16; Huawei Ascend 910-class parts also prefer BF16/FP16 on the cube.\n\nThe copy of config.json is from https://huggingface.co/tiiuae/falcon-40b/blob/main/config.json."
+}

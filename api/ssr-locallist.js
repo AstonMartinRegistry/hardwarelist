@@ -2,6 +2,9 @@
  * SSR locallist.html with embedded setups (same as homepage).
  */
 const path = require('path');
+
+const embedPath = require.resolve('./_embed_html');
+delete require.cache[embedPath];
 const { embedSetupsIntoHtml } = require('./_embed_html');
 
 module.exports = async function handler(req, res) {

@@ -1,0 +1,9 @@
+{
+  "id": "meta-llama-llama-4-scout",
+  "name": "Llama 4 Scout",
+  "provider": "Meta",
+  "hf_repo": "meta-llama/Llama-4-Scout-17B-16E-Original",
+  "hf_url": "https://huggingface.co/meta-llama/Llama-4-Scout-17B-16E-Original/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Llama 4 Scout. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

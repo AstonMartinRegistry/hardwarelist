@@ -1,0 +1,9 @@
+{
+  "id": "yandex-yalm-100b",
+  "name": "YaLM-100B",
+  "provider": "Yandex",
+  "hf_repo": "yandex/YaLM-100B",
+  "hf_url": "https://huggingface.co/yandex/YaLM-100B/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for YaLM-100B. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

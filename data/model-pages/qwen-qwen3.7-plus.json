@@ -1,0 +1,9 @@
+{
+  "id": "qwen-qwen3.7-plus",
+  "name": "Qwen3.7 Plus",
+  "provider": "Qwen",
+  "hf_repo": null,
+  "hf_url": null,
+  "config": null,
+  "description": "Qwen3.7 Plus (June 2026) is a closed-weight Qwen-family model: no public Hugging Face config.json. Parameter count is unpublished. Typical serving context is 262k tokens, with image input. License and training terms need review before production use; it is not an open-weights checkpoint."
+}

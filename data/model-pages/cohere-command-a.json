@@ -1,0 +1,9 @@
+{
+  "id": "cohere-command-a",
+  "name": "Command A",
+  "provider": "Cohere",
+  "hf_repo": "sd-concepts-library/command-and-conquer-remastered-cameos",
+  "hf_url": "https://huggingface.co/sd-concepts-library/command-and-conquer-remastered-cameos/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Command A. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

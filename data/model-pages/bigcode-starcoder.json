@@ -1,0 +1,9 @@
+{
+  "id": "bigcode-starcoder",
+  "name": "StarCoder",
+  "provider": "BigCode",
+  "hf_repo": "bigcode/starcoder",
+  "hf_url": "https://huggingface.co/bigcode/starcoder/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for StarCoder. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

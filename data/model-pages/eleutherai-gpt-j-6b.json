@@ -1,0 +1,48 @@
+{
+  "id": "eleutherai-gpt-j-6b",
+  "name": "GPT-J-6B",
+  "provider": "EleutherAI",
+  "hf_repo": "EleutherAI/GPT-J-6B",
+  "hf_url": "https://huggingface.co/EleutherAI/GPT-J-6B/blob/main/config.json",
+  "config": {
+    "activation_function": "gelu_new",
+    "architectures": [
+      "GPTJForCausalLM"
+    ],
+    "attn_pdrop": 0.0,
+    "bos_token_id": 50256,
+    "embd_pdrop": 0.0,
+    "eos_token_id": 50256,
+    "gradient_checkpointing": false,
+    "initializer_range": 0.02,
+    "layer_norm_epsilon": 1e-05,
+    "model_type": "gptj",
+    "n_embd": 4096,
+    "n_head": 16,
+    "n_inner": null,
+    "n_layer": 28,
+    "n_positions": 2048,
+    "resid_pdrop": 0.0,
+    "rotary": true,
+    "rotary_dim": 64,
+    "scale_attn_weights": true,
+    "summary_activation": null,
+    "summary_first_dropout": 0.1,
+    "summary_proj_to_labels": true,
+    "summary_type": "cls_index",
+    "summary_use_proj": true,
+    "task_specific_params": {
+      "text-generation": {
+        "do_sample": true,
+        "max_length": 50,
+        "temperature": 1.0
+      }
+    },
+    "tie_word_embeddings": false,
+    "tokenizer_class": "GPT2Tokenizer",
+    "transformers_version": "4.18.0.dev0",
+    "use_cache": true,
+    "vocab_size": 50400
+  },
+  "description": "Here is how to read the GPT-J-6B config.json. The architecture class is GPTJForCausalLM, which is the transformers (or equivalent) module that wires embeddings, attention, the MLP, and the language-modelling head that turns hidden states into next-token logits.\n\nhidden_size is 4,096: that is the width of every residual stream vector. The embedding matrix is therefore 50,400 \u00d7 4,096: each token id owns a vector of that width.\n\nnum_attention_heads is 16, so each head sees 256 dimensions (4,096 / 16). The ratio test is hidden_size / num_attention_heads = 4096 / 16 = 256. 256 is a multiple of 32 (NVIDIA warp-friendly), and a multiple of 16 (Huawei cube-friendly), and a power of two (Triton / FlashAttention-friendly). From this number alone you cannot name the training chip.\n\nnum_hidden_layers is 28: the stack is that many transformer blocks deep.\n\nvocab_size is 50,400. bos/eos ids, when present, are just two special rows in that table; the padded vocab is often larger than the tokenizer\u2019s real inventory.\n\ntie_word_embeddings is false, so the input embedding matrix and the output LM head are separate learned matrices rather than a shared transpose.\n\nThe copy of config.json is from https://huggingface.co/EleutherAI/GPT-J-6B/blob/main/config.json."
+}

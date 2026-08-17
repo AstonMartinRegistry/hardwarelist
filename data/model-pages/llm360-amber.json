@@ -1,0 +1,37 @@
+{
+  "id": "llm360-amber",
+  "name": "LLM360 Amber",
+  "provider": "LLM360",
+  "hf_repo": "LLM360/Amber",
+  "hf_url": "https://huggingface.co/LLM360/Amber/blob/main/config.json",
+  "config": {
+    "_name_or_path": "llm360/amber",
+    "architectures": [
+      "LlamaForCausalLM"
+    ],
+    "attention_bias": false,
+    "bos_token_id": 1,
+    "eos_token_id": 2,
+    "hidden_act": "silu",
+    "hidden_size": 4096,
+    "initializer_range": 0.02,
+    "intermediate_size": 11008,
+    "max_position_embeddings": 2048,
+    "max_sequence_length": 2048,
+    "model_type": "llama",
+    "num_attention_heads": 32,
+    "num_hidden_layers": 32,
+    "num_key_value_heads": 32,
+    "pad_token_id": 0,
+    "pretraining_tp": 1,
+    "rms_norm_eps": 1e-06,
+    "rope_scaling": null,
+    "rope_theta": 10000.0,
+    "tie_word_embeddings": false,
+    "torch_dtype": "bfloat16",
+    "transformers_version": "4.35.2",
+    "use_cache": true,
+    "vocab_size": 32000
+  },
+  "description": "Here is how to read the LLM360 Amber config.json. The architecture class is LlamaForCausalLM, which is the transformers (or equivalent) module that wires embeddings, attention, the MLP, and the language-modelling head that turns hidden states into next-token logits.\n\nhidden_size is 4,096: that is the width of every residual stream vector. The embedding matrix is therefore 32,000 \u00d7 4,096: each token id owns a vector of that width.\n\nnum_attention_heads is 32, so each head sees 128 dimensions (4,096 / 32). The ratio test is hidden_size / num_attention_heads = 4096 / 32 = 128. 128 is a multiple of 32 (NVIDIA warp-friendly), and a multiple of 16 (Huawei cube-friendly), and a power of two (Triton / FlashAttention-friendly). From this number alone you cannot name the training chip.\n\nnum_key_value_heads is 32, so this is multi-head attention (MHA): every query head keeps its own key/value.\n\nnum_hidden_layers is 32: the stack is that many transformer blocks deep.\n\nintermediate_size is 11,008. In a SwiGLU MLP this is the high-dimensional workspace: the 4,096-wide stream is projected up, activated with silu, then projected back. Labs usually round this width to a multiple of 128 or 256 so it tiles on the chip.\n\nmax_position_embeddings is 2,048 tokens \u2014 the context window in the config. There is no rope_scaling entry, so the rotary positions are used as-is. rope_theta is 10000.0: that is the wavelength of the rotary embedding. A larger theta keeps distant tokens from aliasing after a full rotation.\n\nvocab_size is 32,000. 32,000 is divisible by 256, the usual vocab-tiling grain. bos/eos ids, when present, are just two special rows in that table; the padded vocab is often larger than the tokenizer\u2019s real inventory.\n\ntie_word_embeddings is false, so the input embedding matrix and the output LM head are separate learned matrices rather than a shared transpose.\n\ntorch_dtype is bfloat16. Brain floating point keeps FP32\u2019s exponent range with less mantissa, which avoids the overflow/underflow of a tiny exponent at the cost of noisier decimals \u2014 and it halves the on-chip footprint versus FP32. NVIDIA A100s were the first NVIDIA chips with native BF16; Huawei Ascend 910-class parts also prefer BF16/FP16 on the cube.\n\nThe copy of config.json is from https://huggingface.co/LLM360/Amber/blob/main/config.json."
+}

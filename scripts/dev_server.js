@@ -128,6 +128,12 @@ const server = http.createServer(async (req, res) => {
         'Content-Type': 'application/json',
       });
       delete require.cache[require.resolve(file)];
+      // Also drop sibling api modules so local edits to helpers apply.
+      for (const key of Object.keys(require.cache)) {
+        if (key.startsWith(path.join(ROOT, 'api') + path.sep)) {
+          delete require.cache[key];
+        }
+      }
       const handler = require(file);
       const { raw, body } = await readBody(req);
       const query = Object.fromEntries(u.searchParams.entries());

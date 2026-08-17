@@ -1,0 +1,9 @@
+{
+  "id": "cerebras-cerebras-gpt-1.3b",
+  "name": "Cerebras-GPT",
+  "provider": "Cerebras",
+  "hf_repo": "cerebras/Cerebras-GPT-1.3B",
+  "hf_url": "https://huggingface.co/cerebras/Cerebras-GPT-1.3B/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Cerebras-GPT. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

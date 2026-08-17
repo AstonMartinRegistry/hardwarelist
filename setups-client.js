@@ -209,6 +209,8 @@
     }
 
     updateNavCounts(counts);
+    global.PLMSetups.lastSetups = setups || [];
+    document.dispatchEvent(new CustomEvent('plm:setups-loaded', { detail: { setups: setups || [] } }));
 
     if (typeof global.locallistBindSetups === 'function') {
       global.locallistBindSetups();
@@ -303,5 +305,6 @@
     mapApiToStats,
     providerSlug,
     PROVIDER_LABELS,
+    lastSetups: [],
   };
 })(typeof window !== 'undefined' ? window : globalThis);

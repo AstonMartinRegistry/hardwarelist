@@ -1,0 +1,665 @@
+/* Quiet portfolio chrome, in the spirit of omgokhale.com */
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;1,400&display=swap");
+
+.plm-shell {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: Inter, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: rgba(0, 0, 0, 0.85);
+  background: #fff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.plm-top {
+  flex-shrink: 0;
+  padding: 2rem 2rem 1.25rem;
+  text-align: center;
+}
+.plm-top h1 {
+  margin: 0;
+  font-family: inherit;
+  font-size: 19px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.85);
+}
+.plm-top a {
+  color: inherit;
+  text-decoration: none;
+}
+.plm-top a:hover { color: rgba(0, 0, 0, 0.55); }
+.plm-frame {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  align-items: stretch;
+}
+.plm-nav {
+  flex: 0 0 11.5rem;
+  width: 11.5rem;
+  padding: 0.5rem 1.5rem 3rem 2rem;
+}
+.plm-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.plm-nav > ul > li { margin: 0; }
+.plm-nav a,
+.plm-nav button.plm-nav-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+  letter-spacing: 0;
+  color: rgba(0, 0, 0, 0.54);
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 2px 0;
+  cursor: pointer;
+  text-decoration: none;
+}
+.plm-nav a:hover,
+.plm-nav button.plm-nav-btn:hover {
+  color: rgba(0, 0, 0, 0.85);
+  background: none;
+}
+.plm-nav a.is-on,
+.plm-nav button.plm-nav-btn.is-on {
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: 400;
+  background: none;
+}
+.plm-nav a:active,
+.plm-nav button.plm-nav-btn:active {
+  opacity: 0.7;
+}
+.plm-nav-sub {
+  display: none;
+  list-style: none;
+  margin: 4px 0 10px;
+  padding: 0 0 0 0.85rem;
+}
+.plm-nav-item.is-open > .plm-nav-sub { display: block; }
+.plm-nav-sub a {
+  font-size: 13px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.4);
+  padding: 1px 0;
+}
+.plm-nav-sub a.is-on { color: rgba(0, 0, 0, 0.85); }
+.plm-main {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 2rem 4rem 1rem;
+}
+.plm-main .chrome {
+  margin-left: 0;
+  margin-right: 0;
+}
+.plm-view[hidden] { display: none !important; }
+.plm-about {
+  max-width: 36rem;
+  padding-top: 0.2rem;
+}
+.plm-about h2 {
+  margin: 0 0 14px;
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.85);
+}
+.plm-about p {
+  margin: 0 0 1.1em;
+  font-size: 14px;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.75);
+}
+.plm-about p:last-child { margin-bottom: 0; }
+.plm-about a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.plm-about blockquote {
+  margin: 0 0 1.1em;
+  padding: 0;
+  border: 0;
+  font-size: 14px;
+  line-height: 22px;
+  font-style: italic;
+  color: rgba(0, 0, 0, 0.75);
+}
+.registry-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 24px;
+  margin: 0 0 18px;
+}
+.registry-count {
+  margin: 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.45);
+}
+#registry-search {
+  width: min(16rem, 100%);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.85);
+  background: none;
+  border: 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 0;
+  padding: 4px 0;
+  outline: none;
+}
+#registry-search:focus { border-bottom-color: rgba(0, 0, 0, 0.45); }
+#registry-search::placeholder { color: rgba(0, 0, 0, 0.35); }
+.registry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 0 0 13.5rem;
+  width: 13.5rem;
+}
+.registry-split {
+  display: flex;
+  align-items: flex-start;
+  gap: 2.5rem;
+  min-height: 12rem;
+}
+.registry-pane {
+  flex: 1;
+  min-width: 0;
+  max-width: 40rem;
+}
+.registry-pane-title {
+  margin: 0 0 10px;
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.85);
+}
+.registry-provider-btn {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  margin: 0;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+}
+.registry-provider-btn .reg-name {
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.54);
+}
+.registry-provider-btn .reg-n {
+  font-size: 13px;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.35);
+}
+.registry-provider-btn:hover .reg-name { color: rgba(0, 0, 0, 0.85); }
+.registry-provider-btn.is-on .reg-name { color: rgba(0, 0, 0, 0.85); }
+.registry-models {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.registry-models li {
+  font-size: 14px;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.54);
+  padding: 1px 0;
+}
+.registry-model-btn {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 1px 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 22px;
+  text-align: left;
+  color: rgba(0, 0, 0, 0.54);
+  cursor: pointer;
+}
+.registry-model-btn:hover { color: rgba(0, 0, 0, 0.85); }
+.registry-detail {
+  max-width: 40rem;
+  padding-top: 0.2rem;
+}
+.registry-back {
+  display: block;
+  margin: 0 0 18px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+}
+.registry-back:hover { color: rgba(0, 0, 0, 0.85); }
+.registry-model-title {
+  margin: 0 0 16px;
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.85);
+}
+.registry-note p {
+  margin: 0 0 1.1em;
+  font-size: 14px;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.75);
+}
+.registry-hf {
+  display: inline-block;
+  margin: 0 0 1.1em;
+  font-size: 13px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.45);
+  word-break: break-all;
+}
+.registry-hf:hover { color: rgba(0, 0, 0, 0.85); }
+.registry-config-label {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.45);
+}
+.registry-config {
+  margin: 0 0 2rem;
+  padding: 0;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.65);
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: none;
+  border: 0;
+}
+.registry-empty {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.45);
+  padding: 12px 0;
+}
+
+@media (max-width: 800px) {
+  .plm-top { padding: 1.5rem 1.5rem 0.75rem; }
+  .plm-frame { flex-direction: column; }
+  .plm-nav {
+    flex: none;
+    width: auto;
+    padding: 0.25rem 1.5rem 0.75rem;
+  }
+  .plm-nav > ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 18px;
+    align-items: flex-start;
+  }
+  .plm-nav > ul > li { margin: 0; }
+  .plm-nav a,
+  .plm-nav button.plm-nav-btn {
+    width: auto;
+  }
+  .plm-nav-item.is-open { flex: 1 1 100%; }
+  .plm-nav-sub {
+    display: none;
+    padding-left: 0;
+  }
+  .plm-nav-item.is-open > .plm-nav-sub {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+  }
+  .plm-main { padding: 0.5rem 1.5rem 3rem; }
+  .registry-split { flex-direction: column; gap: 1.25rem; }
+  .registry-list { flex: none; width: auto; }
+}
+
+/* Setups: same quiet Inter language as the rest of the shell */
+.plm-shell #view-setups {
+  max-width: 64rem;
+}
+.plm-shell .chrome {
+  margin: 0 0 1.5rem;
+  gap: 10px 20px;
+  align-items: baseline;
+}
+.plm-shell .navlinks {
+  gap: 4px 18px;
+}
+.plm-shell .navlink {
+  --cat: transparent;
+  background: none;
+  color: rgba(0, 0, 0, 0.54);
+  border-radius: 0;
+  padding: 2px 0;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0;
+  gap: 8px;
+  transition: color 0.12s ease;
+}
+.plm-shell .navlink:hover {
+  background: none;
+  color: rgba(0, 0, 0, 0.85);
+}
+.plm-shell .navlink.is-active {
+  background: none;
+  color: rgba(0, 0, 0, 0.85);
+  box-shadow: none;
+}
+.plm-shell .navlink .navn,
+.plm-shell .navlink.is-off .navn {
+  min-width: 0;
+  height: auto;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  background-image: none;
+  filter: none;
+  overflow: visible;
+}
+.plm-shell .navlink .navn::before,
+.plm-shell .navlink .navn::after {
+  display: none;
+}
+.plm-shell .navlink .navn-num,
+.plm-shell .navlink.is-off .navn-num {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.35);
+}
+.plm-shell .navlink.is-off {
+  color: rgba(0, 0, 0, 0.28);
+}
+.plm-shell .navlink.is-off:hover {
+  color: rgba(0, 0, 0, 0.54);
+}
+.plm-shell .nav-clear {
+  width: auto;
+  height: auto;
+  margin-left: 4px;
+  border-radius: 0;
+  background: none;
+  color: rgba(0, 0, 0, 0.35);
+  font-size: 16px;
+  font-family: inherit;
+}
+.plm-shell .nav-clear:hover,
+.plm-shell .nav-clear.is-all-off {
+  color: rgba(0, 0, 0, 0.85);
+  background: none;
+}
+.plm-shell .chrome-tools {
+  align-items: baseline;
+  gap: 14px;
+}
+.plm-shell .filter-btn {
+  width: auto;
+  height: auto;
+  padding: 2px 0;
+  border-radius: 0;
+  background: none;
+  color: rgba(0, 0, 0, 0.45);
+}
+.plm-shell .filter-btn:hover,
+.plm-shell .filter-btn[aria-expanded="true"] {
+  background: none;
+  color: rgba(0, 0, 0, 0.85);
+  box-shadow: none;
+}
+.plm-shell .filter-dropdown {
+  min-width: 180px;
+  padding: 8px 0;
+  border-radius: 0;
+  color: rgba(0, 0, 0, 0.75);
+  background: #fff;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+.plm-shell .filter-group {
+  color: rgba(0, 0, 0, 0.4);
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: 12px;
+  padding: 8px 12px 2px;
+}
+.plm-shell .filter-rule {
+  background: rgba(0, 0, 0, 0.08);
+  margin: 6px 12px;
+}
+.plm-shell .filter-option {
+  font-size: 13px;
+  line-height: 20px;
+  letter-spacing: 0;
+  color: rgba(0, 0, 0, 0.54);
+  border-radius: 0;
+  padding: 4px 12px;
+}
+.plm-shell .filter-option:hover {
+  background: none;
+  color: rgba(0, 0, 0, 0.85);
+}
+.plm-shell .filter-option.is-selected {
+  color: rgba(0, 0, 0, 0.85);
+  background: none;
+  background-image: none;
+  isolation: auto;
+}
+.plm-shell .filter-option.is-selected::before,
+.plm-shell .filter-option.is-selected::after {
+  display: none;
+}
+.plm-shell #submit,
+.plm-shell #stats {
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+  padding: 2px 0;
+  border-radius: 0;
+  background: none;
+  color: rgba(0, 0, 0, 0.54);
+  box-shadow: none;
+}
+.plm-shell #submit:hover,
+.plm-shell #stats:hover {
+  background: none;
+  color: rgba(0, 0, 0, 0.85);
+}
+.plm-shell .search-shell {
+  min-width: min(14rem, 50vw);
+  flex: 0 1 16rem;
+  height: auto;
+  border: 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 0;
+  padding: 4px 0;
+  background: none;
+  box-shadow: none;
+  gap: 6px;
+}
+.plm-shell .search-shell:focus-within {
+  border-color: rgba(0, 0, 0, 0.45);
+}
+.plm-shell .search-shell .search-ico,
+.plm-shell .search-shell:focus-within .search-ico {
+  color: rgba(0, 0, 0, 0.35);
+}
+.plm-shell .search-clear {
+  color: rgba(0, 0, 0, 0.35);
+}
+.plm-shell .search-clear:hover { color: rgba(0, 0, 0, 0.85); }
+.plm-shell #model-search {
+  font-size: 13px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.85);
+}
+.plm-shell #model-search::placeholder { color: rgba(0, 0, 0, 0.35); }
+.plm-shell .cats { gap: 2.25rem; }
+.plm-shell .cat-results { padding: 0; }
+.plm-shell .grid {
+  grid-template-columns: repeat(auto-fill, minmax(16.5rem, 1fr));
+  gap: 1.75rem 2rem;
+}
+.plm-shell .setup-rich {
+  --rich-ink: rgba(0, 0, 0, 0.85);
+  --rich-mute: rgba(0, 0, 0, 0.4);
+  --rich-line: rgba(0, 0, 0, 0.08);
+}
+.plm-shell .setup-rich .model-box,
+.plm-shell .model-box {
+  overflow: visible;
+  padding: 0 0 10px;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: rgba(0, 0, 0, 0.85);
+  border-radius: 0;
+  background: none;
+  background-image: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+.plm-shell .setup-rich .model-box::before,
+.plm-shell .setup-rich .model-box::after,
+.plm-shell .model-box::before,
+.plm-shell .model-box::after {
+  display: none;
+}
+.plm-shell .setup-rich .model-name {
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+.plm-shell .setup-new .model-name::after {
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: none;
+  width: 5px;
+  height: 5px;
+}
+.plm-shell .setup-rich .results-box,
+.plm-shell .results-box {
+  background: none;
+  padding: 12px 0 0;
+  border-radius: 0;
+}
+.plm-shell .setup-rich .rich-stack { gap: 8px; }
+.plm-shell .setup-rich .rf {
+  grid-template-columns: 4.5rem 1fr;
+  gap: 12px;
+  font-size: 13px;
+  line-height: 20px;
+}
+.plm-shell .setup-rich .rl {
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: rgba(0, 0, 0, 0.4);
+}
+.plm-shell .setup-rich .rv {
+  color: rgba(0, 0, 0, 0.75);
+}
+.plm-shell .setup-rich .rv .link-plain {
+  font-size: 13px;
+  color: inherit;
+}
+.plm-shell .link-plain:hover { color: rgba(0, 0, 0, 0.85); }
+.plm-shell .setup-rich .rich-rule {
+  background: rgba(0, 0, 0, 0.08);
+  margin: 6px 0 4px;
+}
+.plm-shell .setup-rich .mem-allow {
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 12px;
+}
+.plm-shell .setup-rich .mem-sep,
+.plm-shell .setup-rich .mem-total {
+  color: rgba(0, 0, 0, 0.45);
+}
+.plm-shell .setup-rich .mem-bar {
+  height: 2px;
+  background: rgba(0, 0, 0, 0.08);
+}
+.plm-shell .setup-rich .mem-bar-allow {
+  background: rgba(0, 0, 0, 0.18);
+}
+.plm-shell .setup-rich .mem-bar-fill {
+  background: rgba(0, 0, 0, 0.55);
+}
+.plm-shell .setup-rich .read-more-btn {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.4);
+  border-bottom-color: rgba(0, 0, 0, 0.2);
+}
+.plm-shell .setup-rich .read-more-btn:hover {
+  color: rgba(0, 0, 0, 0.85);
+  border-bottom-color: rgba(0, 0, 0, 0.45);
+}
+.plm-shell .setup-rich .rank-src:hover { color: rgba(0, 0, 0, 0.85); }
+.plm-shell .setups-load-status {
+  font-family: inherit;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+@media (max-width: 960px) {
+  .plm-shell .chrome {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .plm-shell .navlinks { flex: none; width: 100%; }
+  .plm-shell .chrome-tools {
+    margin-left: 0;
+    width: 100%;
+  }
+  .plm-shell .search-shell {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 800px) {
+  .plm-shell .chrome {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .plm-shell .chrome-tools {
+    margin-left: 0;
+    width: 100%;
+  }
+  .plm-shell .search-shell {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+  }
+}

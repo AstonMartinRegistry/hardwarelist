@@ -29,6 +29,48 @@ async function loadSetups() {
   );
 }
 
+const SEARCH_QUERIES = [
+  'personal language model list',
+  'PLM list local LLM',
+  'local LLM hardware setups',
+  'local LLM VRAM requirements',
+  'llama.cpp tokens per second benchmarks',
+  'GGUF quantization hardware directory',
+  'what GPU to run Qwen 27B locally',
+  'RTX 4090 local LLM setups',
+  'Mac local LLM hardware list',
+  'vLLM vs llama.cpp community benchmarks',
+  'Ollama hardware requirements',
+  'best GPU for running LLMs locally',
+  'community local AI rig directory',
+  'local LLM price vs speed comparison',
+  'personal language models vs cloud AI',
+];
+
+function faqEntries() {
+  return [
+    {
+      q: 'What is PLM List?',
+      a: 'PLM List (plmlist.com) is a community directory of Personal Language Models—local LLMs you run yourself. It lists real hardware setups with model, quantization (GGUF), VRAM, context length, and tokens/sec for engines like llama.cpp, vLLM, and Ollama.',
+    },
+    {
+      q: 'What does PLM mean on plmlist.com?',
+      a: 'On plmlist.com, PLM means Personal Language Model (local LLM), not Product Lifecycle Management, Panel Linear Models, or Protein Language Models.',
+    },
+    {
+      q: 'How do I find local LLM hardware setups and tokens/sec?',
+      a: 'Browse plmlist.com for curated cards showing GPU or Apple Silicon, model and quant, memory used vs total VRAM, context, price, and reported generation speed in tokens per second.',
+    },
+    {
+      q: 'Which search queries relate to PLM List?',
+      a:
+        'People looking for this site often search for: ' +
+        SEARCH_QUERIES.join('; ') +
+        '.',
+    },
+  ];
+}
+
 function jsonLd(setups) {
   const items = (setups || []).slice(0, 200).map((row, i) => ({
     '@type': 'ListItem',
@@ -44,16 +86,78 @@ function jsonLd(setups) {
       .join(' — ')
       .slice(0, 300),
   }));
+
+  const faq = faqEntries().map(({ q, a }) => ({
+    '@type': 'Question',
+    name: q,
+    acceptedAnswer: { '@type': 'Answer', text: a },
+  }));
+
   return {
     '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    name: 'PLM List — Personal Language Model hardware setups',
-    description:
-      'Community directory of personal language models (local LLMs): hardware, quantization, VRAM, and tokens/sec.',
-    url: SITE,
-    numberOfItems: (setups || []).length,
-    itemListElement: items,
+    '@graph': [
+      {
+        '@type': 'WebSite',
+        '@id': `${SITE}/#website`,
+        url: SITE,
+        name: 'PLM List',
+        alternateName: [
+          'Personal Language Model List',
+          'Personal Language Models directory',
+          'local LLM hardware list',
+        ],
+        description:
+          'Community directory of personal language models (local LLMs): hardware, GGUF quantization, VRAM, and tokens/sec for llama.cpp, vLLM, and Ollama.',
+        inLanguage: 'en',
+        keywords: SEARCH_QUERIES.join(', '),
+      },
+      {
+        '@type': 'ItemList',
+        '@id': `${SITE}/#setups`,
+        name: 'PLM List — Personal Language Model hardware setups',
+        description:
+          'Community directory of personal language models (local LLMs): hardware, quantization, VRAM, and tokens/sec.',
+        url: SITE,
+        numberOfItems: (setups || []).length,
+        itemListElement: items,
+      },
+      {
+        '@type': 'FAQPage',
+        '@id': `${SITE}/#faq`,
+        mainEntity: faq,
+      },
+    ],
   };
+}
+
+/** Crawlable / GEO copy kept out of the visual layout (not display:none keyword spam). */
+function geoSeoBlock() {
+  const faqs = faqEntries()
+    .map(
+      ({ q, a }) =>
+        `<div class="plm-geo-item"><h3>${esc(q)}</h3><p>${esc(a)}</p></div>`,
+    )
+    .join('\n');
+  const queries = SEARCH_QUERIES.map((q) => `<li>${esc(q)}</li>`).join('\n');
+  return `<aside class="plm-geo-seo" aria-label="About PLM List for search and AI assistants">
+<style>
+.plm-geo-seo{
+  position:absolute!important;
+  width:1px!important;height:1px!important;
+  padding:0!important;margin:-1px!important;
+  overflow:hidden!important;clip:rect(0,0,0,0)!important;
+  white-space:nowrap!important;border:0!important;
+}
+</style>
+<h2>About PLM List (Personal Language Models)</h2>
+<p>PLM List at plmlist.com is a free community directory of Personal Language Models and local LLM hardware. It helps people compare real setups—GPU or Mac VRAM, GGUF quants, llama.cpp / vLLM / Ollama, context length, price, and tokens per second—so they can run open models locally instead of only in the cloud.</p>
+<p>PLM here means Personal Language Model, not Product Lifecycle Management software, econometric panel linear models (R plm), public land mobile networks, or protein language models.</p>
+${faqs}
+<h3>Example search queries for this site</h3>
+<ul>
+${queries}
+</ul>
+</aside>`;
 }
 
 function noscriptList(setups) {
@@ -87,7 +191,8 @@ function bootstrapScript(setups) {
   // Break </script> in JSON if present
   const safe = payload.replace(/</g, '\\u003c');
   return `<script type="application/json" id="plm-setups-bootstrap">${safe}</script>
-<script type="application/ld+json" id="plm-jsonld">${JSON.stringify(jsonLd(setups)).replace(/</g, '\\u003c')}</script>`;
+<script type="application/ld+json" id="plm-jsonld">${JSON.stringify(jsonLd(setups)).replace(/</g, '\\u003c')}</script>
+${geoSeoBlock()}`;
 }
 
 /** Minimal card HTML for crawlers (mirrors setups-client structure). */

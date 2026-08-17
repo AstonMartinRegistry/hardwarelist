@@ -1,0 +1,32 @@
+{
+  "id": "bigscience-bloom",
+  "name": "BLOOM",
+  "provider": "BigScience",
+  "hf_repo": "bigscience/bloom",
+  "hf_url": "https://huggingface.co/bigscience/bloom/blob/main/config.json",
+  "config": {
+    "apply_residual_connection_post_layernorm": false,
+    "attention_dropout": 0.0,
+    "architectures": [
+      "BloomForCausalLM"
+    ],
+    "attention_softmax_in_fp32": true,
+    "pad_token_id": 3,
+    "bos_token_id": 1,
+    "eos_token_id": 2,
+    "hidden_dropout": 0.0,
+    "initializer_range": 0.02,
+    "layer_norm_epsilon": 1e-05,
+    "masked_softmax_fusion": true,
+    "model_type": "bloom",
+    "n_embed": 14336,
+    "n_layer": 70,
+    "num_attention_heads": 112,
+    "pretraining_tp": 4,
+    "slow_but_exact": false,
+    "transformers_version": "4.21.0",
+    "use_cache": true,
+    "vocab_size": 250880
+  },
+  "description": "Here is how to read the BLOOM config.json. The architecture class is BloomForCausalLM, which is the transformers (or equivalent) module that wires embeddings, attention, the MLP, and the language-modelling head that turns hidden states into next-token logits.\n\nnum_hidden_layers is 70: the stack is that many transformer blocks deep.\n\nvocab_size is 250,880. 250,880 is divisible by 256, the usual vocab-tiling grain. bos/eos ids, when present, are just two special rows in that table; the padded vocab is often larger than the tokenizer\u2019s real inventory.\n\nThe copy of config.json is from https://huggingface.co/bigscience/bloom/blob/main/config.json."
+}

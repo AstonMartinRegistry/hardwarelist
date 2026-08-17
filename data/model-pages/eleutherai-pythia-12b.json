@@ -1,0 +1,32 @@
+{
+  "id": "eleutherai-pythia-12b",
+  "name": "Pythia",
+  "provider": "EleutherAI",
+  "hf_repo": "EleutherAI/pythia-12b",
+  "hf_url": "https://huggingface.co/EleutherAI/pythia-12b/blob/main/config.json",
+  "config": {
+    "architectures": [
+      "GPTNeoXForCausalLM"
+    ],
+    "bos_token_id": 0,
+    "eos_token_id": 0,
+    "hidden_act": "gelu",
+    "hidden_size": 5120,
+    "initializer_range": 0.02,
+    "intermediate_size": 20480,
+    "layer_norm_eps": 1e-05,
+    "max_position_embeddings": 2048,
+    "model_type": "gpt_neox",
+    "num_attention_heads": 40,
+    "num_hidden_layers": 36,
+    "rotary_emb_base": 10000,
+    "rotary_pct": 0.25,
+    "tie_word_embeddings": false,
+    "torch_dtype": "float16",
+    "transformers_version": "4.24.0",
+    "use_cache": true,
+    "use_parallel_residual": true,
+    "vocab_size": 50688
+  },
+  "description": "Here is how to read the Pythia config.json. The architecture class is GPTNeoXForCausalLM, which is the transformers (or equivalent) module that wires embeddings, attention, the MLP, and the language-modelling head that turns hidden states into next-token logits.\n\nhidden_size is 5,120: that is the width of every residual stream vector. The embedding matrix is therefore 50,688 \u00d7 5,120: each token id owns a vector of that width.\n\nnum_attention_heads is 40, so each head sees 128 dimensions (5,120 / 40). The ratio test is hidden_size / num_attention_heads = 5120 / 40 = 128. 128 is a multiple of 32 (NVIDIA warp-friendly), and a multiple of 16 (Huawei cube-friendly), and a power of two (Triton / FlashAttention-friendly). From this number alone you cannot name the training chip.\n\nnum_hidden_layers is 36: the stack is that many transformer blocks deep.\n\nintermediate_size is 20,480. In a SwiGLU MLP this is the high-dimensional workspace: the 5,120-wide stream is projected up, activated with gelu, then projected back. Labs usually round this width to a multiple of 128 or 256 so it tiles on the chip.\n\nmax_position_embeddings is 2,048 tokens \u2014 the context window in the config. There is no rope_scaling entry, so the rotary positions are used as-is.\n\nvocab_size is 50,688. 50,688 is divisible by 256, the usual vocab-tiling grain. bos/eos ids, when present, are just two special rows in that table; the padded vocab is often larger than the tokenizer\u2019s real inventory.\n\ntie_word_embeddings is false, so the input embedding matrix and the output LM head are separate learned matrices rather than a shared transpose.\n\ntorch_dtype is float16.\n\nThe copy of config.json is from https://huggingface.co/EleutherAI/pythia-12b/blob/main/config.json."
+}

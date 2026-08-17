@@ -1,0 +1,9 @@
+{
+  "id": "google-gemma-3-27b-it",
+  "name": "Gemma 3 27B",
+  "provider": "Google",
+  "hf_repo": "google/gemma-3-27b-it",
+  "hf_url": "https://huggingface.co/google/gemma-3-27b-it/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Gemma 3 27B. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

@@ -1,0 +1,9 @@
+{
+  "id": "meta-llama-llama-3.2-11b-vision-instruct",
+  "name": "Llama 3.2 11B Vision Instruct",
+  "provider": "Meta",
+  "hf_repo": "meta-llama/Llama-3.2-11B-Vision-Instruct",
+  "hf_url": "https://huggingface.co/meta-llama/Llama-3.2-11B-Vision-Instruct/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Llama 3.2 11B Vision Instruct. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

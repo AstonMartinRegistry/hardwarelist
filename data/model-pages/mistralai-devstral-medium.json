@@ -1,0 +1,9 @@
+{
+  "id": "mistralai-devstral-medium",
+  "name": "Mistral: Devstral Medium",
+  "provider": "Mistral",
+  "hf_repo": null,
+  "hf_url": null,
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Mistral: Devstral Medium. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

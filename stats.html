@@ -467,11 +467,30 @@ a { color: inherit; }
   .podium-block { height: 36px !important; border-radius: 8px; }
 }
 </style>
+<link rel="stylesheet" href="shell.css">
 </head>
-<body>
-<a class="back" href="index.html">← PLM List</a>
+<body class="plm-shell" data-plm-page="stats">
+<header class="plm-top"><h1><a href="index.html#setups">PLM List</a></h1></header>
+<div class="plm-frame">
+<nav class="plm-nav" aria-label="Site">
+  <ul>
+    <li><a href="index.html#setups" data-view="setups">Setups</a></li>
+    <li><a href="index.html#registry" data-view="registry">Open source registry</a></li>
+    <li class="plm-nav-item" data-nav="research">
+      <button type="button" class="plm-nav-btn" data-view="research" aria-expanded="false">Research</button>
+      <ul class="plm-nav-sub">
+        <li><a href="stats.html" data-research="stats">Stats</a></li>
+        <li><a href="hamsters.html" data-research="hamsters">The hamsters go brrrrr</a></li>
+        <li><a href="chinese-oss.html" data-research="chinese-oss">The Chinese Open Source Model Registry</a></li>
+      </ul>
+    </li>
+    <li><a href="index.html#history" data-view="history">History</a></li>
+    <li><a href="index.html#manifesto" data-view="manifesto">Manifesto</a></li>
+  </ul>
+</nav>
+<main class="plm-main">
 <div class="header-box">
-  <h1>Stats</h1>
+  <h2 class="panel-title" style="font-size:16px;margin:0 0 6px">Stats</h2>
   <p class="status" id="status">Loading setups…</p>
 </div>
 
@@ -1302,5 +1321,8 @@ a { color: inherit; }
   init();
 })();
 </script>
+</main>
+</div>
+<script src="shell.js"></script>
 </body>
 </html>

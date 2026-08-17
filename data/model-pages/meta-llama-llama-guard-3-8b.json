@@ -1,0 +1,9 @@
+{
+  "id": "meta-llama-llama-guard-3-8b",
+  "name": "Llama Guard 3 8B",
+  "provider": "Meta",
+  "hf_repo": "meta-llama/Llama-Guard-3-8B-INT8",
+  "hf_url": "https://huggingface.co/meta-llama/Llama-Guard-3-8B-INT8/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Llama Guard 3 8B. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

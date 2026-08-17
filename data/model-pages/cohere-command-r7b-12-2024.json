@@ -1,0 +1,9 @@
+{
+  "id": "cohere-command-r7b-12-2024",
+  "name": "Command R7B (12-2024)",
+  "provider": "Cohere",
+  "hf_repo": null,
+  "hf_url": null,
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Command R7B (12-2024). Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

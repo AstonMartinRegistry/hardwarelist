@@ -1,0 +1,9 @@
+{
+  "id": "qwen-qwen3-max-thinking",
+  "name": "Qwen3 Max Thinking",
+  "provider": "Qwen",
+  "hf_repo": null,
+  "hf_url": null,
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Qwen3 Max Thinking. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

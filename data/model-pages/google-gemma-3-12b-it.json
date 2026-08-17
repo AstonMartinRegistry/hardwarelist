@@ -1,0 +1,9 @@
+{
+  "id": "google-gemma-3-12b-it",
+  "name": "Gemma 3 12B",
+  "provider": "Google",
+  "hf_repo": "google/gemma-3-12b-it-qat-q4_0-unquantized",
+  "hf_url": "https://huggingface.co/google/gemma-3-12b-it-qat-q4_0-unquantized/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Gemma 3 12B. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

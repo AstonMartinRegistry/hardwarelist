@@ -1,0 +1,31 @@
+{
+  "id": "google-bert",
+  "name": "BERT",
+  "provider": "Google",
+  "hf_repo": "google-bert/bert-base-uncased",
+  "hf_url": "https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json",
+  "config": {
+    "architectures": [
+      "BertForMaskedLM"
+    ],
+    "attention_probs_dropout_prob": 0.1,
+    "gradient_checkpointing": false,
+    "hidden_act": "gelu",
+    "hidden_dropout_prob": 0.1,
+    "hidden_size": 768,
+    "initializer_range": 0.02,
+    "intermediate_size": 3072,
+    "layer_norm_eps": 1e-12,
+    "max_position_embeddings": 512,
+    "model_type": "bert",
+    "num_attention_heads": 12,
+    "num_hidden_layers": 12,
+    "pad_token_id": 0,
+    "position_embedding_type": "absolute",
+    "transformers_version": "4.6.0.dev0",
+    "type_vocab_size": 2,
+    "use_cache": true,
+    "vocab_size": 30522
+  },
+  "description": "Here is how to read the BERT config.json. The architecture class is BertForMaskedLM, which is the transformers (or equivalent) module that wires embeddings, attention, the MLP, and the language-modelling head that turns hidden states into next-token logits.\n\nhidden_size is 768: that is the width of every residual stream vector. The embedding matrix is therefore 30,522 \u00d7 768: each token id owns a vector of that width.\n\nnum_attention_heads is 12, so each head sees 64 dimensions (768 / 12). The ratio test is hidden_size / num_attention_heads = 768 / 12 = 64. 64 is a multiple of 32 (NVIDIA warp-friendly), and a multiple of 16 (Huawei cube-friendly), and a power of two (Triton / FlashAttention-friendly). From this number alone you cannot name the training chip.\n\nnum_hidden_layers is 12: the stack is that many transformer blocks deep.\n\nintermediate_size is 3,072. In a SwiGLU MLP this is the high-dimensional workspace: the 768-wide stream is projected up, activated with gelu, then projected back. Labs usually round this width to a multiple of 128 or 256 so it tiles on the chip.\n\nmax_position_embeddings is 512 tokens \u2014 the context window in the config. There is no rope_scaling entry, so the rotary positions are used as-is.\n\nvocab_size is 30,522. bos/eos ids, when present, are just two special rows in that table; the padded vocab is often larger than the tokenizer\u2019s real inventory.\n\nThe copy of config.json is from https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json."
+}

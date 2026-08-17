@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Chinese Open Source Model Registry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root { --ink:#111; --rich-ink:#141414; --mute:#888; }
+* { box-sizing: border-box; }
+body {
+  font-family: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--ink); background: #fff; margin: 0;
+  padding: 28px 24px 60px;
+}
+.shell { max-width: 40rem; margin: 0 auto; }
+.header-box { text-align: center; margin-bottom: 0; }
+.header-box h1 {
+  margin: 0;
+  font-size: clamp(22px, 4.4vw, 32px);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  line-height: 1.15;
+}
+.subheader {
+  margin: 14px 0 0;
+  font-size: 13px; line-height: 1.55; color: #444;
+}
+.essay .byline {
+  margin: 0 0 1.4em;
+  font-size: 12px; color: var(--mute);
+}
+.essay .rule {
+  border: 0; border-top: 1px solid #e0e0e0;
+  margin: 1.4em 0 1em;
+}
+.essay .body p {
+  margin: 0 0 1.15em;
+  font-size: 13px; line-height: 1.55; color: #444;
+}
+.essay .body h2 {
+  margin: 1.8em 0 0.85em;
+  font-size: 16px; font-weight: 400; letter-spacing: 1px; line-height: 1.4;
+  color: #111;
+}
+.essay .body h2:first-child { margin-top: 0; }
+.essay .body a { color: #444; }
+.essay pre {
+  margin: 0 0 1.15em;
+  padding: 12px 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #333;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-x: auto;
+}
+@media (max-width: 600px) {
+  body { padding: 16px 18px 40px; }
+}
+</style>
+<link rel="stylesheet" href="shell.css">
+</head>
+<body class="plm-shell" data-plm-page="chinese-oss">
+<header class="plm-top"><h1><a href="index.html#setups">PLM List</a></h1></header>
+<div class="plm-frame">
+<nav class="plm-nav" aria-label="Site">
+  <ul>
+    <li><a href="index.html#setups" data-view="setups">Setups</a></li>
+    <li><a href="index.html#registry" data-view="registry">Open source registry</a></li>
+    <li class="plm-nav-item" data-nav="research">
+      <button type="button" class="plm-nav-btn" data-view="research" aria-expanded="false">Research</button>
+      <ul class="plm-nav-sub">
+        <li><a href="stats.html" data-research="stats">Stats</a></li>
+        <li><a href="hamsters.html" data-research="hamsters">The hamsters go brrrrr</a></li>
+        <li><a href="chinese-oss.html" data-research="chinese-oss">The Chinese Open Source Model Registry</a></li>
+      </ul>
+    </li>
+    <li><a href="index.html#history" data-view="history">History</a></li>
+    <li><a href="index.html#manifesto" data-view="manifesto">Manifesto</a></li>
+  </ul>
+</nav>
+<main class="plm-main">
+<div class="shell">
+  <header class="header-box">
+    <h1>The Chinese Open Source Model Registry</h1>
+    <p class="subheader">A report on Chinese open source models and their use of NVIDIA vs Ascend chips.</p>
+  </header>
+  <article class="essay">
+    <p class="byline">By Daniel Kiss</p>
+    <hr class="rule">
+    <div class="body">
+      <p>This essay grew out of a curious question I asked Markian Rybchuk, founder of Open Inference, who redesigned GPT OSS 120B to work on TPUs without a loss in performance. He mentioned many of the Chinese models had similar architectures to TPUs and when asked how he knew, he said one had to look at the head dimension of the model, though this was not a guaranteed signal. This got me thinking: hypothetically, if we knew what kind of chips Chinese open source models were being trained on, perhaps that could give us clues to the current state of the AI chip war. This essay will attempt to do exactly that.</p>
+      <p>Therefore, to do this study we will draw from a list of Chinese open source models and try to observe some patterns.</p>
+      <p>It is important to first understand what the crucial difference is. NVIDIA GPUs process data using warps, groups of 32 parallel threads that execute instructions together. Because the scheduling is tied to this 32-thread warp, matrix dimensions are usually clean multiples of 32, and if not, the chip has to execute adjustments that waste cycles. Huawei’s NPUs (the 910 series) use the DaVinci architecture, which centres around a hardwired 3D matrix cube engine. This cube can process tensor operations using a grid of exactly 16 × 16 × 16 elements in a single clock cycle for FP16 / BF16. So we just have to remember to look for multiples of 32 for NVIDIA and multiples of 16 for Huawei.</p>
+      <p>There is a new constraint that must be added, and this relates to how both chips handle parallel reduction and softmax compiler optimization. On NVIDIA platforms, executing operations like the softmax loop relies on OpenAI’s Triton or FlashAttention. These software backends rely on strict powers of two (2^n) so they can recursively halve the data to build symmetric parallel reduction trees and align perfectly with 64 or 128 byte hardware cache bursts. On Huawei chips, the DaVinci architecture handles this challenge by physically separating the computing engines. Tensors move from the cube core (16 × 16 × 16) into dedicated vector cores, which allows it to operate outside of the recursive binary layout. Therefore, it does not need to conform to the power-of-two structure.</p>
+
+      <h2>LongCat-2.0</h2>
+      <p>Yesterday as of writing this, LongCat-2.0, which went under the pseudonym of “Owl Alpha” on OpenRouter, processed 11.136T input tokens between May 31st and June 29th. For the week of the release, the preview model ranked among the top five models globally by the sum of input and output tokens, above the likes of GLM 5.2. What is impressive about LongCat-2.0 is that it was entirely trained on domestic chips, almost certainly on Huawei’s Ascend 910 series. We can infer this from their technical blog post at the time of release.</p>
+      <p>A few hints point to it. First, the blog claims: “KV-cache transfer between P and D nodes utilizes the built-in 200 Gbps network adapter within the accelerator.” NVIDIA platforms rely on discrete networking such as their ConnectX NICs, which support 400 Gbps of bandwidth. Huawei’s Ascend series on the other hand have built-in networking in a multi-die design pairing a compute die with an I/O companion die. Second, the article notes “our accelerators have significantly less per-device memory than an H800 (80 GB), making memory the primary bottleneck at scale.” Hardware specifications for the Ascend 910B are 64 GB of HBM2e. The Ascend 910C, which essentially combines two 910Bs, has 128 GB of HBM2e. The wording “per-device” could hint to either chip being used. Lastly, the LongCat team says “by leveraging explicit per-core control on the accelerator, we enable full parallel execution of the dense and MoE branches, moving beyond mere overlap.” This is a reference to Huawei’s DaVinci architecture, where developers can manage separate hardware units. “The Ascend 910 operates in decoupled mode, the cube core and the vector core each operate under their own dedicated scalar scheduling units, which are separately deployed on the respective cores.”</p>
+      <p>Given the American embargo on NVIDIA hardware flowing into China will further incentivize Huawei to pour more resources into developing these chips, the 910D is already in development.</p>
+
+      <h2>DeepSeek</h2>
+      <p>The first open source model to come out of DeepSeek was DeepSeek-Coder. They mention in the paper that “Our experiments utilize clusters outfitted with NVIDIA A100 and H800 GPUs.” The config.json is as follows:</p>
+<pre>{
+  "architectures": ["LlamaForCausalLM"],
+  "bos_token_id": 32013,
+  "eos_token_id": 32014,
+  "hidden_act": "silu",
+  "hidden_size": 4096,
+  "initializer_range": 0.02,
+  "intermediate_size": 11008,
+  "max_position_embeddings": 16384,
+  "model_type": "llama",
+  "num_attention_heads": 32,
+  "num_hidden_layers": 32,
+  "num_key_value_heads": 32,
+  "pretraining_tp": 1,
+  "rms_norm_eps": 1e-06,
+  "rope_scaling": { "factor": 4.0, "type": "linear" },
+  "rope_theta": 100000,
+  "tie_word_embeddings": false,
+  "torch_dtype": "bfloat16",
+  "transformers_version": "4.34.1",
+  "use_cache": true,
+  "vocab_size": 32256
+}</pre>
+      <p><a href="https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-base/blob/main/config.json">huggingface.co/deepseek-ai/deepseek-coder-6.7b-base</a></p>
+      <p>First, let us dissect what all of this means. To start, the LlamaForCausalLM class comes from the transformers library that puts together the logic behind the llama model. It is the heart of the llama architecture that handles the embeddings, attention mechanisms, the hidden states, and the language modelling head that returns the predicted tokens. The bos_token_id and the eos_token_id relate to the vocab size. In the model’s tokenizer.json there are 32021 token ids, and the attributes mentioned are just the ids of those specific bos (beginning of sequence) and eos (end of sequence) tokens. So then why is the vocab_size 32256? Due to tiling and to keep it divisible by 256. To contrast, the original Llama 2-7b base model of DeepSeek coder had a vocab size of 32000. Next, the hidden_size is the dimension of the vectors that each token is embedded into. So the embedding matrix has a size of 32256 × 4096, the vocab size paired with the hidden size. To put it plainly each id of the vocab gets its own vector. The intermediate_size is the step that projects the 4096 dimension vectors to 11008 dimensions to execute the SwiGLU activation function. It acts as a high dimensional workspace where stored weights are compared to other tokens to extract richer contextual patterns before being reduced back to 4096 dimensions. Next, the num_attention_heads is important because it cuts up the 4096 dimension vectors into 32 separate heads, each working with 128 dimensions. 128 is both divisible by 16 and by 32 and can be converted to a base 2 number, so from this information alone you can not conclude exactly which hardware was used to train it. num_key_value_heads is also 32, meaning each head gets its own key value. This means the model uses multi-head attention (MHA) instead of grouped query attention (GQA) or multi-query attention (MQA). The max_position_embeddings is also related to the rope_scaling. The max_position_embeddings is the context window of the model. However, during training, the original Llama 2 model only ever saw input text that was at most 4096 tokens long, so the question is how did DeepSeek manage to get the model to understand beyond this 4096 space? DeepSeek found that you can increase the context window by just scaling down an inflated context window. Real position just gets compressed back into 4096 positions. That is why the rope_scaling is being scaled by a factor of 4.0. The larger context window is also the reason why the rope_theta was increased from the original 10k in Llama 2 to 100k. RoPE dictates how much each token is rotated. A full rotation would happen in Llama 2’s case after 10k tokens. If a token becomes fully rotated, it would look identical to the start token, meaning the model loses its ability to distinguish how far tokens are from each other.</p>
+      <p>tie_word_embeddings: false means the input embedding matrix and the output language model head are separate learned matrices. pretraining_tp: 1 is a default setting regarding tensor-parallelism used during pretraining. A value of 1 means no tensor-parallel sharding was applied. Lastly, we will touch on the significance of bfloat16 (brain floating point). Brain floating point was developed at Google Brain in 2019 and was invented to keep the same exponent range as floating point 32 with less precision. For deep learning, not having the exponent range leads to underflows and overflows that produce infinities or zeros, which produce more issues than imprecise decimals. This saves on-chip memory, one of the major constraints of training neural networks, and Google mentions it makes “8 GB of memory per core feel more like 16 GB, and 16 GB feel more like 32 GB.” This enables TPUs in Google’s case to “train models that are deeper, wider, or have larger inputs.” What is important to note is that A100s were the first chips from NVIDIA that natively supported bfloat16, which aligns with what DeepSeek published: that A100s were used for training.</p>
+      <p>The second model is DeepSeek’s LLM, which came in both 7B and 67B variants. Here is the architecture of the 67B variant:</p>
+<pre>{
+  "architectures": ["LlamaForCausalLM"],
+  "bos_token_id": 1,
+  "eos_token_id": 2,
+  "hidden_act": "silu",
+  "hidden_size": 8192,
+  "initializer_range": 0.02,
+  "intermediate_size": 22016,
+  "max_position_embeddings": 4096,
+  "model_type": "llama",
+  "num_attention_heads": 64,
+  "num_hidden_layers": 95,
+  "num_key_value_heads": 8,
+  "pretraining_tp": 1,
+  "rms_norm_eps": 1e-06,
+  "rope_scaling": null,
+  "rope_theta": 10000.0,
+  "tie_word_embeddings": false,
+  "torch_dtype": "bfloat16",
+  "transformers_version": "4.33.1",
+  "use_cache": true,
+  "vocab_size": 102400
+}</pre>
+      <p><a href="https://huggingface.co/deepseek-ai/deepseek-llm-67b-base/blob/main/config.json">huggingface.co/deepseek-ai/deepseek-llm-67b-base</a></p>
+      <p>First, let us perform the ratio test: total hidden_size is 8192 and the num_attention_heads is 64. Divide both and we get again 128. While this is not conclusive as to which chip was used for training, we know NVIDIA chips were used from the repo’s README, which says “for DeepSeek LLM 7B, we utilize 1 NVIDIA A100-PCIE-40GB GPU for inference,” and the 67B used 8. Notice hidden_size increased to 8192. The context window was left at 4096, meaning there is no rope_scaling needed. The num_key_value_heads decreasing down to 8 means the model uses grouped-query attention (GQA) instead of MHA because there are more attention heads than key-value heads. The reason this is done is because storing a full KV pair per attention head for each token becomes huge. By reducing the number of stored KV sets from 64 to 8, you shrink the cache by 8×, making the model much faster to run. Also worth noting the formula that is used to come up with the intermediate_size: 8/3 × hidden_size, then scaled up to a hardware-friendly number. So 8192 × 8/3 = 21,845.33, then rounded up to the nearest multiple of 128 would be 21888 (128 × 171), but it is interesting that 22016 was chosen instead (128 × 172). The reason for this goes back to the original architecture of the Llama 2 model, under the FFN class:</p>
+<pre>multiple_of: int = 256  # make SwiGLU hidden layer size multiple of large power of 2
+
+hidden_dim = int(2 * hidden_dim / 3)
+# custom dim factor multiplier
+if ffn_dim_multiplier is not None:
+    hidden_dim = int(ffn_dim_multiplier * hidden_dim)
+hidden_dim = multiple_of * ((hidden_dim + multiple_of - 1) // multiple_of)</pre>
+      <p>As we can see, this piece of code highlights how this multiple affects the calculation. Vocab size has also dramatically increased from 32256 to 102400. Confirmed in the paper, DeepSeek used a completely different, custom-trained tokenizer. This is what they said: “Based on our prior experience, we set the number of conventional tokens in the vocabulary at 100000. The tokenizer was trained on a multilingual corpus of approximately 24 GB, and we augmented the final vocabulary with 15 special tokens, bringing the total size to 100015. To ensure computational efficiency during training and to reserve space for any additional special tokens that might be needed in the future, we configured the model’s vocabulary size to 102400 for training.” Only once we actually look at the tokenizer does it reveal the huge increase in tokens. For example there is Chinese, Russian, Catalan, Spanish, Japanese, programming, even LaTeX notation, even names as full tokens such as “Michelangelo.” Furthermore 102400 is divisible perfectly by 256 × 400. Technically, you would only need 391 × 256 = 100096 tokens to be hardware optimal, but based on the information that 8 A100s were used to inference the 67B model, a different equilibrium shows up. Not only does the total vocab size need to be divisible by 256, it must also be divisible by 256 after being distributed across 8 GPUs: 102400 / 8 = 12800, and 12800 / 256 = 50.</p>
+      <p>The third model is the Mixture of Experts model. The idea that you could turn your model into a router for different specialized models actually comes from a 1991 paper written by Robert Jacobs, Michael Jordan, Steven Nowlan, and Geoffrey Hinton titled “Adaptive Mixtures of Local Experts.”</p>
+    </div>
+  </article>
+</div>
+</main>
+</div>
+<script src="shell.js"></script>
+</body>
+</html>

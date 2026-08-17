@@ -1,0 +1,9 @@
+{
+  "id": "meta-opt-175b",
+  "name": "OPT-175B",
+  "provider": "Meta",
+  "hf_repo": "patrickvonplaten/opt-175b-resharded",
+  "hf_url": "https://huggingface.co/patrickvonplaten/opt-175b-resharded/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for OPT-175B. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

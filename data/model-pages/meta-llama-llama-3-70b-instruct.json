@@ -1,0 +1,9 @@
+{
+  "id": "meta-llama-llama-3-70b-instruct",
+  "name": "Llama 3 70B Instruct",
+  "provider": "Meta",
+  "hf_repo": "meta-llama/Meta-Llama-3-70B-Instruct",
+  "hf_url": "https://huggingface.co/meta-llama/Meta-Llama-3-70B-Instruct/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Llama 3 70B Instruct. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

@@ -1,0 +1,9 @@
+{
+  "id": "qwen-qwen-plus",
+  "name": "Qwen-Plus",
+  "provider": "Qwen",
+  "hf_repo": null,
+  "hf_url": null,
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Qwen-Plus. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

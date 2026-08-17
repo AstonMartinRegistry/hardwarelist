@@ -1,0 +1,50 @@
+{
+  "id": "thudm-chatglm3-6b",
+  "name": "ChatGLM3",
+  "provider": "THUDM",
+  "hf_repo": "THUDM/chatglm3-6b",
+  "hf_url": "https://huggingface.co/THUDM/chatglm3-6b/blob/main/config.json",
+  "config": {
+    "_name_or_path": "THUDM/chatglm3-6b",
+    "model_type": "chatglm",
+    "architectures": [
+      "ChatGLMModel"
+    ],
+    "auto_map": {
+      "AutoConfig": "configuration_chatglm.ChatGLMConfig",
+      "AutoModel": "modeling_chatglm.ChatGLMForConditionalGeneration",
+      "AutoModelForCausalLM": "modeling_chatglm.ChatGLMForConditionalGeneration",
+      "AutoModelForSeq2SeqLM": "modeling_chatglm.ChatGLMForConditionalGeneration",
+      "AutoModelForSequenceClassification": "modeling_chatglm.ChatGLMForSequenceClassification"
+    },
+    "add_bias_linear": false,
+    "add_qkv_bias": true,
+    "apply_query_key_layer_scaling": true,
+    "apply_residual_connection_post_layernorm": false,
+    "attention_dropout": 0.0,
+    "attention_softmax_in_fp32": true,
+    "bias_dropout_fusion": true,
+    "ffn_hidden_size": 13696,
+    "fp32_residual_connection": false,
+    "hidden_dropout": 0.0,
+    "hidden_size": 4096,
+    "kv_channels": 128,
+    "layernorm_epsilon": 1e-05,
+    "multi_query_attention": true,
+    "multi_query_group_num": 2,
+    "num_attention_heads": 32,
+    "num_layers": 28,
+    "original_rope": true,
+    "padded_vocab_size": 65024,
+    "post_layer_norm": true,
+    "rmsnorm": true,
+    "seq_length": 8192,
+    "use_cache": true,
+    "torch_dtype": "float16",
+    "transformers_version": "4.30.2",
+    "tie_word_embeddings": false,
+    "eos_token_id": 2,
+    "pad_token_id": 0
+  },
+  "description": "Here is how to read the ChatGLM3 config.json. The architecture class is ChatGLMModel, which is the transformers (or equivalent) module that wires embeddings, attention, the MLP, and the language-modelling head that turns hidden states into next-token logits.\n\nhidden_size is 4,096: that is the width of every residual stream vector.\n\nnum_attention_heads is 32, so each head sees 128 dimensions (4,096 / 32). The ratio test is hidden_size / num_attention_heads = 4096 / 32 = 128. 128 is a multiple of 32 (NVIDIA warp-friendly), and a multiple of 16 (Huawei cube-friendly), and a power of two (Triton / FlashAttention-friendly). From this number alone you cannot name the training chip.\n\nnum_hidden_layers is 28: the stack is that many transformer blocks deep.\n\nmax_position_embeddings is 8,192 tokens \u2014 the context window in the config. There is no rope_scaling entry, so the rotary positions are used as-is.\n\ntie_word_embeddings is false, so the input embedding matrix and the output LM head are separate learned matrices rather than a shared transpose.\n\ntorch_dtype is float16.\n\nThe copy of config.json is from https://huggingface.co/THUDM/chatglm3-6b/blob/main/config.json."
+}

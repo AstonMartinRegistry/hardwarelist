@@ -1,0 +1,97 @@
+{
+  "id": "baidu-ernie-4.5-vl-28b-a3b",
+  "name": "ERNIE 4.5 VL 28B A3B",
+  "provider": "Baidu",
+  "hf_repo": "baidu/ERNIE-4.5-VL-28B-A3B",
+  "hf_url": "https://huggingface.co/baidu/ERNIE-4.5-VL-28B-A3B/blob/main/config.json",
+  "config": {
+    "architectures": [
+      "Ernie4_5_VLMoeForConditionalGeneration"
+    ],
+    "auto_map": {
+      "AutoConfig": "configuration_ernie4_5_vl.Ernie4_5_VLMoEConfig",
+      "AutoModel": "modeling_ernie4_5_vl.Ernie4_5_VLMoeForConditionalGeneration",
+      "AutoModelForCausalLM": "modeling_ernie4_5_vl.Ernie4_5_VLMoeForConditionalGeneration"
+    },
+    "pad_token_id": 0,
+    "bos_token_id": 1,
+    "eos_token_id": 2,
+    "torch_dtype": "bfloat16",
+    "hidden_act": "silu",
+    "hidden_size": 2560,
+    "intermediate_size": 12288,
+    "im_patch_id": 100295,
+    "image_start_token_id": 101304,
+    "image_end_token_id": 101305,
+    "video_start_token_id": 101306,
+    "video_end_token_id": 101307,
+    "max_position_embeddings": 131072,
+    "model_type": "ernie4_5_moe_vl",
+    "moe_capacity": [
+      128,
+      128,
+      128
+    ],
+    "moe_gate": "topk",
+    "moe_intermediate_size": [
+      1536,
+      512
+    ],
+    "moe_k": 6,
+    "moe_layer_end_index": [
+      29,
+      28
+    ],
+    "moe_layer_interval": 1,
+    "moe_layer_start_index": [
+      1,
+      1
+    ],
+    "moe_multimodal_dispatch_use_allgather": "v2-alltoall-unpad-text",
+    "moe_num_experts": [
+      64,
+      64
+    ],
+    "moe_num_shared_experts": 2,
+    "moe_use_aux_free": true,
+    "num_attention_heads": 20,
+    "num_hidden_layers": 28,
+    "num_key_value_heads": 4,
+    "pixel_hidden_size": 1280,
+    "rms_norm_eps": 1e-05,
+    "rope_3d": true,
+    "rope_theta": 500000,
+    "spatial_conv_size": 2,
+    "temporal_conv_size": 2,
+    "vocab_size": 103424,
+    "tie_word_embeddings": true,
+    "use_cache": true,
+    "use_rmsnorm": true,
+    "use_bias": false,
+    "rope_scaling": {
+      "type": "default",
+      "mrope_section": [
+        22,
+        22,
+        20
+      ]
+    },
+    "vision_config": {
+      "attn_implementation": "eager",
+      "depth": 32,
+      "embed_dim": 1280,
+      "hidden_act": "quick_gelu",
+      "hidden_size": 1280,
+      "in_channels": 3,
+      "in_chans": 3,
+      "mlp_ratio": 4,
+      "num_heads": 16,
+      "patch_size": 14,
+      "spatial_merge_size": 2,
+      "spatial_patch_size": 14,
+      "vit_first_fwd_bsz": 128,
+      "attn_sep": true
+    }
+  },
+  "description": "Here is how to read the ERNIE 4.5 VL 28B A3B config.json. The architecture class is Ernie4_5_VLMoeForConditionalGeneration, which is the transformers (or equivalent) module that wires embeddings, attention, the MLP, and the language-modelling head that turns hidden states into next-token logits.\n\nhidden_size is 2,560: that is the width of every residual stream vector. The embedding matrix is therefore 103,424 \u00d7 2,560: each token id owns a vector of that width.\n\nnum_attention_heads is 20, so each head sees 128 dimensions (2,560 / 20). The ratio test is hidden_size / num_attention_heads = 2560 / 20 = 128. 128 is a multiple of 32 (NVIDIA warp-friendly), and a multiple of 16 (Huawei cube-friendly), and a power of two (Triton / FlashAttention-friendly). From this number alone you cannot name the training chip.\n\nnum_key_value_heads is 4, so this is grouped-query attention (GQA): 20 query heads share 4 key/value groups, so the KV cache is about 5\u00d7 smaller than full MHA.\n\nnum_hidden_layers is 28: the stack is that many transformer blocks deep.\n\nintermediate_size is 12,288. In a SwiGLU MLP this is the high-dimensional workspace: the 2,560-wide stream is projected up, activated with silu, then projected back. Labs usually round this width to a multiple of 128 or 256 so it tiles on the chip.\n\nmax_position_embeddings is 131,072 tokens \u2014 the context window in the config. rope_scaling is present ({\"type\": \"default\", \"mrope_section\": [22, 22, 20]}). rope_theta is 500000: that is the wavelength of the rotary embedding. A larger theta keeps distant tokens from aliasing after a full rotation.\n\nvocab_size is 103,424. 103,424 is divisible by 256, the usual vocab-tiling grain. bos/eos ids, when present, are just two special rows in that table; the padded vocab is often larger than the tokenizer\u2019s real inventory.\n\ntie_word_embeddings is true: the same matrix is reused for input embeddings and the LM head.\n\ntorch_dtype is bfloat16. Brain floating point keeps FP32\u2019s exponent range with less mantissa, which avoids the overflow/underflow of a tiny exponent at the cost of noisier decimals \u2014 and it halves the on-chip footprint versus FP32. NVIDIA A100s were the first NVIDIA chips with native BF16; Huawei Ascend 910-class parts also prefer BF16/FP16 on the cube.\n\nThe copy of config.json is from https://huggingface.co/baidu/ERNIE-4.5-VL-28B-A3B/blob/main/config.json."
+}

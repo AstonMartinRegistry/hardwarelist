@@ -1,0 +1,9 @@
+{
+  "id": "mistralai-devstral-small",
+  "name": "Mistral: Devstral Small 1.1",
+  "provider": "Mistral",
+  "hf_repo": null,
+  "hf_url": null,
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Mistral: Devstral Small 1.1. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

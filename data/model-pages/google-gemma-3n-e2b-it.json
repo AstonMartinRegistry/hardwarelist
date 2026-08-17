@@ -1,0 +1,9 @@
+{
+  "id": "google-gemma-3n-e2b-it",
+  "name": "Gemma 3n 2B",
+  "provider": "Google",
+  "hf_repo": "google/gemma-3n-E2B-it-litert-preview",
+  "hf_url": "https://huggingface.co/google/gemma-3n-E2B-it-litert-preview/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Gemma 3n 2B. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

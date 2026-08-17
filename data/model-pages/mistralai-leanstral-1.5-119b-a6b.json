@@ -1,0 +1,9 @@
+{
+  "id": "mistralai-leanstral-1.5-119b-a6b",
+  "name": "Mistral: Leanstral 1.5 119B A6B",
+  "provider": "Mistral",
+  "hf_repo": "mistralai/Leanstral-1.5-119B-A6B",
+  "hf_url": "https://huggingface.co/mistralai/Leanstral-1.5-119B-A6B/blob/main/config.json",
+  "config": null,
+  "description": "No public Hugging Face config.json was found for Mistral: Leanstral 1.5 119B A6B. Some directory entries are API names, distilled checkpoints, or repos without a root config."
+}

@@ -1,0 +1,44 @@
+{
+  "id": "bigcode-santacoder",
+  "name": "SantaCoder",
+  "provider": "BigCode",
+  "hf_repo": "bigcode/santacoder",
+  "hf_url": "https://huggingface.co/bigcode/santacoder/blob/main/config.json",
+  "config": {
+    "activation_function": "gelu_fast",
+    "architectures": [
+      "GPT2LMHeadCustomModel"
+    ],
+    "attention_head_type": "multiquery",
+    "attn_pdrop": 0.1,
+    "auto_map": {
+      "AutoConfig": "configuration_gpt2_mq.GPT2CustomConfig",
+      "AutoModelForCausalLM": "modeling_gpt2_mq.GPT2LMHeadCustomModel"
+    },
+    "bos_token_id": 49152,
+    "embd_pdrop": 0.1,
+    "eos_token_id": 49152,
+    "initializer_range": 0.02,
+    "layer_norm_epsilon": 1e-05,
+    "model_type": "gpt2",
+    "n_embd": 2048,
+    "n_head": 16,
+    "n_inner": 8192,
+    "n_layer": 24,
+    "n_positions": 2048,
+    "reorder_and_upcast_attn": false,
+    "resid_pdrop": 0.1,
+    "scale_attn_by_inverse_layer_idx": false,
+    "scale_attn_weights": true,
+    "summary_activation": null,
+    "summary_first_dropout": 0.1,
+    "summary_proj_to_labels": true,
+    "summary_type": "cls_index",
+    "summary_use_proj": true,
+    "torch_dtype": "float32",
+    "transformers_version": "4.24.0",
+    "use_cache": true,
+    "vocab_size": 49280
+  },
+  "description": "Here is how to read the SantaCoder config.json. The architecture class is GPT2LMHeadCustomModel, which is the transformers (or equivalent) module that wires embeddings, attention, the MLP, and the language-modelling head that turns hidden states into next-token logits.\n\nhidden_size is 2,048: that is the width of every residual stream vector. The embedding matrix is therefore 49,280 \u00d7 2,048: each token id owns a vector of that width.\n\nnum_attention_heads is 16, so each head sees 128 dimensions (2,048 / 16). The ratio test is hidden_size / num_attention_heads = 2048 / 16 = 128. 128 is a multiple of 32 (NVIDIA warp-friendly), and a multiple of 16 (Huawei cube-friendly), and a power of two (Triton / FlashAttention-friendly). From this number alone you cannot name the training chip.\n\nnum_hidden_layers is 24: the stack is that many transformer blocks deep.\n\nintermediate_size is 8,192. In a SwiGLU MLP this is the high-dimensional workspace: the 2,048-wide stream is projected up, activated, then projected back. Labs usually round this width to a multiple of 128 or 256 so it tiles on the chip.\n\nvocab_size is 49,280. 49,280 is divisible by 128. bos/eos ids, when present, are just two special rows in that table; the padded vocab is often larger than the tokenizer\u2019s real inventory.\n\ntorch_dtype is float32.\n\nThe copy of config.json is from https://huggingface.co/bigcode/santacoder/blob/main/config.json."
+}

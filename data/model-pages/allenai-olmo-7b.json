@@ -1,0 +1,59 @@
+{
+  "id": "allenai-olmo-7b",
+  "name": "OLMo",
+  "provider": "Allen AI",
+  "hf_repo": "allenai/OLMo-7B",
+  "hf_url": "https://huggingface.co/allenai/OLMo-7B/blob/main/config.json",
+  "config": {
+    "activation_type": "swiglu",
+    "alibi": false,
+    "alibi_bias_max": 8.0,
+    "architectures": [
+      "OLMoForCausalLM"
+    ],
+    "attention_dropout": 0.0,
+    "attention_layer_norm": false,
+    "attention_layer_norm_with_affine": false,
+    "bias_for_layer_norm": false,
+    "block_group_size": 1,
+    "block_type": "sequential",
+    "d_model": 4096,
+    "embedding_dropout": 0.0,
+    "embedding_size": 50304,
+    "eos_token_id": 50279,
+    "flash_attention": true,
+    "include_bias": false,
+    "init_cutoff_factor": null,
+    "init_device": "meta",
+    "init_fn": "mitchell",
+    "init_std": 0.02,
+    "layer_norm_type": "default",
+    "layer_norm_with_affine": false,
+    "max_sequence_length": 2048,
+    "mlp_hidden_size": 22016,
+    "mlp_ratio": 4,
+    "model_type": "hf_olmo",
+    "multi_query_attention": false,
+    "n_heads": 32,
+    "n_layers": 32,
+    "pad_token_id": 1,
+    "precision": "amp_bf16",
+    "residual_dropout": 0.0,
+    "rope": true,
+    "rope_full_precision": true,
+    "scale_logits": false,
+    "transformers_version": "4.36.2",
+    "use_cache": true,
+    "vocab_size": 50280,
+    "weight_tying": false,
+    "auto_map": {
+      "AutoConfig": "configuration_olmo.OLMoConfig",
+      "AutoModelForCausalLM": "modeling_olmo.OLMoForCausalLM",
+      "AutoTokenizer": [
+        "tokenization_olmo_fast.OLMoTokenizerFast",
+        "tokenization_olmo_fast.OLMoTokenizerFast"
+      ]
+    }
+  },
+  "description": "Here is how to read the OLMo config.json. The architecture class is OLMoForCausalLM, which is the transformers (or equivalent) module that wires embeddings, attention, the MLP, and the language-modelling head that turns hidden states into next-token logits.\n\nhidden_size is 4,096: that is the width of every residual stream vector. The embedding matrix is therefore 50,280 \u00d7 4,096: each token id owns a vector of that width.\n\nvocab_size is 50,280. bos/eos ids, when present, are just two special rows in that table; the padded vocab is often larger than the tokenizer\u2019s real inventory.\n\nThe copy of config.json is from https://huggingface.co/allenai/OLMo-7B/blob/main/config.json."
+}

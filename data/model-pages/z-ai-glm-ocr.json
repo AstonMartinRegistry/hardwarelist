@@ -1,0 +1,73 @@
+{
+  "id": "z-ai-glm-ocr",
+  "name": "GLM-OCR",
+  "provider": "Z.ai",
+  "hf_repo": "zai-org/GLM-OCR",
+  "hf_url": "https://huggingface.co/zai-org/GLM-OCR/blob/main/config.json",
+  "config": {
+    "architectures": [
+      "GlmOcrForConditionalGeneration"
+    ],
+    "model_type": "glm_ocr",
+    "text_config": {
+      "model_type": "glm_ocr_text",
+      "pad_token_id": 59246,
+      "vocab_size": 59392,
+      "eos_token_id": [
+        59246,
+        59253
+      ],
+      "attention_bias": false,
+      "attention_dropout": 0.0,
+      "head_dim": 128,
+      "hidden_act": "silu",
+      "hidden_size": 1536,
+      "initializer_range": 0.02,
+      "intermediate_size": 4608,
+      "max_position_embeddings": 131072,
+      "num_attention_heads": 16,
+      "num_hidden_layers": 16,
+      "num_nextn_predict_layers": 1,
+      "num_key_value_heads": 8,
+      "rms_norm_eps": 1e-05,
+      "dtype": "bfloat16",
+      "rope_parameters": {
+        "rope_type": "default",
+        "mrope_section": [
+          16,
+          24,
+          24
+        ],
+        "partial_rotary_factor": 1.0,
+        "rope_theta": 10000
+      },
+      "tie_word_embeddings": false,
+      "use_cache": true
+    },
+    "vision_config": {
+      "model_type": "glm_ocr_vision",
+      "hidden_size": 1024,
+      "depth": 24,
+      "num_heads": 16,
+      "attention_bias": true,
+      "intermediate_size": 4096,
+      "hidden_act": "silu",
+      "hidden_dropout_prob": 0.0,
+      "initializer_range": 0.02,
+      "image_size": 336,
+      "patch_size": 14,
+      "out_hidden_size": 1536,
+      "rms_norm_eps": 1e-05,
+      "spatial_merge_size": 2,
+      "temporal_patch_size": 2
+    },
+    "image_start_token_id": 59256,
+    "image_end_token_id": 59257,
+    "video_start_token_id": 59258,
+    "video_end_token_id": 59259,
+    "image_token_id": 59280,
+    "video_token_id": 59281,
+    "transformers_version": "5.0.1dev0"
+  },
+  "description": "Here is how to read the GLM-OCR config.json. The architecture class is GlmOcrForConditionalGeneration, which is the transformers (or equivalent) module that wires embeddings, attention, the MLP, and the language-modelling head that turns hidden states into next-token logits.\n\nhidden_size is 1,536: that is the width of every residual stream vector. The embedding matrix is therefore 59,392 \u00d7 1,536: each token id owns a vector of that width.\n\nnum_attention_heads is 16, so each head sees 128 dimensions (1,536 / 16). The ratio test is hidden_size / num_attention_heads = 1536 / 16 = 128. 128 is a multiple of 32 (NVIDIA warp-friendly), and a multiple of 16 (Huawei cube-friendly), and a power of two (Triton / FlashAttention-friendly). From this number alone you cannot name the training chip.\n\nnum_key_value_heads is 8, so this is grouped-query attention (GQA): 16 query heads share 8 key/value groups, so the KV cache is about 2\u00d7 smaller than full MHA.\n\nnum_hidden_layers is 16: the stack is that many transformer blocks deep.\n\nintermediate_size is 4,608. In a SwiGLU MLP this is the high-dimensional workspace: the 1,536-wide stream is projected up, activated with silu, then projected back. Labs usually round this width to a multiple of 128 or 256 so it tiles on the chip.\n\nmax_position_embeddings is 131,072 tokens \u2014 the context window in the config. There is no rope_scaling entry, so the rotary positions are used as-is.\n\nvocab_size is 59,392. 59,392 is divisible by 256, the usual vocab-tiling grain. bos/eos ids, when present, are just two special rows in that table; the padded vocab is often larger than the tokenizer\u2019s real inventory.\n\ntie_word_embeddings is false, so the input embedding matrix and the output LM head are separate learned matrices rather than a shared transpose.\n\ntorch_dtype is bfloat16. Brain floating point keeps FP32\u2019s exponent range with less mantissa, which avoids the overflow/underflow of a tiny exponent at the cost of noisier decimals \u2014 and it halves the on-chip footprint versus FP32. NVIDIA A100s were the first NVIDIA chips with native BF16; Huawei Ascend 910-class parts also prefer BF16/FP16 on the cube.\n\nThe copy of config.json is from https://huggingface.co/zai-org/GLM-OCR/blob/main/config.json."
+}

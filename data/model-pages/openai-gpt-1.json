@@ -1,0 +1,39 @@
+{
+  "id": "openai-gpt-1",
+  "name": "GPT-1",
+  "provider": "OpenAI",
+  "hf_repo": "openai-community/openai-gpt",
+  "hf_url": "https://huggingface.co/openai-community/openai-gpt/blob/main/config.json",
+  "config": {
+    "afn": "gelu",
+    "architectures": [
+      "OpenAIGPTLMHeadModel"
+    ],
+    "attn_pdrop": 0.1,
+    "embd_pdrop": 0.1,
+    "initializer_range": 0.02,
+    "layer_norm_epsilon": 1e-05,
+    "model_type": "openai-gpt",
+    "n_ctx": 512,
+    "n_embd": 768,
+    "n_head": 12,
+    "n_layer": 12,
+    "n_positions": 512,
+    "n_special": 0,
+    "predict_special_tokens": true,
+    "resid_pdrop": 0.1,
+    "summary_activation": null,
+    "summary_first_dropout": 0.1,
+    "summary_proj_to_labels": true,
+    "summary_type": "cls_index",
+    "summary_use_proj": true,
+    "task_specific_params": {
+      "text-generation": {
+        "do_sample": true,
+        "max_length": 50
+      }
+    },
+    "vocab_size": 40478
+  },
+  "description": "Here is how to read the GPT-1 config.json. The architecture class is OpenAIGPTLMHeadModel, which is the transformers (or equivalent) module that wires embeddings, attention, the MLP, and the language-modelling head that turns hidden states into next-token logits.\n\nhidden_size is 768: that is the width of every residual stream vector. The embedding matrix is therefore 40,478 \u00d7 768: each token id owns a vector of that width.\n\nnum_attention_heads is 12, so each head sees 64 dimensions (768 / 12). The ratio test is hidden_size / num_attention_heads = 768 / 12 = 64. 64 is a multiple of 32 (NVIDIA warp-friendly), and a multiple of 16 (Huawei cube-friendly), and a power of two (Triton / FlashAttention-friendly). From this number alone you cannot name the training chip.\n\nnum_hidden_layers is 12: the stack is that many transformer blocks deep.\n\nvocab_size is 40,478. bos/eos ids, when present, are just two special rows in that table; the padded vocab is often larger than the tokenizer\u2019s real inventory.\n\nThe copy of config.json is from https://huggingface.co/openai-community/openai-gpt/blob/main/config.json."
+}
